@@ -1,0 +1,16 @@
+node_modules/
+
+# Local agent tool state. This repo ships agent artifacts under
+# skills/, commands/, rules/ — not personal agent configs. Keep
+# contributor machines decoupled.
+.claude/
+.codex/
+.cursor/
+.entire/
+.gemini/
+.superset/
+
+# Local maintainer notes and ops scripts. Kept out of git so that
+# repo history doesn't reveal personal tooling, past incidents, or
+# operational checklists.
+.ops/

@@ -1,0 +1,7 @@
+{
+  "name": "smart-comments",
+  "kind": "rule",
+  "description": "Make the agent write selective, intent-preserving inline comments, and respect existing ones.",
+  "source": "RULE.md",
+  "targets": ["cursor", "claude-code", "codex"]
+}
