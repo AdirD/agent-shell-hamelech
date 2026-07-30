@@ -16,5 +16,3 @@ node_modules/
 # operational checklists.
 .ops/
 
-# Private local-only skills.
-skills/ideation/
