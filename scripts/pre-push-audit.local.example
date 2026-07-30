@@ -1,0 +1,5 @@
+# Copy to .ops/pre-push-audit.local (gitignored) to extend the tracked audit.
+# Loaded by scripts/pre-push-audit.sh when present.
+
+# Extra grep -E pattern for tracked files (employer domains, internal hostnames, etc.)
+EXTRA_PATTERN='your-employer\.com|work-email@'

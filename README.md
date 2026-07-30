@@ -183,6 +183,8 @@ Every skill is self-contained: a `SKILL.md` with frontmatter, optional `scripts/
 
 Add a new skill by creating `skills/<name>/SKILL.md` with proper frontmatter (`name`, `description`). Then update the catalog above — the `AGENTS.md` maintenance rule enforces this.
 
+Before pushing, run `bash scripts/pre-push-audit.sh` (see `AGENTS.md` for commit/push safety rules and optional git hook setup).
+
 ## License
 
 [MIT](./LICENSE)
