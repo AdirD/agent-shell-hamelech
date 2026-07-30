@@ -46,15 +46,15 @@ visualize how project creation works end to end
 **Assistant**
 
 ```text
-Homepage submit → bootstrap-project workflow
+Homepage submit → create-project workflow
 
   HomepagePromptInput
         |
         v
-  POST /api/v1/workflows/bootstrap-project
+  POST /api/v1/workflows/create-project
         |
         v
-  WorkflowsController.bootstrapProject()
+  WorkflowsController.createProject()
         |
         +---> WorkspaceService.getOrCreateDefault(user)
         |
