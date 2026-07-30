@@ -1,3 +1,16 @@
+---
+name: visualize
+description: >-
+  Render the current idea, flow, structure, screen, sequence, boundary, or
+  mental model as a compact ASCII diagram. Use when the user asks to
+  "visualize", "draw", "diagram", "sketch", or "map out" something, or when
+  structural/flow ambiguity in the conversation would be easier to reason about
+  visually than in prose.
+disable-model-invocation: true
+---
+
+# Visualize
+
 Take the current chat context and render the relevant idea in compact ASCII.
 
 Draw the thing that would make the discussion click:
@@ -27,9 +40,7 @@ After the diagram, briefly explain:
 
 **User**
 ```text
-/visualize
-
-how does project creation work end to end?
+visualize how project creation works end to end
 ```
 
 **Assistant**
@@ -78,9 +89,7 @@ What became clearer:
 **User**
 
 ```text
-/visualize
-
-we want to add a "recently viewed" section to the homepage
+visualize a "recently viewed" section on the homepage
 ```
 
 **Assistant**
@@ -145,9 +154,7 @@ What became clearer:
 **User**
 
 ```text
-/visualize
-
-draw how publish/deploy works across services
+visualize how publish/deploy works across services
 ```
 
 **Assistant**
@@ -196,9 +203,7 @@ What became clearer:
 **User**
 
 ```text
-/visualize
-
-compare adding project search as a new endpoint vs query param on existing
+visualize adding project search as a new endpoint vs query param on existing
 ```
 
 **Assistant**
@@ -242,9 +247,7 @@ What became clearer:
 **User**
 
 ```text
-/visualize
-
-draw your current understanding of the chat/AI flow
+visualize your current understanding of the chat/AI flow
 ```
 
 **Assistant**

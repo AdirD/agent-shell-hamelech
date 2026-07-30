@@ -1,10 +1,19 @@
+---
+name: smart-comments
+description: >-
+  Write selective, intent-preserving inline code comments and respect existing
+  ones as load-bearing memory. Use when authoring, editing, refactoring, or
+  reviewing code with comments — especially when tempted to add "what" comments,
+  remove "redundant" comments during a refactor, or rewrite existing warnings.
+---
+
 # Smart Comments
 
 You are often the first reader of this code. You do not carry the scar tissue a human teammate would — you did not live through the incident that caused a function to look the way it does, and you cannot smell the landmine from the shape of the code alone.
 
 Comments are the spec layer closest to the code. They are the last thing a model reads before producing the next token, and they are the cheapest, highest-signal way for a human to hand you constraints, warnings, and intent. Treat them accordingly.
 
-This rule governs how you write new comments and how you treat existing ones.
+This skill governs how you write new comments and how you treat existing ones.
 
 ## When to Write a Comment
 
@@ -36,7 +45,7 @@ If the WHY is obvious from the name of the function and its arguments, the comme
 
 ## Respecting Existing Comments
 
-This section is the reason this rule exists.
+This section is the reason this skill exists.
 
 - **Treat every existing comment as load-bearing until proven otherwise.** Someone — human or past agent — paid a cost to leave it there. Assume that cost was real.
 - **Do not delete a comment during a refactor** unless the code the comment describes is also being removed. Moving code does not justify dropping its comment.

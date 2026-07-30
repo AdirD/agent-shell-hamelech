@@ -1,4 +1,17 @@
-I already have a direction, idea, or partial plan in mind.
+---
+name: challenge
+description: >-
+  Pressure-test an existing idea, direction, or partial plan before
+  implementation. Ask one high-value question at a time, revise assumptions
+  after each answer, and surface risks, weak trade-offs, and over-engineering.
+  Use when the user asks to "challenge", "pressure-test", "poke holes in",
+  "stress test", or "sanity check" a direction they already have.
+disable-model-invocation: true
+---
+
+# Challenge
+
+The user already has a direction, idea, or partial plan in mind.
 
 Your job is to pressure-test the thinking behind it before implementation starts.
 
@@ -39,7 +52,7 @@ Flag places where the current direction may be broader, more abstract, or more m
 For non-critical details, make reasonable working assumptions and move on.
 Only surface those assumptions if they become risky.
 
-When structural or flow ambiguity would be easier to reason about visually, use a compact ASCII sketch or explicitly use the /visualize command, it would help you to communicate your ideas better with the human developer.
+When structural or flow ambiguity would be easier to reason about visually, use a compact ASCII sketch or trigger the `visualize` skill — it helps communicate ideas with the human developer.
 
 Keep going until we reach a plateau, meaning further questions are no longer meaningfully improving the thinking.
 

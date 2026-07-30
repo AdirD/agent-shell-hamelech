@@ -6,6 +6,7 @@ node_modules/
 .claude/
 .codex/
 .cursor/
+.serena/
 .entire/
 .gemini/
 .superset/
@@ -14,3 +15,6 @@ node_modules/
 # repo history doesn't reveal personal tooling, past incidents, or
 # operational checklists.
 .ops/
+
+# Private local-only skills.
+skills/ideation/
