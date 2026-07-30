@@ -15,13 +15,14 @@ Do not leave the repo in a state where the catalog in `README.md` is stale.
 
 ## Git Identity (this repo)
 
-Use your personal email for every commit in this public repo — both **author** and **committer**. Git sets the committer from `user.email` at commit time; amending only the author is not enough.
+Use your personal email for every commit in this public repo — both **author** and **committer**.
 
-Configure it once for this clone:
+Global git config should default to personal email, with work email applied only in Elementor repos via conditional includes in `~/.gitconfig` (see `~/.gitconfig-elementor-dirs` and `~/.gitconfig-work`). Do not set a repo-local `user.email` override here unless debugging.
+
+Verify in this repo:
 
 ```bash
-git config user.email "your-personal@gmail.com"
-git config user.name "AdirD"
+git config user.email   # expect your personal address
 ```
 
 Also enable on GitHub: [Settings → Emails](https://github.com/settings/emails) → *Block command line pushes that expose my email*.
