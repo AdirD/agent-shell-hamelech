@@ -56,7 +56,8 @@ if [[ -n "${EXTRA_PATTERN:-}" ]]; then
   say "Extra local pattern scan"
   EXTRA_FILES="$(printf '%s\n' "$TRACKED" | grep -v 'pre-push-audit\.local\.example$' || true)"
   if [[ -n "$EXTRA_FILES" ]]; then
-    EXTRA_HITS="$(printf '%s\n' "$EXTRA_FILES" | xargs grep -aE "$EXTRA_PATTERN" 2>/dev/null || true)"
+    # -i: employer names often appear as bare words, not only as domains.
+    EXTRA_HITS="$(printf '%s\n' "$EXTRA_FILES" | xargs grep -aiE "$EXTRA_PATTERN" 2>/dev/null || true)"
   else
     EXTRA_HITS=""
   fi

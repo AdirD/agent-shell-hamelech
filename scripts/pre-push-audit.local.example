@@ -1,8 +1,9 @@
 # Copy to .ops/pre-push-audit.local (gitignored) to extend the tracked audit.
 # Loaded by scripts/pre-push-audit.sh when present.
 
-# Extra grep -E pattern for tracked files (employer domains, internal hostnames, etc.)
-EXTRA_PATTERN='your-employer\.com|work-email@'
+# Extra grep -aiE pattern for tracked files (employer names, domains, internal hostnames).
+# Matched case-insensitively — prefer bare names over only the .com form.
+EXTRA_PATTERN='your-employer|work-email@'
 
 # Block author/committer emails matching this pattern on unpushed commits
 WORK_EMAIL_PATTERN='@(your-employer\.com|.*\.internal)$'

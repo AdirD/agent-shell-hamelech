@@ -17,7 +17,7 @@ Do not leave the repo in a state where the catalog in `README.md` is stale.
 
 Use your personal email for every commit in this public repo — both **author** and **committer**.
 
-Global git config should default to personal email, with work email applied only in Elementor repos via conditional includes in `~/.gitconfig` (see `~/.gitconfig-elementor-dirs` and `~/.gitconfig-work`). Do not set a repo-local `user.email` override here unless debugging.
+Global git config should default to personal email, with work email applied only in employer/work repos via conditional includes in `~/.gitconfig` (e.g. a dirs include plus a work-identity file). Do not set a repo-local `user.email` override here unless debugging.
 
 Verify in this repo:
 
