@@ -3,3 +3,9 @@
 
 # Extra grep -E pattern for tracked files (employer domains, internal hostnames, etc.)
 EXTRA_PATTERN='your-employer\.com|work-email@'
+
+# Block author/committer emails matching this pattern on unpushed commits
+WORK_EMAIL_PATTERN='@(your-employer\.com|.*\.internal)$'
+
+# Optional: expected git config user.email for this repo
+PERSONAL_EMAIL='your-personal@gmail.com'

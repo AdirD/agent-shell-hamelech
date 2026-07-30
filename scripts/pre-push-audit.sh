@@ -68,19 +68,32 @@ if [[ -n "${EXTRA_PATTERN:-}" ]]; then
   fi
 fi
 
-say "Commit author emails (HEAD..origin/main, if any)"
+say "Commit identity on unpushed commits (author and committer)"
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  UNPUSHED="$(git log origin/main..HEAD --format='%H %ae' 2>/dev/null || true)"
+  UNPUSHED="$(git log origin/main..HEAD --format='%H %ae %ce' 2>/dev/null || true)"
 else
-  UNPUSHED="$(git log --format='%H %ae')"
+  UNPUSHED="$(git log --format='%H %ae %ce')"
 fi
 if [[ -n "$UNPUSHED" ]]; then
-  WORK_EMAILS="$(printf '%s\n' "$UNPUSHED" | awk '{print $2}' | grep -E '@(elementor\.com|.*\.internal)$' || true)"
-  if [[ -n "$WORK_EMAILS" ]]; then
-    warn "Work/internal email in commits about to push:"
-    printf '%s\n' "$WORK_EMAILS" | sort -u
+  if [[ -n "${WORK_EMAIL_PATTERN:-}" ]]; then
+    BAD_IDENTITY="$(printf '%s\n' "$UNPUSHED" | awk '{print $2"\n"$3}' | grep -E "$WORK_EMAIL_PATTERN" || true)"
+    if [[ -n "$BAD_IDENTITY" ]]; then
+      warn "Work/internal email in author or committer on commits about to push:"
+      printf '%s\n' "$BAD_IDENTITY" | sort -u
+    else
+      ok "no work/internal author or committer emails in unpushed commits"
+    fi
   else
-    ok "no work/internal author emails in unpushed commits"
+    ok "WORK_EMAIL_PATTERN not configured (.ops/pre-push-audit.local)"
+  fi
+
+  if [[ -n "${PERSONAL_EMAIL:-}" ]]; then
+    CONFIG_EMAIL="$(git config user.email 2>/dev/null || true)"
+    if [[ "$CONFIG_EMAIL" != "$PERSONAL_EMAIL" ]]; then
+      warn "git config user.email is '$CONFIG_EMAIL' (expected '$PERSONAL_EMAIL' for this repo)"
+    else
+      ok "git config user.email matches PERSONAL_EMAIL"
+    fi
   fi
 else
   ok "nothing new to push"

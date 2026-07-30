@@ -13,6 +13,21 @@ At minimum, keep the matching README section accurate:
 
 Do not leave the repo in a state where the catalog in `README.md` is stale.
 
+## Git Identity (this repo)
+
+Use your personal email for every commit in this public repo — both **author** and **committer**. Git sets the committer from `user.email` at commit time; amending only the author is not enough.
+
+Configure it once for this clone:
+
+```bash
+git config user.email "your-personal@gmail.com"
+git config user.name "AdirD"
+```
+
+Also enable on GitHub: [Settings → Emails](https://github.com/settings/emails) → *Block command line pushes that expose my email*.
+
+Copy `scripts/pre-push-audit.local.example` to `.ops/pre-push-audit.local` and set `PERSONAL_EMAIL` plus `WORK_EMAIL_PATTERN` so the audit catches work-email slips before push.
+
 ## Before You Commit
 
 - Do not stage gitignored local agent state: `.claude/`, `.codex/`, `.cursor/`, `.entire/`, `.gemini/`, `.serena/`, `.superset/`, `.ops/`.
@@ -33,7 +48,8 @@ The script checks:
 
 - staged paths are not under gitignored agent/ops dirs
 - tracked files do not match common secret patterns
-- unpushed commits do not use work/internal author emails
+- unpushed commits do not use work/internal author or committer emails (when `.ops/pre-push-audit.local` is configured)
+- `git config user.email` matches your personal email for this repo (when configured)
 - `origin` has only `main` (no stray side branches from agent tooling)
 - `entire` auto-push hooks are not installed
 
