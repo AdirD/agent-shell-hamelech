@@ -23,18 +23,97 @@ cp -R skills/<name> .agents/skills/<name>
 
 ---
 
-## Skills
+## Choose a skill
 
-| Skill | What it does | When to reach for it |
+Start from the outcome you need. Skills are individual capabilities; the
+[workflow bundles](#workflow-bundles) below show how to combine them.
+
+### Understand what you need
+
+| Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`8020`](#8020) | Finds the smallest useful path to a product goal before coding. | "least diff", "minimal change", "80/20", "least intrusive". |
-| [`babysit`](#babysit) | Loops on an open PR — comments, conflicts, CI — until it's merge-ready. | You have a PR and don't want to poll it every 5 minutes. |
-| [`challenge`](#challenge) | Pressure-tests an existing direction one high-value question at a time. | You have a plan and want holes poked before you build it. |
-| [`hebrew-rtl-writing`](#hebrew-rtl-writing) | Fixes mixed RTL/LTR rendering in Hebrew Markdown with embedded English. | Hebrew prose that looks broken because of English words. |
-| [`ideation`](#ideation) | Product/startup thinking partner — clarifies the real goal, researches, challenges. | Ideating on a product, service, or business — before it's a spec. |
-| [`podcast-production`](#podcast-production) | Turns long recordings into a user-approved podcast story and finished video. | Raw interview/meeting/webinar → storyline, script, clips, or rendered cut. |
-| [`smart-comments`](#smart-comments) | Writes intent-preserving inline comments and treats existing ones as load-bearing. | Any code edit where the agent might narrate what code does or "clean up" comments. |
-| [`visualize`](#visualize) | Renders the current idea as a compact ASCII diagram. | Flow, structure, layout, comparison, or mental-model ambiguity. |
+| [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
+| [`product-ideation`](#product-ideation) | What product, feature, or direction is worth pursuing? | A product/company idea, feature opportunity, market question, or premise is still open. |
+
+### Shape work before coding
+
+| Skill | Question it answers | Reach for it when |
+|---|---|---|
+| [`pre-plan`](#pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
+| [`8020`](#8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
+| [`challenge`](#challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
+| [`visualize`](#visualize) | Can this structure, flow, or trade-off be easier to see? | Prose is hiding architecture, sequence, boundaries, layout, or ambiguity. |
+
+### Implement and ship safely
+
+| Skill | Question it answers | Reach for it when |
+|---|---|---|
+| [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
+| [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
+
+### Specialized production
+
+| Skill | What it does | Reach for it when |
+|---|---|---|
+| [`podcast-production`](#podcast-production) | Turns long recordings into an approved short story and finished video. | Interview/meeting/webinar → storyline, script, clips, or rendered cut. |
+| [`hebrew-rtl-writing`](#hebrew-rtl-writing) | Fixes mixed RTL/LTR rendering in Hebrew text with embedded English. | English terms make primarily Hebrew prose render incorrectly. |
+
+---
+
+## Which skill do I need?
+
+| If you are saying… | Start with | Why |
+|---|---|---|
+| "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
+| "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
+| "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
+| "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
+| "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
+| "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
+| "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
+| "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
+
+## Workflow bundles
+
+Bundles are **journey recipes**, not additional skills. Skip any step whose
+question is already answered.
+
+### Product discovery
+
+```text
+distill-need → product-ideation → pre-plan
+```
+
+Use when you are unsure what should exist. The flow may stop at
+`distill-need` if an existing tool, process change, or don't-build answer wins.
+
+### Better engineering
+
+```text
+distill-need → pre-plan → 8020 → challenge (optional)
+```
+
+Use when someone requested a feature or change and you want to avoid building
+the wrong thing, aligning it poorly, or overbuilding the solution.
+
+### Existing-plan review
+
+```text
+challenge → 8020
+```
+
+Use when the direction already exists: pressure-test it, then find the smallest
+useful implementation.
+
+### Shipping
+
+```text
+smart-comments (during implementation) → babysit
+```
+
+Use when the work is decided and the remaining job is preserving code intent
+and driving the PR to merge-ready. `visualize` can assist any bundle when
+structure or flow is unclear.
 
 ---
 
@@ -83,6 +162,38 @@ Use it when:
 
 ---
 
+### `pre-plan`
+
+Reaches a shared buildable design concept before plan mode or code. Auto-calibrates question density (`light` / `standard` / `deep`), keeps domain nouns aligned, kills premature scale/architecture, and optionally pressure-tests the concept. Stops at a short decision log unless you explicitly lock a plan.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill pre-plan
+```
+
+Use it when:
+- you want alignment before a plan, PRD, or implementation
+- plan mode keeps inventing the wrong thing too early
+- you need grilling without a 40-question tax on every bugfix
+- you want scale/status architecture stripped before it hardens
+
+---
+
+### `distill-need`
+
+Treats the literal ask as a proposed solution, not scripture. Distills the outcome that must be true, checks context and existing alternatives, and surfaces better solution categories — including reuse or don't-build. Hands off to `pre-plan` / `8020` only when the work is still build-shaped.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill distill-need
+```
+
+Use it when:
+- the request may be a faster-horse style proposed solution
+- you want the agent to find the real need before implementing
+- existing tools/process might already solve it
+- "don't just build what I asked" is the point
+
+---
+
 ### `hebrew-rtl-writing`
 
 Fixes mixed RTL/LTR rendering for any textual artifact that is primarily Hebrew but includes embedded English terms. Wraps English spans with Unicode bidi isolates without touching code blocks, links, or frontmatter.
@@ -98,12 +209,12 @@ Use it when:
 
 ---
 
-### `ideation`
+### `product-ideation`
 
 An adaptive, circular thinking partner for new ideas and existing products. It clarifies the idea's relationship to any current product, explores only the uncertainty that matters now, researches or parallelizes proportionately, reframes as evidence changes, and keeps one evolving brief or produces a specialized artifact only when useful.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill ideation
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill product-ideation
 ```
 
 Use it when:
@@ -170,9 +281,11 @@ skills/
   8020/
   babysit/
   challenge/
+  distill-need/
   hebrew-rtl-writing/
-  ideation/
+  product-ideation/
   podcast-production/
+  pre-plan/
   smart-comments/
   visualize/
 ```

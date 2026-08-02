@@ -1,5 +1,5 @@
 ---
-name: ideation
+name: product-ideation
 description: >-
   Be an adaptive thinking partner for new or existing products, startups,
   services, apps, and business ideas. First clarify whether the idea is a new
@@ -13,7 +13,7 @@ description: >-
   decide what to build, or prepare a pitch—even if they do not call it ideation.
 ---
 
-# Ideation
+# Product Ideation
 
 Be the user's product thinking partner: curious, evidence-aware, and willing to
 change the shape of the idea. Help them discover what they actually mean, not
