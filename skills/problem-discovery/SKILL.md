@@ -12,10 +12,10 @@ description: >-
 Be the user's evidence-first partner for deciding whether a problem is worth
 solving now, for whom, and under what conditions.
 
-The goal is not to defend an idea. The goal is to reduce false positives:
-building solutions for weak, rare, low-budget, or non-urgent problems.
-
-A verdict is optional; better decision quality is mandatory.
+A problem is worth solving now when it is frequent, severe, owned by someone
+with a budget, and reachable. Most of this skill exists to keep you from
+greenlighting problems that are merely loud — enthusiasm is not demand.
+You don't owe a verdict; you owe a clearer picture.
 
 ## Stance
 
@@ -28,35 +28,14 @@ A verdict is optional; better decision quality is mandatory.
 
 ## Scope
 
-Use this skill when the user needs to answer questions like:
+Reach for this skill to decide whether a problem is real, painful, and worth
+solving now — pain validation, demand and willingness-to-pay checks, segment
+choice, or a go/refine/stop call. Customer discovery, pain research, demand
+validation, and JTBD interviewing are all methods inside it, not separate modes.
 
-- "Is this problem real and painful enough?"
-- "Do enough buyers have this problem?"
-- "Will people switch, adopt, or pay?"
-- "Is this pain frequent, urgent, and expensive?"
-- "Which customer segment has strongest pull?"
-- "Should we proceed, refine the premise, or stop?"
-
-This skill can include these paradigms as methods:
-
-- Customer Discovery (Steve Blank style)
-- Problem Discovery / Problem Validation
-- Pain Discovery / Pain-Point Research
-- Demand Validation (including willingness-to-pay)
-- JTBD Discovery (Jobs To Be Done)
-
-## The loop
-
-```mermaid
-flowchart LR
-    A[Define hypotheses and risk] --> B[Collect signals by strength]
-    B --> C[Stress test contradictions]
-    C --> D[Update confidence and decision]
-    D --> A
-    D -. when useful .-> E[Artifact or recommendation]
-```
-
-Repeat in short cycles. Help in every turn.
+Work the loop in short cycles — frame hypotheses, collect signals by strength,
+stress-test for contradictions, update confidence — and give something useful
+every turn rather than waiting to finish.
 
 ## 1) Frame the test
 
@@ -85,6 +64,34 @@ Default to this signal hierarchy (strongest to weakest):
 5. Weak social signals (opinions, upvotes, generic enthusiasm)
 
 Never claim "validated demand" from weak signals alone.
+
+## Execution (AI executor)
+
+When the user asks you to *run* the audit and produce a report, run it as an
+orchestrator: you keep the judgment, subagents just fetch.
+
+Orchestrator owns (never delegated):
+
+- the hypothesis set and which assumptions are riskiest
+- the living evidence map, deduplication, and the triangulation rule
+- contradiction handling, confidence, and the verdict
+
+Fan out one **lane per independent question**, not per source, and only when two
+or more lanes are genuinely independent. Default lanes map to signal tiers:
+
+- buying behavior (Tier 1) · workarounds (Tier 2) · intent proxies (Tier 4)
+- alternatives/competitor spend
+- Tier 3 interviews are human-gated, so they become a *next test*, not a lane
+
+Each lane runs read-only and returns evidence rows only — `{claim, tier, source
+URL, date, verbatim snippet, confidence, contradicts?}` — with no verdicts and no
+cross-lane synthesis. On merge, **deduplicate by canonical source first**, then
+apply the triangulation rule, so N copies of one source can never masquerade as
+independent corroboration. If subagents are unavailable, run lanes sequentially;
+only speed changes.
+
+For the lane contract, the dedupe/merge protocol, the subagent prompt template,
+and the end-to-end report pipeline, read `references/orchestration.md`.
 
 ## 3) Maintain a living evidence map
 
@@ -120,21 +127,15 @@ Actively test for false positives:
 
 ## 5) Steer to a decision
 
-Default output is orientation, not theatrics:
+Give an orientation, not a score:
 
 - strongest current segment/problem shape
 - what evidence supports it
 - what remains risky or contradictory
-- the fastest next test that would change the decision
+- the fastest next test that would change the decision — name the signal you'd
+  look for and the threshold that would flip the call, not just "talk to users"
 
 Recommend **Proceed / Refine / Hold / Stop** only when useful.
-
-A good next move must include:
-
-- uncertainty to resolve
-- concrete action
-- observable signal
-- threshold that changes the plan
 
 ## Artifacts
 
