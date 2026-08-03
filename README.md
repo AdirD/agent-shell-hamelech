@@ -33,6 +33,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
+| [`problem-discovery`](#problem-discovery) | Is this problem real, painful, and worth solving now? | Pain validation, demand/WTP checks, customer discovery, JTBD research. |
 | [`product-ideation`](#product-ideation) | What product, feature, or direction is worth pursuing? | A product/company idea, feature opportunity, market question, or premise is still open. |
 
 ### Shape work before coding
@@ -65,6 +66,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | If you are saying… | Start with | Why |
 |---|---|---|
 | "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
+| "Is this pain real / will buyers pay?" | [`problem-discovery`](#problem-discovery) | Demand and pain need evidence before solutioning. |
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
@@ -81,11 +83,11 @@ question is already answered.
 ### Product discovery
 
 ```text
-distill-need → product-ideation → pre-plan
+distill-need → problem-discovery (if demand/pain unclear) → product-ideation → pre-plan
 ```
 
 Use when you are unsure what should exist. The flow may stop at
-`distill-need` if an existing tool, process change, or don't-build answer wins.
+`distill-need` or `problem-discovery` if reuse, refine, hold, or stop wins.
 
 ### Better engineering
 
@@ -209,6 +211,22 @@ Use it when:
 
 ---
 
+### `problem-discovery`
+
+Evidence-first validation of whether a real segment has a painful, frequent, costly problem with credible willingness to adopt or pay. Uses a signal ladder (behavior over opinions), triangulation rules, and optional decision artifacts. Keeps customer discovery, pain research, demand validation, and JTBD as methods inside one skill.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill problem-discovery
+```
+
+Use it when:
+- you need to know if the problem is real and painful enough before solutioning
+- you want demand / willingness-to-pay confidence, not feature brainstorming
+- you are choosing among segments or ranking pains by severity and frequency
+- you need a Problem Validation Brief, interview guide, or evidence ledger
+
+---
+
 ### `product-ideation`
 
 An adaptive, circular thinking partner for new ideas and existing products. It clarifies the idea's relationship to any current product, explores only the uncertainty that matters now, researches or parallelizes proportionately, reframes as evidence changes, and keeps one evolving brief or produces a specialized artifact only when useful.
@@ -283,9 +301,10 @@ skills/
   challenge/
   distill-need/
   hebrew-rtl-writing/
-  product-ideation/
   podcast-production/
   pre-plan/
+  problem-discovery/
+  product-ideation/
   smart-comments/
   visualize/
 ```
