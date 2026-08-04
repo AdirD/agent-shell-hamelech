@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bizy — Should you build it?</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#fff; --ink:#1c1b19; --soft:#57534e; --faint:#8a847c;
+    --line:#e9e4db; --grn:#1f8a5b; --amb:#b4791a; --red:#c0453b; --blu:#2563a8;
+    --accent:#2f2b26;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Georgia,serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:64px 26px 120px}
+  .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+
+  .eyebrow{font-family:-apple-system,system-ui,sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:40px;line-height:1.12;margin:14px 0 20px;letter-spacing:-.02em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-weight:800}
+  .lede{font-size:21px;line-height:1.55;color:var(--accent);margin:0}
+  .lede b{color:var(--ink)}
+
+  .verdicts{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 0}
+  .chip{font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;display:inline-flex;gap:8px;align-items:center}
+  .chip .d{width:8px;height:8px;border-radius:50%}
+  .go{background:#e6f4ec;color:var(--grn)} .go .d{background:var(--grn)}
+  .cau{background:#fbf1dd;color:var(--amb)} .cau .d{background:var(--amb)}
+
+  .tldr{background:var(--accent);color:#f4f1ec;border-radius:16px;padding:26px 28px;margin:34px 0 8px}
+  .tldr h2{font-family:-apple-system,system-ui,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#c9c2b6;margin:0 0 14px;font-weight:700}
+  .tldr ul{margin:0;padding:0;list-style:none}
+  .tldr li{position:relative;padding:0 0 14px 26px;font-size:16px;line-height:1.55}
+  .tldr li:last-child{padding-bottom:0}
+  .tldr li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;border-radius:50%;background:#8a8175}
+  .tldr li.g::before{background:#5bd39a} .tldr li.r::before{background:#e58b83}
+  .tldr b{color:#fff}
+
+  section{margin-top:52px}
+  .q{font-family:-apple-system,system-ui,sans-serif;font-size:13px;letter-spacing:.02em;color:var(--faint);font-weight:700;text-transform:uppercase;margin:0 0 4px}
+  h3{font-size:27px;line-height:1.2;margin:0 0 14px;letter-spacing:-.01em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-weight:800}
+  h3 .y{color:var(--grn)} h3 .n{color:var(--red)} h3 .m{color:var(--amb)}
+  p{margin:0 0 16px;color:var(--soft)}
+  p .k{color:var(--ink);font-weight:600;font-family:-apple-system,system-ui,sans-serif}
+
+  .stat{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--blu);border-radius:10px;padding:16px 18px;margin:18px 0;font-family:-apple-system,system-ui,sans-serif}
+  .stat .big{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+  .stat .cap{font-size:14px;color:var(--faint);margin-top:2px}
+
+  .ladder{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:20px 0;font-family:-apple-system,system-ui,sans-serif}
+  .rung{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font-size:15px}
+  .rung:last-child{border-bottom:0}
+  .rung .l{color:var(--soft)} .rung .l b{color:var(--ink)}
+  .rung .p{font-weight:800;font-size:16px}
+  .r1{background:#fcfbf9} .r1 .p{color:var(--faint)}
+  .r2 .p{color:var(--amb)}
+  .r3{background:#f2f8f4} .r3 .p{color:var(--grn)}
+
+  .rivals{margin:20px 0}
+  .rival{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;font-family:-apple-system,system-ui,sans-serif}
+  .rival .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .rival .nm{font-weight:800;font-size:16px;color:var(--ink)}
+  .rival .badge{font-size:11px;font-weight:700;color:var(--red);background:#f8e7e5;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .rival .desc{font-size:14.5px;color:var(--soft);margin-top:6px;line-height:1.5}
+
+  .calloutbox{background:#fbf1dd;border:1px solid #efdcb0;border-radius:12px;padding:20px 22px;margin:20px 0}
+  .calloutbox .hd{font-family:-apple-system,system-ui,sans-serif;font-weight:800;color:var(--amb);font-size:16px;margin-bottom:6px}
+  .calloutbox p{color:#7a5a15;margin:0}
+
+  .do{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 24px;margin:20px 0}
+  .move{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .move:last-child{border-bottom:0}
+  .move .num{font-family:-apple-system,system-ui,sans-serif;font-weight:800;font-size:15px;color:#fff;background:var(--accent);min-width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .move .txt{flex:1}
+  .move .mt{font-family:-apple-system,system-ui,sans-serif;font-weight:800;color:var(--ink);font-size:17px;margin-bottom:3px}
+  .move .md{font-size:15px;color:var(--soft);line-height:1.55}
+
+  .test{background:#f2f8f4;border:1px solid #cfe8db;border-radius:14px;padding:22px 24px;margin-top:22px;font-family:-apple-system,system-ui,sans-serif}
+  .test .hd{font-weight:800;color:var(--grn);font-size:16px;margin-bottom:8px}
+  .test p{color:#2c5a44;font-size:15px;margin:0 0 10px}
+  .test .thr{font-size:14px;color:#2c5a44;border-top:1px dashed #a8d4be;padding-top:12px;margin-top:4px}
+  .test .thr b{color:var(--grn)}
+
+  .foot{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font-size:13px;font-family:-apple-system,system-ui,sans-serif;line-height:1.6}
+  hr.sep{border:0;border-top:1px solid var(--line);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Bizy · Problem Discovery</div>
+  <h1>Should you build Bizy?</h1>
+  <p class="lede">Short answer: <b>the problem is real and people already pay to fix it</b> — but Bizy would be entering a crowded, funded race, and its core rule ("we don't touch the site") points the wrong way.</p>
+
+  <div class="verdicts">
+    <span class="chip go"><span class="d"></span> The problem: green light</span>
+    <span class="chip cau"><span class="d"></span> Bizy as designed: needs a rethink</span>
+  </div>
+
+  <div class="tldr">
+    <h2>The 30-second version</h2>
+    <ul>
+      <li class="g"><b>The pain is real.</b> AI-built sites break in production — the same handful of ways, every time.</li>
+      <li class="g"><b>People already pay.</b> $150–$15k to fix a broken AI site; ongoing retainers from $500/mo.</li>
+      <li class="r"><b>The money follows the fix, not the report.</b> "Just tell me what's wrong" is a $10–30/mo commodity.</li>
+      <li class="r"><b>You're not early to an empty space.</b> YC-backed startups are shipping this exact loop right now.</li>
+      <li class="g"><b>Best buyer: the agency.</b> They'll happily resell it under their own brand across many client sites.</li>
+    </ul>
+  </div>
+
+  <section>
+    <p class="q">Question 1</p>
+    <h3>Is the pain real? <span class="y">Yes — strongly.</span></h3>
+    <p>This isn't a few loud people online. There's a whole industry that only exists because AI-built sites keep breaking after launch. Independent write-ups describe the <span class="k">same failure modes over and over</span>: blank dashboards after a traffic spike, leaked payment keys, checkout that works once then dies, SEO that vanishes because AI crawlers see an empty page.</p>
+    <div class="stat">
+      <div class="big">64%</div>
+      <div class="cap">of AI-generated payment integrations fail a basic checkout check (Stripe's own benchmark). One builder: "12 apps, the same 6 things broke every time."</div>
+    </div>
+  </section>
+
+  <section>
+    <p class="q">Question 2</p>
+    <h3>Will people pay? <span class="m">Yes — but for the cure, not the diagnosis.</span></h3>
+    <p>Every source points the same way: <span class="k">telling someone what's wrong is cheap; making it right is where the money is.</span> Sentry (the big monitoring company) deliberately isn't "we show you problems" — it won by moving people to "here's how to fix it."</p>
+    <div class="ladder">
+      <div class="rung r1"><div class="l"><b>Just knowing</b> — dashboards, audits, reports</div><div class="p">$5–30/mo</div></div>
+      <div class="rung r2"><div class="l"><b>Diagnosing</b> — prioritized "here's what's broken"</div><div class="p">$150–800</div></div>
+      <div class="rung r3"><div class="l"><b>Fixed &amp; proven</b> — rescue shops, Sentry+AI fixes</div><div class="p">$2.5k–200k</div></div>
+    </div>
+    <p>Bizy's defining rule — <span class="k">"we observe and explain but don't change the site"</span> — plants it on the cheap top rung. That's the core tension.</p>
+  </section>
+
+  <section>
+    <p class="q">Question 3</p>
+    <h3>Who actually buys it? <span class="y">The agency — and they'll resell it.</span></h3>
+    <p>This is the good news. "Vibe-coding agencies" are now a real, named segment (Octave, Whitelabel AI, Groovy Web) selling AI-built sites with <span class="k">maintenance retainers from $499/mo</span>. And they're not precious about manual work — they're racing to automate delivery and jump from ~20% margins to 70%+.</p>
+    <div class="stat">
+      <div class="big">3–10× markup</div>
+      <div class="cap">what agencies already charge reselling white-label monitoring dashboards under their own brand. The reseller motion is mature — 1,200+ agencies on a single platform.</div>
+    </div>
+    <p>Translation: agencies are a <span class="k">channel, not a wall</span>. Bizy as "the ops layer an agency runs across all its client sites, branded as theirs" is a much stronger story than "solo founder's control room."</p>
+  </section>
+
+  <section>
+    <p class="q">Question 4</p>
+    <h3>Who else is doing this? <span class="n">A lot of funded people — right now.</span></h3>
+    <p>This is the part I have to be blunt about. Bizy's "observe → prioritize → fix → verify" loop is <span class="k">not an empty category</span>. In 2026 it's an active land grab, and several rivals already close the loop <em>and</em> do the fix Bizy refuses to.</p>
+    <div class="rivals">
+      <div class="rival"><div class="top"><span class="nm">Robynn AI</span><span class="badge">closes the whole loop</span></div><div class="desc">Connects by URL, auto-detects the CMS, audits every page, proposes evidence-backed fixes, publishes on approval, then measures against live Google data — reinforces wins, auto-rolls-back regressions. That's Bizy's five steps, shipping today.</div></div>
+      <div class="rival"><div class="top"><span class="nm">Sherpa (YC, 2026)</span><span class="badge">funded</span></div><div class="desc">"The website that improves itself." One line of code, watches real visitors, drafts + A/B tests fixes, ships winners with a human approving. Now tunes for humans <em>and</em> AI agents.</div></div>
+      <div class="rival"><div class="top"><span class="nm">Reeve (Ability.ai)</span><span class="badge">"website operations agent"</span></div><div class="desc">Autonomous SEO, quality, regression, security scanning, GEO scoring — human review as the final gate. Nearly Bizy's exact pitch.</div></div>
+    </div>
+    <p>They mostly lean toward <span class="k">automatically fixing</span> conversion/SEO and embedding via code — so none yet nails Bizy's <em>neutral, cross-stack, any-builder, zero-setup</em> angle across all 8 dimensions (DNS, email, checkout QA, security…). But the headline is clear: <span class="k">this race has started without you.</span></p>
+  </section>
+
+  <section>
+    <div class="calloutbox">
+      <div class="hd">The uncomfortable knot</div>
+      <p>The money is on the fix. The competitors do the fix. The "just observe and explain" lane is a $10–30/mo commodity that website builders (Wix, Replit) are already bundling in for free. Bizy's one firm rule — <b>don't change the site</b> — sits it squarely in the cheapest, most contested lane, against funded players who go further.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="q">The bottom line</p>
+    <h3>Build it — but not the version in the deck.</h3>
+    <p>The problem is validated; don't second-guess that. What needs to change is the shape. Two moves the evidence is basically shouting:</p>
+    <div class="do">
+      <div class="move"><div class="num">1</div><div class="txt"><div class="mt">Sell through agencies, across many sites</div><div class="md">Not the solo founder who ships and forgets. The agency with a book of client sites, a retainer, and an appetite to resell your tool as their own. Recurring, multi-site, budget already there.</div></div></div>
+      <div class="move"><div class="num">2</div><div class="txt"><div class="mt">Get closer to the proven fix, or you're a $12 dashboard</div><div class="md">Make "the fix actually landed — proven from the outside, on any stack, with zero setup" the hero. That's the one square the funded rivals (code-embedded, single-site, auto-fixers) haven't nailed — and it's what people actually pay for.</div></div></div>
+    </div>
+    <div class="test">
+      <div class="hd">The one test that settles it</div>
+      <p>Offer the same 8 agencies two things and see which one they put a card down for:</p>
+      <p><b>A —</b> "A prioritized report of what's wrong on your client sites, every deploy."<br><b>B —</b> "We brief your coding agent and then <em>prove</em> the fix worked — resolved, regressed, or inconclusive."</p>
+      <div class="thr"><b>If B wins and they'll pay a premium → build around proving the fix.</b> If A ≈ B → you're in a price fight, and you should get into the fix itself.</div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Evidence-first snapshot — a decision aid, not a guarantee. Sources include: vibe-code rescue pricing, agency retainer economics, Sentry &amp; Replit monitoring, Checkly, Wix Site Inspection, the Agentic Commerce Protocol, white-label reseller platforms, and direct rivals Robynn AI, Sherpa (YC 2026) and Reeve.
+  </div>
+
+</div>
+</body>
+</html>

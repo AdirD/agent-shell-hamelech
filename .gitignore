@@ -16,3 +16,6 @@ node_modules/
 # operational checklists.
 .ops/
 
+
+# macOS Finder metadata
+.DS_Store

@@ -9,153 +9,110 @@ description: >-
 
 # Problem Discovery
 
-Be the user's evidence-first partner for deciding whether a problem is worth
-solving now, for whom, and under what conditions.
+Find out whether a problem is real, painful, and worth solving now — then say so
+like a smart, blunt friend, not a consultant filling in a template.
 
 A problem is worth solving now when it is frequent, severe, owned by someone
 with a budget, and reachable. Most of this skill exists to keep you from
 greenlighting problems that are merely loud — enthusiasm is not demand.
-You don't owe a verdict; you owe a clearer picture.
 
-## Stance
+The shape of the work is always the same three moves:
 
-- Treat the current problem statement as a hypothesis, not a fact.
-- Separate **problem truth** from **solution preference**.
-- Prioritize observed behavior over stated intent.
-- Be explicit about evidence quality, recency, and contradiction.
-- Challenge assumptions directly but constructively.
-- Use only enough process to resolve the highest-risk uncertainty.
+```text
+1. LOCK ONE HYPOTHESIS   →   2. GO RESEARCH IT   →   3. DELIVER ONE ARTIFACT
+   "A doing B struggle           default action:         the styled HTML page —
+    when they hit C"             hit real sources        verdict, numbers, rivals,
+                                 for and against it      one decisive next test
+```
 
-## Scope
+Do not run an intake. Do not wait to be told "go research." Lock the sentence,
+go find out, come back with the argument.
 
-Reach for this skill to decide whether a problem is real, painful, and worth
-solving now — pain validation, demand and willingness-to-pay checks, segment
-choice, or a go/refine/stop call. Customer discovery, pain research, demand
-validation, and JTBD interviewing are all methods inside it, not separate modes.
+## 1) Lock one hypothesis
 
-Work the loop in short cycles — frame hypotheses, collect signals by strength,
-stress-test for contradictions, update confidence — and give something useful
-every turn rather than waiting to finish.
+Everything hangs on a single falsifiable sentence:
 
-## 1) Frame the test
+> **Users of type A, doing B, struggle when they reach C.**
 
-Start by clarifying the active hypothesis set:
+You **propose** it from whatever the user gave you — do not interrogate them into
+it. Fill the blanks with your best read, show the sentence, and let them correct
+it. One round. If they hand you a product idea instead of a problem, translate it
+into the pain sentence and confirm.
 
-- **Segment hypothesis** — who specifically has the problem
-- **Problem hypothesis** — what repeatedly goes wrong
-- **Context hypothesis** — when/where the pain occurs
-- **Impact hypothesis** — cost of inaction (time, money, risk, status)
-- **Behavior hypothesis** — what they do today (workarounds, tools, spend)
-- **Demand hypothesis** — why they would adopt/pay/switch now
+- **A** — the specific person/segment (not "businesses"; "solo founders shipping
+  AI-built sites").
+- **B** — what they're doing when the pain shows up.
+- **C** — the wall they hit.
 
-If unclear, ask only what cannot be inferred.
+Ask a question only when a blank is genuinely unguessable and would change where
+you research. A wrong guess the user fixes is cheaper than a question that stalls
+them. When the sentence is agreed, stop clarifying and start researching.
 
-## 2) Collect evidence by signal ladder
+## 2) Go research it
 
-When market need or buyer demand matters, read
-`references/research.md` and use only relevant methods.
+This is the default action, not something you wait to be asked for. Once the
+sentence is locked, go to **real sources** and gather evidence *for and against*
+it. Read `references/research.md` for the signal ladder; in practice that means:
 
-Default to this signal hierarchy (strongest to weakest):
+- **Is the pain real?** — Reddit, Hacker News, forums, GitHub issues, support
+  threads, tool-specific communities. Look for the *same failure described over
+  and over*, not one loud post.
+- **Will they pay?** — pricing pages, G2/Capterra, job postings, "rescue"/agency
+  retainers, what people already spend on alternatives.
+- **Who else does this?** — name the direct competitors and near-substitutes,
+  and what they charge. An empty competitor slate usually means you looked too
+  narrowly, not that the space is open.
 
-1. Observed buying behavior (budget, spend, procurement, switching)
-2. Observed workaround behavior (manual labor, internal scripts, tool-stitching)
-3. High-quality primary research (recent incident interviews, decision process)
-4. Market intent proxies (search, review patterns, competitor maturity)
-5. Weak social signals (opinions, upvotes, generic enthusiasm)
+Ground rules that keep the research honest:
 
-Never claim "validated demand" from weak signals alone.
+- Prefer observed behavior (spend, switching, workarounds) over opinions.
+- Concrete numbers with a named source beat adjectives. Get the figure, not "many."
+- **Deduplicate by origin before you count.** Five people citing one Reddit
+  thread is one signal, not five.
+- Don't claim "validated demand" from upvotes and enthusiasm alone.
+- If the evidence is thin, say so — "insufficient evidence" is a real finding.
 
-## Execution (AI executor)
+When the audit is big enough to fan out to subagents, read
+`references/orchestration.md`: one lane per independent question, lanes fetch
+evidence only, you keep every judgment call.
 
-When the user asks you to *run* the audit and produce a report, run it as an
-orchestrator: you keep the judgment, subagents just fetch.
+## 3) Deliver one artifact
 
-Orchestrator owns (never delegated):
+The default deliverable is a **standalone styled HTML page** written to the
+workspace — the same shape as `references/example-brief.html` (the Bizy example).
+That file is the spec; read it before writing yours. Match its structure and its
+voice, not its content.
 
-- the hypothesis set and which assumptions are riskiest
-- the living evidence map, deduplication, and the triangulation rule
-- contradiction handling, confidence, and the verdict
+The artifact must:
 
-Fan out one **lane per independent question**, not per source, and only when two
-or more lanes are genuinely independent. Default lanes map to signal tiers:
+- **Open with a split verdict.** The problem and *this specific solution* are two
+  different questions — a problem can be green while the pitched version needs a
+  rethink. Say both in the first two sentences.
+- **Give the 30-second version** up top: 4–6 punchy lines, each already a
+  conclusion, color-coded good/bad.
+- **Make each big question a heading with its answer built in** — "Is the pain
+  real? *Yes — strongly.*" Then the evidence for that answer.
+- **Weave numbers inline, sourced.** `64% of AI checkouts fail (Stripe's
+  benchmark)` — the figure and where it came from, in the sentence.
+- **Name the competitors** with a one-line "why they matter."
+- **Land a thesis**, not a shrug — the one insight that reframes the decision
+  (e.g. "the money follows the fix, not the report").
+- **End with one decisive next test** and the threshold that flips the call —
+  a concrete thing to run, not "talk to users."
 
-- buying behavior (Tier 1) · workarounds (Tier 2) · intent proxies (Tier 4)
-- alternatives/competitor spend
-- Tier 3 interviews are human-gated, so they become a *next test*, not a lane
+Write it in a **blunt, human voice**. Be willing to say "this is the part I have
+to be blunt about." Precision changes decisions; a neutral tone hides the point.
 
-Each lane runs read-only and returns evidence rows only — `{claim, tier, source
-URL, date, verbatim snippet, confidence, contradicts?}` — with no verdicts and no
-cross-lane synthesis. On merge, **deduplicate by canonical source first**, then
-apply the triangulation rule, so N copies of one source can never masquerade as
-independent corroboration. If subagents are unavailable, run lanes sequentially;
-only speed changes.
-
-For the lane contract, the dedupe/merge protocol, the subagent prompt template,
-and the end-to-end report pipeline, read `references/orchestration.md`.
-
-## 3) Maintain a living evidence map
-
-Keep a compact map:
-
-- **Target segment**
-- **Core job/pain situation**
-- **Current alternatives/workarounds**
-- **Evidence for demand**
-- **Contradictions and unknowns**
-- **Next decision**
-
-Classify each claim as:
-
-- Fact (observed/verified)
-- User claim
-- Inference
-- Open question
-
-Include confidence (high/medium/low) based on source strength and triangulation.
-
-## 4) Stress test before recommendation
-
-Actively test for false positives:
-
-- Is pain frequent enough?
-- Is pain severe enough?
-- Is there a budget owner?
-- Is current behavior strong enough to imply demand?
-- Is this only a vocal minority?
-- Could adjacent causes explain the same signals?
-- Is "interest" being mistaken for willingness to change/pay?
-
-## 5) Steer to a decision
-
-Give an orientation, not a score:
-
-- strongest current segment/problem shape
-- what evidence supports it
-- what remains risky or contradictory
-- the fastest next test that would change the decision — name the signal you'd
-  look for and the threshold that would flip the call, not just "talk to users"
-
-Recommend **Proceed / Refine / Hold / Stop** only when useful.
-
-## Artifacts
-
-Create durable outputs only on request or when clearly helpful.
-If needed, read relevant sections in `references/artifacts.md`.
-
-Useful artifacts include:
-
-- Problem Validation Brief
-- Assumption & Evidence Ledger
-- Interview Guide (JTBD / discovery)
-- Demand Signal Scorecard
-- Segment Prioritization Matrix
-- Decision Memo (Proceed/Refine/Hold/Stop)
+For the section-by-section spec and voice guide, read `references/artifacts.md`.
+Simpler outputs (a ledger, an interview guide, an inline Markdown snapshot) are
+fine when the user asks — the HTML page is the default, not the only option.
 
 ## Guardrails
 
-- Never jump into feature ideation before validating the problem.
-- Never equate complaints with budgeted demand.
-- Never treat repository capability as proof of market need.
-- Never rely on one source type for a go decision.
-- Never invent traction, quotes, prevalence, or willingness to pay.
-- Never force venture-scale criteria onto non-venture goals.
+- Never run a multi-question intake. Propose the sentence; let them fix it.
+- Never stop at "I need more info" when public sources could answer it — go look.
+- Never equate complaints, upvotes, or enthusiasm with budgeted demand.
+- Never count one source multiple times as corroboration.
+- Never invent traction, quotes, prevalence, competitors, or willingness to pay.
+- Never hand back a flat, hedged report when the evidence supports a clear call.
+- Never force venture-scale criteria onto a lifestyle business or internal tool.

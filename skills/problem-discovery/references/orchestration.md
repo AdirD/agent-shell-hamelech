@@ -1,9 +1,12 @@
 # Orchestrating the Audit (AI executor)
 
-How an AI runs a problem-discovery audit end to end: what the orchestrator
-keeps, how to fan work out to subagents, and how to merge without inventing
-corroboration. Read this only when the user asks you to *run* the audit or
-produce a report — for a normal back-and-forth, `SKILL.md` is enough.
+How to fan the research (SKILL.md step 2) out to subagents when the audit is big
+enough to be worth it: what the orchestrator keeps, how to split the work, and
+how to merge without inventing corroboration. For a quick check, just research
+it yourself — this layer is for when parallel lanes genuinely save time.
+
+Everything serves the **one locked hypothesis** ("A doing B struggle at C").
+Lanes gather evidence for and against that sentence; they never redefine it.
 
 The two failure modes this layer exists to prevent:
 
@@ -17,7 +20,7 @@ The two failure modes this layer exists to prevent:
 
 ```text
 ORCHESTRATOR (main agent, never delegated)
-  • frames falsifiable hypotheses, picks the 2–4 riskiest assumptions
+  • owns the locked hypothesis and which sub-questions are riskiest
   • decides which lanes to spawn and their stop conditions
   • holds the living evidence map
   • dedupes sources, applies the triangulation rule, scores, decides verdict
@@ -135,17 +138,17 @@ When the user asked for a report, assemble it from lane outputs — do not
 re-research during writing.
 
 ```text
-frame hypotheses
-   → pick riskiest assumptions
+lock the hypothesis
+   → pick the riskiest sub-questions
    → spawn lanes (parallel)     ── gate: each lane returned rows or "[] + reason"
    → dedupe by source_id        ── gate: no source counted twice
    → triangulation rule         ── gate: behavioral + narrative + no fatal conflict
    → score + contradictions
    → verdict + next test
-   → write Problem Validation Brief   (references/artifacts.md §1)
+   → write the Problem Validation Page   (references/artifacts.md §1)
 ```
 
-The Brief maps straight onto this run: its evidence table is the deduped set,
-its recommendation is the merge verdict, its next move is the fastest test from
-step 6 (usually the human-gated Tier 3 interviews). Cite sources inline — a
-Brief with claims and no `source_url`s is a draft, not a result.
+The page maps straight onto this run: its evidence is the deduped set, its
+split verdict is the merge outcome, its one test is the fastest next step from
+step 6 (often the human-gated Tier 3 interviews). Numbers carry their source
+inline — claims with no source are a draft, not a result.

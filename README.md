@@ -213,7 +213,7 @@ Use it when:
 
 ### `problem-discovery`
 
-Evidence-first validation of whether a real segment has a painful, frequent, costly problem with credible willingness to adopt or pay. Uses a signal ladder (behavior over opinions), triangulation rules, and optional decision artifacts. Keeps customer discovery, pain research, demand validation, and JTBD as methods inside one skill.
+Locks one falsifiable hypothesis ("users of type A doing B struggle when they hit C"), then researches real sources (Reddit, forums, G2, GitHub, job posts) for and against it and delivers a blunt, styled decision page — split verdict, sourced numbers, named rivals, one decisive next test. Proposes the hypothesis instead of interrogating you; researches by default instead of waiting to be told.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill problem-discovery
@@ -222,8 +222,8 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill problem-dis
 Use it when:
 - you need to know if the problem is real and painful enough before solutioning
 - you want demand / willingness-to-pay confidence, not feature brainstorming
-- you are choosing among segments or ranking pains by severity and frequency
-- you need a Problem Validation Brief, interview guide, or evidence ledger
+- you want the agent to go research the pain, not interview you about it
+- you want a decision-ready validation page, not a hedged report
 
 ---
 
