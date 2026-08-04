@@ -48,7 +48,7 @@ Ask a question only when a blank is genuinely unguessable and would change where
 you research. A wrong guess the user fixes is cheaper than a question that stalls
 them. When the sentence is agreed, stop clarifying and start researching.
 
-## 2) Go research it
+## 2) Go research it — and don't stop early
 
 This is the default action, not something you wait to be asked for. Once the
 sentence is locked, go to **real sources** and gather evidence *for and against*
@@ -63,6 +63,47 @@ it. Read `references/research.md` for the signal ladder; in practice that means:
   and what they charge. An empty competitor slate usually means you looked too
   narrowly, not that the space is open.
 
+### Run it as a research goal, not a couple of searches
+
+The failure mode this section exists to kill is **quitting after 3-4 searches**.
+Two or three results is a first glance, not research. Treat the audit as a
+standing objective and loop until it clears a depth bar — do not return on the
+first plausible answer.
+
+If a persistent **goal / loop** primitive is available (a `goal` command or a
+long-running task loop), open one and hold it for the whole audit. Frame it as:
+*"Keep researching '<the locked sentence>' until the depth bar is met or the
+stop condition fires; do not end the turn early."* If no such primitive exists,
+self-loop: keep issuing searches and reading sources, and refuse to write the
+artifact until the bar below is met.
+
+**Depth bar — do not deliver until ALL are true:**
+
+- **>= 3 of the 4 questions** (pain, pay, who-buys, who-else) each have **>= 2
+  independent sources** — different origins, not one thread requoted.
+- **>= 1 hard behavioral/commercial signal** (Tier 1-2: real spend, pricing,
+  job posts, switching) — not opinions alone.
+- **Competitors named** (at least the obvious direct ones), or an explicit,
+  argued reason the slate is genuinely empty.
+- **You searched for disconfirming evidence** — ran queries designed to *break*
+  the hypothesis, not only confirm it.
+- **Saturation:** new searches have stopped surfacing new signal (you keep
+  hitting the same sources).
+
+**Stop condition (so it can't loop forever):** stop when the depth bar is met,
+OR when a hard cap is hit (a set number of search rounds / a time or token
+budget) with no new signal — then deliver what you have and say plainly where
+the evidence ran thin. "Insufficient evidence — here's the gap and the fastest
+next test" is a valid, honest finding.
+
+### Keep a research log as you go
+
+Keep a running tally you can show later: queries run, distinct sources found,
+which of the 4 questions each covers, the tier of each source, and duplicate
+collisions (N mentions collapsing to 1 origin). This is not busywork — it
+becomes the **coverage panel** in the artifact (step 3) that lets the reader
+trust the depth.
+
 Ground rules that keep the research honest:
 
 - Prefer observed behavior (spend, switching, workarounds) over opinions.
@@ -74,7 +115,8 @@ Ground rules that keep the research honest:
 
 When the audit is big enough to fan out to subagents, read
 `references/orchestration.md`: one lane per independent question, lanes fetch
-evidence only, you keep every judgment call.
+evidence only, you keep every judgment call. Fanning out is also the fastest way
+to hit the depth bar — run the four questions as parallel lanes.
 
 ## 3) Deliver one artifact
 
@@ -99,6 +141,14 @@ The artifact must:
   (e.g. "the money follows the fix, not the report").
 - **End with one decisive next test** and the threshold that flips the call —
   a concrete thing to run, not "talk to users."
+- **Show the depth so the reader trusts it.** Include a small coverage panel
+  from your research log: how many sources, across which of the 4 questions,
+  how many are hard Tier 1-2 signals, and how many duplicate mentions collapsed
+  to how many distinct origins (e.g. "23 mentions -> 9 origins"). Mark each
+  question's answer with a **confidence** (high / medium / low) tied to how much
+  independent evidence backs it, and surface the **counter-evidence** you found,
+  not just the confirming side. A visible "here is how hard I looked, and what
+  argued against it" is what separates a trusted audit from a vibe.
 
 Write it in a **blunt, human voice**. Be willing to say "this is the part I have
 to be blunt about." Precision changes decisions; a neutral tone hides the point.
@@ -115,4 +165,8 @@ fine when the user asks — the HTML page is the default, not the only option.
 - Never count one source multiple times as corroboration.
 - Never invent traction, quotes, prevalence, competitors, or willingness to pay.
 - Never hand back a flat, hedged report when the evidence supports a clear call.
+- Never stop after a handful of searches — hold the research goal open until the
+  depth bar or the stop condition is met.
+- Never hide how shallow the research was — show the coverage panel and per-answer
+  confidence so a thin audit reads as thin.
 - Never force venture-scale criteria onto a lifestyle business or internal tool.

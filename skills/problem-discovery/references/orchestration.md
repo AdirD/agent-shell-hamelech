@@ -126,6 +126,10 @@ Run these in order — the sequence is what prevents fake triangulation:
 4. **Handle contradictions** (`research.md` §E): keep both sides visible, weight
    by strength and recency, name the minimal test to resolve.
 5. **Score** each surviving segment/problem hypothesis (`research.md` §D).
+5b. **Check the depth bar** (SKILL.md §2): >= 3 of 4 questions each backed by
+   >= 2 independent origins, >= 1 hard Tier 1-2 signal, competitors named, and
+   disconfirming evidence actually sought. If it is not met and the cap is not
+   hit, **spawn more lanes / deeper queries — do not proceed to a verdict yet.**
 6. **Decide** Proceed / Refine / Hold / Stop — or "insufficient evidence" plus
    the single fastest next test that would change the decision.
 
@@ -145,6 +149,7 @@ lock the hypothesis
    → triangulation rule         ── gate: behavioral + narrative + no fatal conflict
    → score + contradictions
    → verdict + next test
+   → emit coverage panel (queries, origins, tiers, collisions, per-answer confidence)
    → write the Problem Validation Page   (references/artifacts.md §1)
 ```
 

@@ -18,11 +18,18 @@ structure and voice. Copy the shape, not the content.
    needs-rethink solution is the most common and most useful shape.
 3. **Verdict chips** — two short pills, one for the problem, one for the pitched
    solution (green / amber / red).
+3b. **Coverage panel** — a small "how hard we looked" strip near the top, from
+   the research log: sources read, how many of the 4 questions are covered,
+   count of hard Tier 1-2 signals, and dedup collisions ("23 mentions -> 9
+   origins"). This is the trust signal — it tells the reader this is a dug-in
+   audit, not a first glance.
 4. **The 30-second version** — 4–6 lines, each already a conclusion, dotted
    good/bad. Someone should be able to stop reading here and know the answer.
 5. **One section per real question** — heading states the question *and its
    answer*: "Will people pay? *Yes — but for the cure, not the diagnosis.*"
-   Follow with 1–2 short paragraphs of evidence.
+   Tag each with a **confidence** (high / medium / low) reflecting how much
+   independent evidence backs it, and include the **counter-evidence** you
+   found. Follow with 1–2 short paragraphs of evidence.
 6. **Evidence callouts** — pull the strongest number into a stat block: the
    figure big, the source and caveat small.
 7. **A value ladder / comparison** when pricing or positioning is the crux —
@@ -50,6 +57,8 @@ structure and voice. Copy the shape, not the content.
 - At least one concrete, sourced number per question section.
 - Name real competitors or explain why the slate is genuinely empty.
 - Exactly one decisive next test with a threshold.
+- Show the coverage panel and per-question confidence — depth must be visible.
+- Surface counter-evidence, not only the confirming side.
 - Never invent a figure, quote, competitor, or source to fill a slot — a gap,
   named honestly, is stronger than a fabricated stat.
 

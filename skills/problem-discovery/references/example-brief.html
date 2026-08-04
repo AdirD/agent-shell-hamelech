@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ShiftPlate — Should you build it?</title>
+<title>ShiftPlate — Problem Discovery Report</title>
 <style>
   :root{
     --bg:#faf8f4; --card:#fff; --ink:#1c1b19; --soft:#57534e; --faint:#8a847c;
@@ -17,8 +17,21 @@
     font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Georgia,serif;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:720px;margin:0 auto;padding:64px 26px 120px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 26px 120px}
   .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+
+  /* Report banner — the commissioned-research framing */
+  .banner{background:var(--accent);color:#f4f1ec;margin:0 -26px 0;padding:56px 40px 44px;border-radius:0 0 20px 20px}
+  .banner .kicker{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#b7ae9f;font-weight:700}
+  .banner .clientq{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-size:29px;line-height:1.28;font-weight:800;letter-spacing:-.01em;margin:16px 0 6px;color:#fff}
+  .banner .hyp{font-size:15px;line-height:1.55;color:#d9d2c6;margin:14px 0 24px;border-left:3px solid #6b6357;padding-left:14px}
+  .banner .hyp b{color:#f4f1ec}
+  .meta{display:flex;flex-wrap:wrap;gap:22px;font-family:-apple-system,system-ui,sans-serif;font-size:12.5px;color:#c9c2b6;border-top:1px solid #4a453d;padding-top:18px}
+  .meta div span{display:block;color:#8f887c;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+
+  /* depth gradient rail */
+  .depth{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);font-weight:700;margin:0 0 2px;display:flex;align-items:center;gap:8px}
+  .depth::before{content:"";width:22px;height:2px;background:var(--faint);display:inline-block}
 
   .eyebrow{font-family:-apple-system,system-ui,sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);font-weight:700}
   h1{font-size:40px;line-height:1.12;margin:14px 0 20px;letter-spacing:-.02em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-weight:800}
@@ -46,6 +59,14 @@
   h3 .y{color:var(--grn)} h3 .n{color:var(--red)} h3 .m{color:var(--amb)}
   p{margin:0 0 16px;color:var(--soft)}
   p .k{color:var(--ink);font-weight:600;font-family:-apple-system,system-ui,sans-serif}
+
+  .conf{font-family:-apple-system,system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;display:inline-block;margin-bottom:12px}
+  .conf.hi{background:#e6f4ec;color:var(--grn)}
+  .conf.md{background:#fbf1dd;color:var(--amb)}
+  .conf.lo{background:#f5ede9;color:var(--red)}
+
+  .against{font-size:14.5px;color:var(--soft);border-left:3px solid var(--line);padding:2px 0 2px 14px;margin:16px 0}
+  .against b{color:var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:12px;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:3px;color:var(--faint)}
 
   .stat{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--blu);border-radius:10px;padding:16px 18px;margin:18px 0;font-family:-apple-system,system-ui,sans-serif}
   .stat .big{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
@@ -85,6 +106,17 @@
   .test .thr{font-size:14px;color:#2c5a44;border-top:1px dashed #a8d4be;padding-top:12px;margin-top:4px}
   .test .thr b{color:var(--grn)}
 
+  /* methodology / coverage appendix */
+  .coverage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:22px 0;font-family:-apple-system,system-ui,sans-serif}
+  .coverage .hd{font-weight:800;color:var(--ink);font-size:16px;margin-bottom:14px}
+  .cgrid{display:flex;flex-wrap:wrap;gap:14px 26px;margin-bottom:16px}
+  .cgrid .cell{min-width:120px}
+  .cgrid .n{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+  .cgrid .lbl{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-top:1px}
+  .covnote{font-size:13.5px;color:var(--soft);line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
+  .covnote b{color:var(--ink)}
+  .srclist{margin:10px 0 0;padding:0 0 0 18px;font-size:13.5px;color:var(--soft);line-height:1.7}
+
   .foot{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font-size:13px;font-family:-apple-system,system-ui,sans-serif;line-height:1.6}
   hr.sep{border:0;border-top:1px solid var(--line);margin:0}
 </style>
@@ -92,96 +124,145 @@
 <body>
 <div class="wrap">
 
-  <div class="eyebrow">ShiftPlate · Problem Discovery</div>
-  <h1>Should you build ShiftPlate?</h1>
-  <p class="lede">Short answer: <b>the problem is real and people already pay to work around it</b> — but ShiftPlate would be entering a crowded, funded race, and its core rule ("we only plan, we never cook") points at the cheap end of the market.</p>
-
-  <div class="verdicts">
-    <span class="chip go"><span class="d"></span> The problem: green light</span>
-    <span class="chip cau"><span class="d"></span> ShiftPlate as designed: needs a rethink</span>
+  <!-- ── THE QUESTION: commissioned-report banner ────────────────── -->
+  <div class="banner">
+    <div class="kicker">Problem Discovery Report · Prepared for the ShiftPlate team</div>
+    <div class="clientq">Should we build ShiftPlate — pre-portioned meal kits sized and scheduled around rotating shift patterns?</div>
+    <div class="hyp">Hypothesis we tested: <b>Rotating-shift workers (nurses, warehouse, transit) cooking for themselves struggle to eat well because their eating windows move every few days, so standard weekly meal plans and delivery slots don't fit.</b></div>
+    <div class="meta">
+      <div><span>Method</span>Desktop evidence audit — behavior &amp; spend first</div>
+      <div><span>Depth</span>4 questions · saturation reached on 3</div>
+      <div><span>Verdict</span>Real problem · reshape the product</div>
+    </div>
   </div>
+
+  <!-- ── THE ANSWER: shallowest layer, skim and stop ─────────────── -->
+  <section style="margin-top:44px">
+    <p class="depth">Layer 1 · The answer</p>
+    <p class="lede">Short answer: <b>the problem is real and shift workers already spend to work around it</b> — but a fixed meal-kit subscription fights the very thing that defines them: their schedule never holds still. The winning shape is flexibility, not another weekly box.</p>
+    <div class="verdicts">
+      <span class="chip go"><span class="d"></span> The problem: green light</span>
+      <span class="chip cau"><span class="d"></span> ShiftPlate as designed: needs a rethink</span>
+    </div>
+  </section>
 
   <div class="tldr">
     <h2>The 30-second version</h2>
     <ul>
-      <li class="g"><b>The pain is real.</b> Night-shift workers keep failing to eat well — the same handful of ways, every week.</li>
-      <li class="g"><b>People already pay.</b> $40&ndash;$120/wk on takeout and meal kits to paper over it.</li>
-      <li class="r"><b>The money follows the food, not the plan.</b> "Just tell me what to eat" is a near-free commodity.</li>
-      <li class="r"><b>You're not early to an empty space.</b> Funded meal-planning apps ship this exact loop today.</li>
-      <li class="g"><b>Best buyer: the employer.</b> Hospitals and warehouses will pay per-head to keep shift staff fed.</li>
+      <li class="g"><b>The pain is real.</b> Shift workers describe the same trap repeatedly — no time to cook post-shift, healthy options closed at 3am, plans built for 9-to-5 lives.</li>
+      <li class="g"><b>They already pay to cope.</b> Convenience food, late-night delivery premiums, and impulse takeout eat a real share of the paycheck.</li>
+      <li class="r"><b>A fixed weekly box is the wrong shape.</b> Their whole problem is that the week isn't fixed — a rigid subscription reproduces the mismatch.</li>
+      <li class="m"><b>Delivery timing is the moat and the risk.</b> "Food that arrives when your shift ends" is the real unmet need; it's also the hard operational part.</li>
+      <li class="g"><b>Best wedge: the employer, not the individual.</b> Hospitals and warehouses already subsidize staff meals and fight retention — a channel, not a wall.</li>
     </ul>
   </div>
 
+  <!-- ── THE DEEP DIVE: deeper layer, one question at a time ──────── -->
   <section>
+    <p class="depth">Layer 2 · The deep dive</p>
     <p class="q">Question 1</p>
-    <h3>Is the pain real? <span class="y">Yes &mdash; strongly.</span></h3>
-    <p>This isn't a few loud people online. There's a recurring, well-documented pattern in shift-worker communities: meals skipped or replaced with vending-machine food, energy crashes mid-shift, weight and sleep problems blamed on erratic eating. Independent write-ups describe the <span class="k">same failure modes over and over</span>: nothing open at 3am, no energy to cook after a 12-hour shift, groceries spoiling on a flipped schedule.</p>
+    <h3>Is the pain real? <span class="y">Yes — strongly.</span></h3>
+    <span class="conf hi">Confidence: high · 4 independent origins</span>
+    <p>This isn't a handful of loud posts. Across shift-worker communities the <span class="k">same complaint recurs in the same words</span>: finishing a shift too tired to cook, healthy options closed at odd hours, and every meal plan assuming a daytime routine they don't have. Nurses, drivers, and warehouse staff describe it independently — different jobs, identical trap.</p>
     <div class="stat">
       <div class="big">~2 in 3</div>
-      <div class="cap">shift workers report irregular or skipped meals in occupational-health surveys (illustrative figure &mdash; replace with your sourced number). One nurse: "I live on whatever's in the break-room."</div>
+      <div class="cap">shift workers in an occupational-health survey report their schedule harms how they eat (illustrative figure). One nurse: "I meal-prep Sunday, then my shifts flip Wednesday and it's all wrong."</div>
     </div>
+    <div class="against"><b>What argues against it</b>Some workers say they've simply adapted — batch-cook and freeze — and don't see it as a problem worth paying to solve. Real, but a minority in the sample.</div>
   </section>
 
   <section>
     <p class="q">Question 2</p>
-    <h3>Will people pay? <span class="m">Yes &mdash; but for the food, not the plan.</span></h3>
-    <p>Every source points the same way: <span class="k">telling someone what to eat is cheap; getting the food into their hands is where the money is.</span> The category leaders didn't win as "here's a plan" &mdash; they won by moving people to "here's the meal, delivered."</p>
+    <h3>Will they pay? <span class="m">Yes — but for timing, not for recipes.</span></h3>
+    <span class="conf md">Confidence: medium · spend inferred, not observed</span>
+    <p>The money already moves — it just goes to coping. Late-night delivery premiums, gas-station food, and impulse takeout are the current spend. The signal: <span class="k">people pay for food that shows up when they're free, not for a nicer meal plan.</span> Convenience beats cuisine for this segment.</p>
     <div class="ladder">
-      <div class="rung r1"><div class="l"><b>Just knowing</b> &mdash; recipes, plans, reminders</div><div class="p">$0&ndash;8/mo</div></div>
-      <div class="rung r2"><div class="l"><b>Assembling</b> &mdash; ordered grocery lists, kits</div><div class="p">$40&ndash;90/wk</div></div>
-      <div class="rung r3"><div class="l"><b>Fed &amp; effortless</b> &mdash; hot meals delivered on shift</div><div class="p">$120&ndash;300/wk</div></div>
+      <div class="rung r1"><div class="l"><b>Recipes &amp; plans</b> — apps, PDFs, "eat this on nights"</div><div class="p">$0–10/mo</div></div>
+      <div class="rung r2"><div class="l"><b>Meal kits</b> — fixed weekly box, you cook</div><div class="p">$60–110/wk</div></div>
+      <div class="rung r3"><div class="l"><b>Right food, right time</b> — ready, delivered to the shift</div><div class="p">premium, sticky</div></div>
     </div>
-    <p>ShiftPlate's defining rule &mdash; <span class="k">"we only plan, we never touch the food"</span> &mdash; plants it on the cheap top rung. That's the core tension.</p>
+    <p>ShiftPlate's pitched shape — <span class="k">a scheduled weekly kit you cook at home</span> — sits on the middle rung, the one already crowded by generalist meal-kit players. The unmet rung is the bottom one: timing.</p>
+    <div class="against"><b>What argues against it</b>No observed transaction data yet — this rung is inferred from complaints and adjacent spend, not from anyone paying for this exact thing. Flagged as the weakest link.</div>
   </section>
 
   <section>
     <p class="q">Question 3</p>
-    <h3>Who actually buys it? <span class="y">The employer &mdash; and they'll roll it out.</span></h3>
-    <p>This is the good news. Employers of large shift workforces (hospitals, warehouses, call centers) already spend on staff wellbeing to cut turnover, and they buy <span class="k">per-head programs, not consumer apps</span>. They're not precious about it &mdash; they want something they can offer as a benefit across a whole site.</p>
+    <h3>Who actually buys it? <span class="y">The employer — and it solves their problem too.</span></h3>
+    <span class="conf md">Confidence: medium · strong logic, thin direct evidence</span>
+    <p>This is the good news. Hospitals, warehouses, and transit operators <span class="k">already subsidize staff meals</span> and are fighting night-shift burnout and turnover. "Well-fed staff who don't leave" is a budget line that already exists — which turns a hard consumer-acquisition problem into a B2B sale.</p>
     <div class="stat">
-      <div class="big">per-seat</div>
-      <div class="cap">employers already buy wellbeing perks per employee per month (illustrative &mdash; cite the real benchmark for your market). The B2B2C motion is mature across adjacent perks.</div>
+      <div class="big">1 buyer → 100s of eaters</div>
+      <div class="cap">a single facilities or HR contract covers a whole night shift, versus signing up individuals one at a time. Retention framing, not grocery framing.</div>
     </div>
-    <p>Translation: employers are a <span class="k">channel, not a wall</span>. ShiftPlate as "the eating-well benefit an employer runs across a whole site" is a much stronger story than "one tired worker's meal app."</p>
+    <p>Translation: the employer is a <span class="k">channel, not a wall</span>. "The night-shift meal program your facility runs" is a stronger story than "another subscription box for tired individuals."</p>
+    <div class="against"><b>What argues against it</b>B2B sales cycles are slow, and facilities may prefer existing canteen/vending contracts. This is a hypothesis to test, not a proven route.</div>
   </section>
 
   <section>
     <p class="q">Question 4</p>
-    <h3>Who else is doing this? <span class="n">A lot of funded people &mdash; right now.</span></h3>
-    <p>This is the part I have to be blunt about. ShiftPlate's "assess &rarr; plan &rarr; shop &rarr; adjust" loop is <span class="k">not an empty category</span>. It's an active space, and several rivals already close the loop <em>and</em> handle the food ShiftPlate refuses to.</p>
+    <h3>Who else is doing this? <span class="m">Adjacent giants, no exact fit.</span></h3>
+    <span class="conf hi">Confidence: high · competitor slate mapped</span>
+    <p>The space around this is busy, but <span class="k">no one owns "meals timed to a rotating shift."</span> The nearby players all assume a stable schedule or a corporate 9-to-5 catering rhythm.</p>
     <div class="rivals">
-      <div class="rival"><div class="top"><span class="nm">Rival A (fictional)</span><span class="badge">closes the whole loop</span></div><div class="desc">Onboards by schedule, builds the week's meals, auto-orders the groceries, and adjusts from what you actually ate. That's ShiftPlate's four steps, shipping today. (Placeholder &mdash; swap in the real competitor you find.)</div></div>
-      <div class="rival"><div class="top"><span class="nm">Rival B (fictional)</span><span class="badge">funded</span></div><div class="desc">"The meal plan that plans itself." Syncs to a calendar, learns preferences, delivers kits with a human dietitian in the loop. (Placeholder.)</div></div>
-      <div class="rival"><div class="top"><span class="nm">Rival C (fictional)</span><span class="badge">"workforce nutrition"</span></div><div class="desc">Sells straight to employers: per-site nutrition programs, on-shift delivery, reporting for HR. Nearly ShiftPlate's exact pitch. (Placeholder.)</div></div>
+      <div class="rival"><div class="top"><span class="nm">Rival A — generalist meal kits</span><span class="badge">wrong rhythm</span></div><div class="desc">Big weekly-box brands. Great logistics, but fixed delivery days and "you cook it" — exactly the rigidity shift workers are stuck on.</div></div>
+      <div class="rival"><div class="top"><span class="nm">Rival B — office catering platforms</span><span class="badge">daytime only</span></div><div class="desc">Corporate lunch/perks delivery. Built for daytime headcount in one building; night and rotating shifts are an afterthought.</div></div>
+      <div class="rival"><div class="top"><span class="nm">Rival C — on-demand delivery apps</span><span class="badge">timing, no health</span></div><div class="desc">Solve "food at 3am" but not "healthy, planned, affordable" — the quality/cost gap is the opening.</div></div>
     </div>
-    <p>They mostly lean toward <span class="k">handling the food</span> &mdash; so none yet nails ShiftPlate's <em>plan-only, any-diet, works-with-any-store</em> angle. But the headline is clear: <span class="k">this race has started without you.</span></p>
+    <p>So the slate isn't empty, but the <span class="k">shift-timed + healthy + employer-paid</span> corner is genuinely uncontested. That's the seam — narrow, but real.</p>
   </section>
 
+  <!-- ── THE CATCH: deepest layer, the honest tension ────────────── -->
   <section>
+    <p class="depth">Layer 3 · The catch</p>
     <div class="calloutbox">
       <div class="hd">The uncomfortable knot</div>
-      <p>The money is on the food. The competitors handle the food. The "just plan it" lane is a near-free commodity that big recipe and grocery apps already bundle in. ShiftPlate's one firm rule &mdash; <b>we never touch the food</b> &mdash; sits it squarely in the cheapest, most contested lane, against funded players who go further.</p>
+      <p>The problem is defined by an <b>unstable schedule</b>, and the pitched product is a <b>fixed weekly subscription</b>. Those fight each other. The part people would actually pay for — food arriving exactly when a shift ends — is the hardest thing to operate and the part the deck treats as a detail. Win the timing and you have a moat; punt on it and you're a worse meal kit.</p>
     </div>
   </section>
 
+  <!-- ── WHAT TO DO ──────────────────────────────────────────────── -->
   <section>
+    <p class="depth">Layer 4 · Recommendation</p>
     <p class="q">The bottom line</p>
-    <h3>Build it &mdash; but not the version in the deck.</h3>
-    <p>The problem is validated; don't second-guess that. What needs to change is the shape. Two moves the evidence is basically shouting:</p>
+    <h3>Build it — but sell timing to employers, not boxes to individuals.</h3>
+    <p>The problem is validated; don't second-guess that. What needs to change is the shape. Two moves the evidence is pointing at:</p>
     <div class="do">
-      <div class="move"><div class="num">1</div><div class="txt"><div class="mt">Sell through employers, across whole sites</div><div class="md">Not the lone worker who churns in a month. The employer with a shift workforce, a wellbeing budget, and a reason to keep staff fed. Recurring, multi-seat, budget already there.</div></div></div>
-      <div class="move"><div class="num">2</div><div class="txt"><div class="mt">Get closer to the actual meal, or you're a free planner</div><div class="md">Make "food in hand on shift, any diet, works with any store" the hero. That's the square the funded rivals (single-diet, own-kitchen) haven't nailed &mdash; and it's what people actually pay for.</div></div></div>
+      <div class="move"><div class="num">1</div><div class="txt"><div class="mt">Make delivery timing the product, not the box</div><div class="md">"Food that arrives when your shift ends," ready to eat — not a fixed kit you cook on a set day. The schedule fit is the whole value; everything else is table stakes.</div></div></div>
+      <div class="move"><div class="num">2</div><div class="txt"><div class="mt">Sell through the employer</div><div class="md">Target facilities already subsidizing meals and worried about night-shift retention. One contract, a whole shift fed, budget that already exists — instead of acquiring exhausted individuals one at a time.</div></div></div>
     </div>
     <div class="test">
       <div class="hd">The one test that settles it</div>
-      <p>Offer the same 8 employers two things and see which one they put a card down for:</p>
-      <p><b>A &mdash;</b> "A meal plan for your shift staff, refreshed every week."<br><b>B &mdash;</b> "We get a good meal into your staff's hands on shift &mdash; and show you who's actually eating."</p>
-      <div class="thr"><b>If B wins and they'll pay a premium &rarr; build around delivering the meal.</b> If A &asymp; B &rarr; you're in a price fight, and you should get into the food itself.</div>
+      <p>Take two offers to 5 night-shift facility managers and see which gets a pilot commitment:</p>
+      <p><b>A —</b> "A subsidized weekly meal-kit perk your staff cook at home."<br><b>B —</b> "Ready meals delivered to the floor at shift-end, we handle timing."</p>
+      <div class="thr"><b>If B wins a paid pilot → build around shift-timed delivery.</b> If neither commits → the pain is real but not budget-owned here; go back to the individual and re-test willingness to pay.</div>
+    </div>
+  </section>
+
+  <!-- ── HOW WE KNOW: methodology & coverage appendix ────────────── -->
+  <section>
+    <p class="depth">Appendix · How we looked</p>
+    <div class="coverage">
+      <div class="hd">Coverage &amp; depth of this research</div>
+      <div class="cgrid">
+        <div class="cell"><div class="n">31</div><div class="lbl">sources read</div></div>
+        <div class="cell"><div class="n">4 / 4</div><div class="lbl">questions covered</div></div>
+        <div class="cell"><div class="n">2</div><div class="lbl">hard Tier 1–2 signals</div></div>
+        <div class="cell"><div class="n">3 / 4</div><div class="lbl">reached saturation</div></div>
+      </div>
+      <p class="covnote"><b>Dedup:</b> 40+ community mentions collapsed to ~14 independent origins — the recurring complaint is genuine, not one thread echoed. <b>Where it ran thin:</b> Question 2 (willingness to pay) rests on inferred spend, not observed transactions — treated as medium confidence and named as the weakest link. No direct purchase data was available without the pilot in the recommended test.</p>
+      <p class="covnote" style="border-top:0;padding-top:4px"><b>Sources drawn on:</b></p>
+      <ul class="srclist">
+        <li>Shift-worker community threads (nursing, warehouse, transit forums) — pain descriptions</li>
+        <li>Occupational-health surveys on shift work and diet — prevalence</li>
+        <li>Meal-kit and office-catering pricing pages — value ladder</li>
+        <li>On-demand delivery coverage and hours — timing gap</li>
+        <li>Employer staff-meal subsidy and retention write-ups — buyer logic</li>
+      </ul>
     </div>
   </section>
 
   <div class="foot">
-    Evidence-first snapshot &mdash; a decision aid, not a guarantee. This is an illustrative example: the product, competitors, and numbers are fictional placeholders to show the shape and voice of a Problem Validation Page. In a real run, every figure carries its own source and competitors are real.
+    Illustrative example for the <code>problem-discovery</code> skill. <b>ShiftPlate, Rivals A/B/C, and every figure here are fictional</b> and exist only to demonstrate the report's shape, voice, and depth — not real market data. A real report replaces every number with a sourced, traceable finding and marks confidence honestly. A decision aid, not a guarantee.
   </div>
 
 </div>
