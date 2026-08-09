@@ -41,6 +41,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`pre-plan`](#pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
+| [`design-to-canvas`](#design-to-canvas) | Can the team absorb this design without rereading the whole doc? | You have a design doc / RFC and want a standalone knowledge-transfer Canvas. |
 | [`8020`](#8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`challenge`](#challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
 | [`visualize`](#visualize) | Can this structure, flow, or trade-off be easier to see? | Prose is hiding architecture, sequence, boundaries, layout, or ambiguity. |
@@ -70,6 +71,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
+| "Turn this design doc into a Canvas the team can absorb." | [`design-to-canvas`](#design-to-canvas) | Knowledge transfer from a design doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
@@ -177,6 +179,21 @@ Use it when:
 - plan mode keeps inventing the wrong thing too early
 - you need grilling without a 40-question tax on every bugfix
 - you want scale/status architecture stripped before it hardens
+
+---
+
+### `design-to-canvas`
+
+Turns a design doc into a standalone Cursor Canvas for team knowledge transfer — not an approval workflow or a prettier copy of the document. Surfaces mental model, system shape, decisions, constraints, and rollout with strong hierarchy and progressive disclosure.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill design-to-canvas
+```
+
+Use it when:
+- you have a design doc / RFC / tech design and want the team to absorb it fast
+- you want a knowledge-transfer Canvas, not a debate space or sign-off flow
+- prose is hiding the mental model, ownership, flows, or decisions
 
 ---
 
@@ -299,6 +316,7 @@ skills/
   8020/
   babysit/
   challenge/
+  design-to-canvas/
   distill-need/
   hebrew-rtl-writing/
   podcast-production/
