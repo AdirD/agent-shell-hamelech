@@ -130,7 +130,7 @@ structure or flow is unclear.
 
 ### `melech`
 
-Remote-first catalog for this library. For every skill on GitHub it shows name, description, installed y/n, where (global/project/workspace → which agents), local/remote version (folder SHA), update available y/n, and the exact install/update command. Leverages [`vercel-labs/skills`](https://github.com/vercel-labs/skills); dry-run only (`npx skills check` aliases `update` and applies changes).
+Remote-first catalog for this library. For every skill on GitHub it shows name, description, installed y/n, where (global/project/workspace → which agents), local/remote version (folder SHA), update available y/n, and the exact install/update command. Also lists the [workflow bundles](#workflow-bundles) (journey recipes) with which steps you already have. Leverages [`vercel-labs/skills`](https://github.com/vercel-labs/skills); dry-run only (`npx skills check` aliases `update` and applies changes).
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech

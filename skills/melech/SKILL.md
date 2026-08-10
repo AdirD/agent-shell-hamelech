@@ -54,9 +54,10 @@ Managed with Vercel's Skills CLI
 Melech catalog:
 - [ ] 1. Run scripts/status.py
 - [ ] 2. Lead with summary (remote count, installed, new, updates)
-- [ ] 3. Show per-skill cards (name, description, installed, versions, update)
+- [ ] 3. Show per-skill cards (name, description, installed, where, versions, update, command)
 - [ ] 4. Call out NEW skills and UPDATE rows first
-- [ ] 5. Offer exact add/update commands; mutate only on approval
+- [ ] 5. Show workflow bundles (recipes) with step readiness ✓/✗
+- [ ] 6. Mutate only on approval, using each row's command
 ```
 
 ### Run the script
@@ -114,11 +115,24 @@ Lead with: remote count, installed, **new**, **updates available**. Then the
 per-skill list (include each row's `command`). Versions are folder tree SHAs
 (Skills CLI lock), not semver — say that once, briefly.
 
-When the user says e.g. "install podcast" / "update the outdated ones", run
-that skill's `command` from the catalog (or matching rows). Do not invent a
-different install line. Prefer those named commands over blind
-`npx skills update -g`. After any mutation, re-run the script and show the
-new summary.
+### Workflow bundles
+
+Always include the **workflow bundles** section from the script output.
+Bundles are journey recipes from the README (not installable skills):
+
+- Product discovery
+- Better engineering
+- Existing-plan review
+- Shipping
+
+For each bundle show the flow, when to use it, and which steps are installed
+(✓/✗). If steps are missing, the script already prints their install commands.
+
+When the user says e.g. "install podcast" / "update the outdated ones" /
+"install the missing steps for product discovery", run the matching
+`command`s from the catalog. Do not invent different install lines. Prefer
+named commands over blind `npx skills update -g`. After any mutation, re-run
+the script and show the new summary.
 
 ## Voice
 

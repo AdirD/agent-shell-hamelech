@@ -5,6 +5,9 @@ For every skill on GitHub main (plus any orphan local lock entries), shows:
   name, description, installed, where (global/project + agents), local/remote
   version, update available, and the install/update command.
 
+Also lists workflow bundles from the remote README (journey recipes that
+chain skills), with per-step install readiness.
+
 Versions are the skill-folder tree SHAs the Skills CLI stores in
 ~/.agents/.skill-lock.json. Install locations come from `npx skills list`
 (global + project). Dry-run only — never installs or updates.
@@ -324,12 +327,16 @@ def parse_frontmatter(text: str) -> dict[str, str]:
     return out
 
 
-def fetch_skill_md(owner_repo: str, ref: str, name: str) -> str | None:
-    path = f"skills/{name}/SKILL.md"
-    # Prefer gh raw (uses user auth)
+def fetch_repo_file(owner_repo: str, ref: str, path: str) -> str | None:
     try:
         out = subprocess.check_output(
-            ["gh", "api", f"repos/{owner_repo}/contents/{path}?ref={ref}", "-H", "Accept: application/vnd.github.raw"],
+            [
+                "gh",
+                "api",
+                f"repos/{owner_repo}/contents/{path}?ref={ref}",
+                "-H",
+                "Accept: application/vnd.github.raw",
+            ],
             stderr=subprocess.DEVNULL,
             text=True,
         )
@@ -340,6 +347,114 @@ def fetch_skill_md(owner_repo: str, ref: str, name: str) -> str | None:
     return http_get_text(
         f"https://raw.githubusercontent.com/{owner_repo}/{ref}/{path}"
     )
+
+
+def fetch_skill_md(owner_repo: str, ref: str, name: str) -> str | None:
+    return fetch_repo_file(owner_repo, ref, f"skills/{name}/SKILL.md")
+
+
+def parse_workflow_bundles(readme: str) -> tuple[str, list[dict[str, Any]]]:
+    """Extract ## Workflow bundles from README → (intro, bundles)."""
+    if not readme:
+        return "", []
+    m = re.search(r"(?m)^## Workflow bundles\s*$", readme)
+    if not m:
+        return "", []
+    rest = readme[m.end() :]
+    # Stop at next top-level ##, a --- rule, or the per-skill ### `name` catalog
+    end = re.search(r"(?m)^(?:## |---\s*$|### `)", rest)
+    section = rest[: end.start()] if end else rest
+
+    intro_lines: list[str] = []
+    bundles: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    in_flow = False
+    flow_buf: list[str] = []
+    use_buf: list[str] = []
+
+    def flush() -> None:
+        nonlocal current, in_flow, flow_buf, use_buf
+        if not current:
+            return
+        current["flow"] = " ".join(" ".join(flow_buf).split())
+        current["use_when"] = " ".join(" ".join(use_buf).split())
+        bundles.append(current)
+        current = None
+        in_flow = False
+        flow_buf = []
+        use_buf = []
+
+    for line in section.splitlines():
+        if re.match(r"^### ", line):
+            flush()
+            current = {"name": line[4:].strip(), "flow": "", "use_when": ""}
+            continue
+        if current is None:
+            if line.strip():
+                intro_lines.append(line.strip())
+            continue
+        if line.strip().startswith("```"):
+            in_flow = not in_flow
+            continue
+        if in_flow:
+            if line.strip():
+                flow_buf.append(line.strip())
+            continue
+        if line.strip().lower().startswith("use when"):
+            use_buf.append(re.sub(r"(?i)^use when\s*", "", line.strip()))
+            continue
+        if line.strip() and not line.startswith("#"):
+            use_buf.append(line.strip())
+
+    flush()
+    return " ".join(intro_lines), bundles
+
+
+def skills_in_flow(flow: str, known: set[str]) -> list[str]:
+    """Return known skill names in flow order."""
+    hits: list[tuple[int, str]] = []
+    for name in known:
+        for match in re.finditer(
+            rf"(?<![A-Za-z0-9_-]){re.escape(name)}(?![A-Za-z0-9_-])", flow
+        ):
+            hits.append((match.start(), name))
+            break
+    hits.sort()
+    return [name for _, name in hits]
+
+
+def annotate_bundles(
+    bundles: list[dict[str, Any]], rows: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    by_name = {r["name"]: r for r in rows}
+    known = set(by_name)
+    out: list[dict[str, Any]] = []
+    for b in bundles:
+        skills = skills_in_flow(b.get("flow") or "", known)
+        steps = []
+        for name in skills:
+            row = by_name[name]
+            steps.append(
+                {
+                    "name": name,
+                    "installed": bool(row.get("installed")),
+                    "status": row.get("status"),
+                    "command": row.get("command"),
+                }
+            )
+        missing = [s["name"] for s in steps if not s["installed"]]
+        out.append(
+            {
+                "name": b["name"],
+                "flow": b.get("flow") or "",
+                "use_when": b.get("use_when") or "",
+                "skills": skills,
+                "steps": steps,
+                "ready": len(missing) == 0 and bool(steps),
+                "missing": missing,
+            }
+        )
+    return out
 
 
 def remote_skills(tree: dict[str, Any]) -> dict[str, dict[str, str]]:
@@ -545,7 +660,51 @@ def command_for(row: dict[str, Any]) -> str:
     return f"npx skills remove {name} -g -y"
 
 
-def print_human(rows: list[dict[str, Any]], *, ref: str, source: str) -> None:
+def print_bundles(
+    intro: str, bundles: list[dict[str, Any]], rows: list[dict[str, Any]]
+) -> None:
+    if not bundles:
+        return
+    print()
+    print("workflow bundles (journey recipes, not extra skills):")
+    if intro:
+        print(f"  {intro}")
+    print()
+    by_name = {r["name"]: r for r in rows}
+    for b in bundles:
+        ready_tag = "READY" if b.get("ready") else "MISSING STEPS"
+        print(f"• {b['name']}  [{ready_tag}]")
+        print(f"  {b.get('flow') or '(no flow)'}")
+        if b.get("use_when"):
+            print(f"  use when: {b['use_when']}")
+        step_bits = []
+        for step in b.get("steps") or []:
+            mark = "✓" if step.get("installed") else "✗"
+            step_bits.append(f"{step['name']} {mark}")
+        if step_bits:
+            print(f"  steps: {' | '.join(step_bits)}")
+        missing = b.get("missing") or []
+        if missing:
+            cmds = []
+            for name in missing:
+                cmd = (by_name.get(name) or {}).get("command")
+                if cmd:
+                    cmds.append(cmd)
+            if cmds:
+                print("  install missing:")
+                for cmd in cmds:
+                    print(f"    {cmd}")
+        print()
+
+
+def print_human(
+    rows: list[dict[str, Any]],
+    *,
+    ref: str,
+    source: str,
+    bundle_intro: str = "",
+    bundles: list[dict[str, Any]] | None = None,
+) -> None:
     # Remote-first: all on_remote skills A–Z, then orphans
     remote_rows = [r for r in rows if r.get("on_remote")]
     orphan_rows = [r for r in rows if not r.get("on_remote")]
@@ -624,7 +783,8 @@ def print_human(rows: list[dict[str, Any]], *, ref: str, source: str) -> None:
             f"{short_where}"
         )
 
-    print()
+    print_bundles(bundle_intro, bundles or [], rows)
+
     print("notes:")
     print(
         "  - versions are skill-folder git tree SHAs (same as the skills CLI lock),"
@@ -637,6 +797,10 @@ def print_human(rows: list[dict[str, Any]], *, ref: str, source: str) -> None:
     print(
         "  - each card's `command` is what to run when the user asks to"
         " install/update that skill; do not run until asked"
+    )
+    print(
+        "  - workflow bundles come from the remote README; they chain skills,"
+        " they are not installable packages"
     )
 
 
@@ -688,6 +852,16 @@ def main() -> int:
     if not args.no_descriptions:
         enrich_descriptions(args.source, args.ref, remote)
 
+    readme = fetch_repo_file(args.source, args.ref, "README.md") or ""
+    # Prefer local README when running inside this checkout (unpushed edits)
+    local_readme = cwd / "README.md"
+    if local_readme.is_file() and (cwd / "skills" / "melech").is_dir():
+        try:
+            readme = local_readme.read_text()
+        except OSError:
+            pass
+    bundle_intro, raw_bundles = parse_workflow_bundles(readme)
+
     lock = load_lock(args.lock)
     local = local_melech(lock)
     installs_by_name = load_installs(cwd)
@@ -697,6 +871,7 @@ def main() -> int:
     attach_installs(rows, installs_by_name, cwd)
     for r in rows:
         r["command"] = command_for(r)
+    bundles = annotate_bundles(raw_bundles, rows)
 
     counts: dict[str, int] = {}
     for r in rows:
@@ -722,15 +897,25 @@ def main() -> int:
                 1 for r in rows if r["update_available"] and r["on_remote"]
             ),
             "broken_source": sum(1 for r in rows if r["status"] == "broken-source"),
+            "workflow_bundles": len(bundles),
+            "workflow_bundles_ready": sum(1 for b in bundles if b.get("ready")),
         },
         "skills": rows,
+        "workflow_bundles_intro": bundle_intro,
+        "workflow_bundles": bundles,
         "counts": counts,
     }
 
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print_human(rows, ref=args.ref, source=args.source)
+        print_human(
+            rows,
+            ref=args.ref,
+            source=args.source,
+            bundle_intro=bundle_intro,
+            bundles=bundles,
+        )
     return 0
 
 
