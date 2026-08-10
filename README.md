@@ -28,6 +28,12 @@ cp -R skills/<name> .agents/skills/<name>
 Start from the outcome you need. Skills are individual capabilities; the
 [workflow bundles](#workflow-bundles) below show how to combine them.
 
+### Manage the library
+
+| Skill | Question it answers | Reach for it when |
+|---|---|---|
+| [`melech`](#melech) | What melech skills exist remote vs local, and should I update? | Say `melech list` / `melech list skills`, or ask about catalog sync / updates. |
+
 ### Understand what you need
 
 | Skill | Question it answers | Reach for it when |
@@ -66,6 +72,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | If you are saying… | Start with | Why |
 |---|---|---|
+| "What melech skills do I have / should I update?" | [`melech`](#melech) | Dry remote↔local sync status for this library. |
 | "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
 | "Is this pain real / will buyers pay?" | [`problem-discovery`](#problem-discovery) | Demand and pain need evidence before solutioning. |
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
@@ -118,6 +125,25 @@ smart-comments (during implementation) → babysit
 Use when the work is decided and the remaining job is preserving code intent
 and driving the PR to merge-ready. `visualize` can assist any bundle when
 structure or flow is unclear.
+
+---
+
+### `melech`
+
+Remote-first catalog for this library. For every skill on GitHub it shows name, description, installed y/n, where (global/project/workspace → which agents), local/remote version (folder SHA), update available y/n, and the exact install/update command. Leverages [`vercel-labs/skills`](https://github.com/vercel-labs/skills); dry-run only (`npx skills check` aliases `update` and applies changes).
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech
+```
+
+Invoke it with:
+- `melech list` or `melech list skills` (easiest to remember)
+- `melech`, `melech status`, or "should I update my melech skills?"
+
+Use it when:
+- you want remote → local comparison per skill (including brand-new remote skills)
+- you ask "should I update?" before running `npx skills update`
+- a skill's lock still points at the typo slug `AdirD/agent-shel-hamelech`
 
 ---
 
@@ -319,6 +345,7 @@ skills/
   design-to-canvas/
   distill-need/
   hebrew-rtl-writing/
+  melech/
   podcast-production/
   pre-plan/
   problem-discovery/

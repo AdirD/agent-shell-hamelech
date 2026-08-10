@@ -1,7 +1,18 @@
 ---
 name: podcast-production
-description: Turn long interviews, meetings, webinars, panels, or recorded conversations into a short, user-approved podcast story and finished video. Use this skill whenever the user wants to find the best storyline, compare editorial angles, script a short cut, pull the strongest clips, iterate on an interview narrative, or edit/render/verify an approved podcast video—even if they ask for only one stage or never use the word podcast. It provides two intents: collaborative storyline development from raw media/transcripts, and source-faithful FFmpeg production from an approved script.
-compatibility: Storyline work needs readable media/transcripts and standard research tools. Video production requires Python 3.9+, ffmpeg, and ffprobe; a Whisper-compatible word-timestamp transcriber is optional.
+description: >-
+  Turn long interviews, meetings, webinars, panels, or recorded conversations
+  into a short, user-approved podcast story and finished video. Use this skill
+  whenever the user wants to find the best storyline, compare editorial angles,
+  script a short cut, pull the strongest clips, iterate on an interview
+  narrative, or edit/render/verify an approved podcast video—even if they ask
+  for only one stage or never use the word podcast. It provides two intents:
+  collaborative storyline development from raw media/transcripts, and
+  source-faithful FFmpeg production from an approved script.
+compatibility: >-
+  Storyline work needs readable media/transcripts and standard research tools.
+  Video production requires Python 3.9+, ffmpeg, and ffprobe; a
+  Whisper-compatible word-timestamp transcriber is optional.
 ---
 
 # Podcast production
