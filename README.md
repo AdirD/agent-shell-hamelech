@@ -1,4 +1,4 @@
-# agent-shell-hamelech
+# 👑 agent-shell-hamelech
 
 A small, opinionated library of **agent skills** — drop-in behaviors you can install into Cursor, Claude Code, Codex, and any other agent that speaks the [Agent Skills](https://github.com/anthropics/skills) format.
 
@@ -58,6 +58,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
+| [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. |
 | [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
@@ -82,6 +83,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
 | "Turn this design doc into a Canvas the team can absorb." | [`design-to-canvas`](#design-to-canvas) | Knowledge transfer from a design doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
+| "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
@@ -178,6 +180,24 @@ Use it when:
 - you have an open PR and want it driven to merge without polling every few minutes
 - review bots (Bugbot, CodeRabbit, …) and CI keep making a one-shot check go stale
 - you want the agent to stop cleanly on real blockers instead of spinning
+
+---
+
+### `debug-mode`
+
+Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port, guides the agent to add minimal temporary POST probes, waits for the user to reproduce and reply `proceed`, then inspects evidence, iterates or fixes, removes every probe, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill debug-mode
+```
+
+Use it when:
+- you can reproduce a UI, API, desktop, or integration bug but current logs are insufficient
+- runtime state or control flow must be observed before choosing a fix
+- you want hypothesis-driven instrumentation with an explicit user reproduction gate
+- temporary probes and the local collector must be removed cleanly afterward
+
+Requires Python 3.9+ and the official Vercel Labs `portless` CLI.
 
 ---
 
@@ -348,6 +368,7 @@ skills/
   challenge/
   design-to-canvas/
   distill-need/
+  debug-mode/
   hebrew-rtl-writing/
   melech/
   podcast-production/
