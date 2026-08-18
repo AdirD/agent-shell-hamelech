@@ -1,3 +1,5 @@
+![A fictional Moroccan sultan in a palace courtyard at sunrise](assets/moroccan-sultan-cover.png)
+
 # agent-shell-hamelech
 
 A small, opinionated library of **agent skills** — drop-in behaviors you can install into Cursor, Claude Code, Codex, and any other agent that speaks the [Agent Skills](https://github.com/anthropics/skills) format.
