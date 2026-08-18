@@ -840,8 +840,35 @@ def main() -> int:
         default=Path.cwd(),
         help="project directory for project-level skills list (default: cwd)",
     )
+    parser.add_argument(
+        "--sync-local",
+        action="store_true",
+        help="sync local skill edits across all local dev repos and global agent directories",
+    )
+    parser.add_argument(
+        "--local-check",
+        action="store_true",
+        help="check for deviations across local dev repos and global agent directories without modifying",
+    )
     args = parser.parse_args()
     cwd = args.cwd.expanduser().resolve()
+
+    if args.sync_local or args.local_check:
+        script_dir = Path(__file__).resolve().parent
+        repo_root = script_dir.parent.parent.parent
+        sync_script = repo_root / "scripts" / "sync-local-skills.py"
+        if not sync_script.is_file():
+            eprint(f"could not find local sync script at {sync_script}")
+            return 1
+        cmd = [sys.executable, str(sync_script)]
+        if args.local_check:
+            cmd.append("--check")
+        else:
+            cmd.append("--apply")
+        if args.json:
+            cmd.append("--json")
+        res = subprocess.run(cmd)
+        return res.returncode
 
     tree = fetch_repo_tree(args.source, args.ref)
     if not tree:

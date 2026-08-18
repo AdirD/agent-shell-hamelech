@@ -13,6 +13,20 @@ At minimum, keep the matching README section accurate:
 
 Do not leave the repo in a state where the catalog in `README.md` is stale.
 
+## Local Skill Sync & Zero-Deviation Rule
+
+Whenever modifying, adding, or deleting a skill under `skills/`:
+
+1. All local installations across global agent directories (`~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`, `~/.codex/skills`, etc.) and sibling repositories under `~/Dev` must remain 100% in sync with zero deviation.
+2. The agent must immediately run the sync script to update all usages:
+   ```bash
+   python3 scripts/sync-local-skills.py --apply
+   ```
+3. You can audit deviations at any time:
+   ```bash
+   python3 scripts/sync-local-skills.py --check
+   ```
+
 ## Git Identity (this repo)
 
 Use your personal email for every commit in this public repo — both **author** and **committer**.

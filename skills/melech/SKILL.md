@@ -134,6 +134,22 @@ When the user says e.g. "install podcast" / "update the outdated ones" /
 named commands over blind `npx skills update -g`. After any mutation, re-run
 the script and show the new summary.
 
+### Local development & multi-repo zero-deviation sync
+
+When developing or editing skills locally in this repository, use the local sync tool to guarantee zero deviations across all your dev repos and agent folders:
+
+```bash
+# Check if any local dev repos or global agent dirs have deviated:
+python3 scripts/sync-local-skills.py --check
+# or:
+python3 skills/melech/scripts/status.py --local-check
+
+# Synchronize all local usages immediately:
+python3 scripts/sync-local-skills.py --apply
+# or:
+python3 skills/melech/scripts/status.py --sync-local
+```
+
 ## Voice
 
 Sharp and short. Verdict first (N new, M updates), then the catalog, then

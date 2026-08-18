@@ -141,10 +141,12 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech
 Invoke it with:
 - `melech list` or `melech list skills` (easiest to remember)
 - `melech`, `melech status`, or "should I update my melech skills?"
+- `melech sync-local` or `python3 scripts/sync-local-skills.py` (local zero-deviation sync)
 
 Use it when:
 - you want remote → local comparison per skill (including brand-new remote skills)
 - you ask "should I update?" before running `npx skills update`
+- you edit skills locally and want all usages across sibling repos & global agent dirs synced immediately
 - a skill's lock still points at the typo slug `AdirD/agent-shel-hamelech`
 
 ---
