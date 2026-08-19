@@ -185,7 +185,7 @@ Use it when:
 
 ### `debug-mode`
 
-Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port, guides the agent to add minimal temporary POST probes, waits for the user to reproduce and reply `proceed`, then inspects evidence, iterates or fixes, removes every probe, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience.
+Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port, guides the agent to add minimal temporary POST probes, waits for the user to reproduce and reply `proceed`, then inspects evidence, iterates or fixes, removes every probe, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience. A built-in `doctor` TUI (`debug_session.py doctor`) shows every live session with per-session health (running/degraded/dead from process state plus the collector `/health` endpoint), a real-time event tail, surfaced collector errors, and a hotkey to kill a session.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill debug-mode
@@ -196,8 +196,15 @@ Use it when:
 - runtime state or control flow must be observed before choosing a fix
 - you want hypothesis-driven instrumentation with an explicit user reproduction gate
 - temporary probes and the local collector must be removed cleanly afterward
+- you want a live view of running collectors, their health, and streamed logs, with the ability to kill one manually (`doctor`)
 
 Requires Python 3.9+ and the official Vercel Labs `portless` CLI.
+
+Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, `dm start`/`dm stop <dir>` forward to the launcher):
+
+```bash
+sh <skill-dir>/scripts/install-dm.sh
+```
 
 ---
 

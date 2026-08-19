@@ -13,8 +13,10 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.error import URLError
 from urllib.request import urlopen
 
 SESSION_PREFIX = "debug-mode-"
@@ -101,6 +103,150 @@ def validated_session_dir(raw_path: str) -> Path:
     if not (path / "launcher.json").is_file():
         raise ValueError(f"missing launcher metadata: {path}")
     return path
+
+
+HEALTH_TIMEOUT_SECONDS = 0.4
+ERROR_MARKERS = ("Traceback", "Error", "Exception", "CRITICAL", "Fatal", "refused")
+
+
+def discover_sessions() -> list[Path]:
+    """Return every debug-mode session directory in the temp root."""
+    temp_root = Path(tempfile.gettempdir()).resolve()
+    sessions: list[Path] = []
+    try:
+        children = list(temp_root.iterdir())
+    except OSError:
+        return sessions
+    for child in children:
+        if (
+            child.is_dir()
+            and child.name.startswith(SESSION_PREFIX)
+            and (child / "launcher.json").is_file()
+        ):
+            sessions.append(child.resolve())
+    return sorted(sessions, key=lambda path: path.name)
+
+
+def probe_health(metadata: dict[str, Any]) -> tuple[str, int | None]:
+    """Ping the collector's /health endpoint and classify the result."""
+    host = metadata.get("backend_host")
+    port = metadata.get("backend_port")
+    if not host or not port:
+        return "unknown", None
+    url = f"http://{host}:{port}/health"
+    try:
+        with urlopen(url, timeout=HEALTH_TIMEOUT_SECONDS) as response:
+            if response.status != 200:
+                return "unhealthy", None
+            data = json.loads(response.read().decode("utf-8"))
+    except (URLError, OSError, ValueError):
+        return "unreachable", None
+    entries = data.get("entries")
+    return "healthy", entries if isinstance(entries, int) else None
+
+
+def last_error_line(runtime_log: Path) -> str | None:
+    """Return the most recent runtime.log line that looks like an error."""
+    try:
+        lines = runtime_log.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None
+    for line in reversed(lines):
+        stripped = line.strip()
+        if stripped and any(marker in stripped for marker in ERROR_MARKERS):
+            return stripped
+    return None
+
+
+def format_age(started_at: str | None) -> str:
+    if not started_at:
+        return "-"
+    try:
+        started = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+    except ValueError:
+        return "-"
+    seconds = int((datetime.now(timezone.utc) - started).total_seconds())
+    if seconds < 0:
+        return "0s"
+    if seconds < 60:
+        return f"{seconds}s"
+    if seconds < 3600:
+        return f"{seconds // 60}m{seconds % 60:02d}s"
+    return f"{seconds // 3600}h{(seconds % 3600) // 60:02d}m"
+
+
+def session_snapshot(session_dir: Path) -> dict[str, Any]:
+    """Collect status, health, and diagnostics for one session directory."""
+    snapshot: dict[str, Any] = {
+        "session_dir": session_dir,
+        "session_id": session_dir.name.replace(SESSION_PREFIX, "", 1),
+        "route_name": None,
+        "status": "unknown",
+        "health": "unknown",
+        "entries": None,
+        "backend_port": None,
+        "backend_host": None,
+        "collector_url": None,
+        "launcher_pid": None,
+        "collector_pid": None,
+        "launcher_alive": False,
+        "collector_alive": False,
+        "started_at": None,
+        "age": "-",
+        "last_error": None,
+    }
+    try:
+        launcher = read_json(session_dir / "launcher.json")
+    except (OSError, json.JSONDecodeError):
+        return snapshot
+
+    snapshot["session_id"] = launcher.get("session_id", snapshot["session_id"])
+    snapshot["route_name"] = launcher.get("route_name")
+    launcher_pid = int(launcher.get("launcher_pid", 0) or 0)
+    snapshot["launcher_pid"] = launcher_pid or None
+    snapshot["launcher_alive"] = launcher_pid > 0 and process_alive(launcher_pid)
+
+    metadata_path = session_dir / "collector.json"
+    has_metadata = metadata_path.is_file()
+    if has_metadata:
+        try:
+            metadata = read_json(metadata_path)
+            collector_pid = int(metadata.get("collector_pid", 0) or 0)
+            snapshot["collector_pid"] = collector_pid or None
+            snapshot["collector_alive"] = collector_pid > 0 and process_alive(collector_pid)
+            snapshot["backend_host"] = metadata.get("backend_host")
+            snapshot["backend_port"] = metadata.get("backend_port")
+            snapshot["collector_url"] = metadata.get("collector_url")
+            snapshot["started_at"] = metadata.get("started_at")
+            if snapshot["launcher_alive"] and snapshot["collector_alive"]:
+                snapshot["health"], snapshot["entries"] = probe_health(metadata)
+        except (OSError, json.JSONDecodeError, KeyError, ValueError):
+            pass
+
+    if not snapshot["launcher_alive"] or (has_metadata and not snapshot["collector_alive"]):
+        snapshot["status"] = "dead"
+    elif not has_metadata:
+        snapshot["status"] = "starting"
+    elif snapshot["health"] == "healthy":
+        snapshot["status"] = "running"
+    else:
+        snapshot["status"] = "degraded"
+
+    snapshot["age"] = format_age(snapshot["started_at"])
+
+    runtime_log = launcher.get("runtime_log")
+    if runtime_log:
+        snapshot["last_error"] = last_error_line(Path(runtime_log))
+    return snapshot
+
+
+def kill_session_dir(session_dir: Path) -> None:
+    """Stop a session's processes and delete its temp directory (same as `stop`)."""
+    session_dir = validated_session_dir(str(session_dir))
+    launcher = read_json(session_dir / "launcher.json")
+    stop_session_processes(session_dir, int(launcher["launcher_pid"]))
+    if session_dir.exists():
+        shutil.rmtree(session_dir, ignore_errors=True)
 
 
 def start_session(args: argparse.Namespace) -> int:
@@ -246,9 +392,295 @@ def stop_session(args: argparse.Namespace) -> int:
     return 0
 
 
+STATUS_GLYPHS = {
+    "running": "\u25cf",
+    "degraded": "\u25d0",
+    "starting": "\u25cc",
+    "dead": "\u25cb",
+    "unknown": "\u25cb",
+}
+SCAN_INTERVAL_SECONDS = 0.8
+
+
+def _status_color(status: str) -> int:
+    if status == "running":
+        return 1
+    if status in ("degraded", "starting"):
+        return 2
+    return 3
+
+
+def _compact(value: Any) -> str:
+    text = value if isinstance(value, str) else json.dumps(value, separators=(",", ":"))
+    return text if len(text) <= 40 else text[:37] + "..."
+
+
+def _event_line(event: dict[str, Any]) -> str:
+    payload = event.get("payload", {}) if isinstance(event, dict) else {}
+    seq = event.get("seq", "?") if isinstance(event, dict) else "?"
+    run = payload.get("run", "-")
+    probe = payload.get("probe", "-")
+    data = payload.get("data", {})
+    if isinstance(data, dict):
+        body = ", ".join(f"{key}={_compact(val)}" for key, val in data.items())
+    else:
+        body = _compact(data)
+    return f"#{seq} [{run}] {probe}  {body}".rstrip()
+
+
+def _read_events_tail(session_dir: Path, limit: int) -> list[dict[str, Any]]:
+    if limit <= 0:
+        return []
+    try:
+        lines = (session_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    events: list[dict[str, Any]] = []
+    for line in lines[-limit:]:
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return events
+
+
+def _safe_addstr(win: Any, y: int, x: int, text: str, attr: int = 0) -> None:
+    curses = sys.modules["curses"]
+    height, width = win.getmaxyx()
+    if y < 0 or y >= height or x < 0 or x >= width:
+        return
+    clipped = text[: max(0, width - x - 1)]
+    if not clipped:
+        return
+    try:
+        win.addstr(y, x, clipped, attr)
+    except curses.error:
+        pass
+
+
+def _draw_doctor(
+    stdscr: Any,
+    sessions: list[dict[str, Any]],
+    selected: int,
+    message: str,
+    confirm: Path | None,
+) -> None:
+    curses = sys.modules["curses"]
+    stdscr.erase()
+    height, width = stdscr.getmaxyx()
+    running = sum(1 for snap in sessions if snap["status"] == "running")
+    accent = curses.color_pair(4) | curses.A_BOLD
+
+    title = f" debug-mode doctor \u2014 {len(sessions)} session(s), {running} running"
+    _safe_addstr(stdscr, 0, 0, title.ljust(width - 1), accent)
+    _safe_addstr(
+        stdscr,
+        1,
+        1,
+        f"{'':2}{'STATUS':<10}{'SESSION':<14}{'PORT':<7}{'EV':<6}{'AGE':<8}HEALTH",
+        curses.A_DIM,
+    )
+
+    list_capacity = max(1, (height - 5) // 3)
+    visible = min(len(sessions), list_capacity)
+    list_top = 2
+    for index in range(visible):
+        snap = sessions[index]
+        row = list_top + index
+        selected_row = index == selected
+        base = curses.A_REVERSE if selected_row else 0
+        _safe_addstr(stdscr, row, 1, ">" if selected_row else " ", base | curses.A_BOLD)
+        glyph = STATUS_GLYPHS.get(snap["status"], "?")
+        _safe_addstr(stdscr, row, 2, f" {glyph} ", curses.color_pair(_status_color(snap["status"])) | curses.A_BOLD)
+        port = str(snap.get("backend_port") or "-")
+        entries = snap.get("entries")
+        entries_text = str(entries) if entries is not None else "-"
+        line = (
+            f"{snap['status']:<10}{snap['session_id'][:13]:<14}"
+            f"{port:<7}{entries_text:<6}{snap['age']:<8}{snap['health']}"
+        )
+        _safe_addstr(stdscr, row, 5, line, base)
+
+    if len(sessions) > visible:
+        _safe_addstr(stdscr, list_top + visible, 5, f"... {len(sessions) - visible} more", curses.A_DIM)
+
+    divider_row = list_top + max(visible, 1) + (1 if len(sessions) > visible else 0)
+    _safe_addstr(stdscr, divider_row, 0, "\u2500" * (width - 1), curses.A_DIM)
+
+    detail_top = divider_row + 1
+    footer_row = height - 1
+    if sessions and 0 <= selected < len(sessions):
+        snap = sessions[selected]
+        health_attr = curses.color_pair(_status_color(snap["status"])) | curses.A_BOLD
+        _safe_addstr(stdscr, detail_top, 1, f"SESSION {snap['session_id']}", accent)
+        _safe_addstr(
+            stdscr,
+            detail_top,
+            max(1, width - 30),
+            f"route {snap.get('route_name') or '-'}",
+            curses.A_DIM,
+        )
+        _safe_addstr(stdscr, detail_top + 1, 1, "status ", curses.A_DIM)
+        _safe_addstr(stdscr, detail_top + 1, 8, snap["status"], health_attr)
+        _safe_addstr(
+            stdscr,
+            detail_top + 1,
+            22,
+            f"health {snap['health']}   entries {snap.get('entries') if snap.get('entries') is not None else '-'}   age {snap['age']}",
+        )
+        launcher_state = "alive" if snap["launcher_alive"] else "dead"
+        collector_state = "alive" if snap["collector_alive"] else "dead"
+        _safe_addstr(
+            stdscr,
+            detail_top + 2,
+            1,
+            f"launcher pid {snap.get('launcher_pid') or '-'} ({launcher_state})   "
+            f"collector pid {snap.get('collector_pid') or '-'} ({collector_state})   "
+            f"port {snap.get('backend_port') or '-'}",
+            curses.A_DIM,
+        )
+        if snap.get("last_error"):
+            _safe_addstr(
+                stdscr,
+                detail_top + 3,
+                1,
+                f"last error: {snap['last_error']}",
+                curses.color_pair(3) | curses.A_BOLD,
+            )
+        events_label_row = detail_top + 4
+        _safe_addstr(stdscr, events_label_row, 1, "events (live tail):", curses.A_DIM)
+        tail_top = events_label_row + 1
+        tail_capacity = max(0, footer_row - tail_top)
+        events = _read_events_tail(snap["session_dir"], tail_capacity)
+        if not events:
+            _safe_addstr(stdscr, tail_top, 2, "(no events yet)", curses.A_DIM)
+        else:
+            start = tail_top + max(0, tail_capacity - len(events))
+            for offset, event in enumerate(events[-tail_capacity:]):
+                _safe_addstr(stdscr, start + offset, 2, _event_line(event))
+    else:
+        _safe_addstr(stdscr, detail_top, 1, "No active debug-mode sessions.", curses.A_DIM)
+
+    if confirm is not None:
+        prompt = f" kill {confirm.name.replace(SESSION_PREFIX, '', 1)}? y = confirm, n = cancel "
+        _safe_addstr(stdscr, footer_row, 0, prompt.ljust(width - 1), curses.color_pair(3) | curses.A_BOLD | curses.A_REVERSE)
+    else:
+        keys = " \u2191/\u2193 j/k move   x kill+delete   r refresh   q quit "
+        _safe_addstr(stdscr, footer_row, 0, keys, curses.A_REVERSE)
+        if message:
+            _safe_addstr(stdscr, footer_row, max(0, width - len(message) - 2), message, curses.color_pair(4))
+    stdscr.noutrefresh()
+    curses.doupdate()
+
+
+def _doctor_main(stdscr: Any, _args: argparse.Namespace) -> None:
+    curses = sys.modules["curses"]
+    curses.curs_set(0)
+    stdscr.timeout(200)
+    if curses.has_colors():
+        curses.start_color()
+        try:
+            curses.use_default_colors()
+            background = -1
+        except curses.error:
+            background = curses.COLOR_BLACK
+        curses.init_pair(1, curses.COLOR_GREEN, background)
+        curses.init_pair(2, curses.COLOR_YELLOW, background)
+        curses.init_pair(3, curses.COLOR_RED, background)
+        curses.init_pair(4, curses.COLOR_CYAN, background)
+
+    selected = 0
+    sessions: list[dict[str, Any]] = []
+    message = ""
+    confirm: Path | None = None
+    last_scan = 0.0
+
+    while True:
+        now = time.monotonic()
+        if now - last_scan >= SCAN_INTERVAL_SECONDS:
+            sessions = [session_snapshot(path) for path in discover_sessions()]
+            last_scan = now
+            if selected >= len(sessions):
+                selected = max(0, len(sessions) - 1)
+
+        _draw_doctor(stdscr, sessions, selected, message, confirm)
+
+        try:
+            key = stdscr.getch()
+        except KeyboardInterrupt:
+            return
+        if key == -1:
+            continue
+
+        if confirm is not None:
+            if key in (ord("y"), ord("Y")):
+                target = confirm
+                confirm = None
+                try:
+                    kill_session_dir(target)
+                    message = f"killed {target.name.replace(SESSION_PREFIX, '', 1)}"
+                except (OSError, RuntimeError, ValueError, KeyError, json.JSONDecodeError) as error:
+                    message = f"kill failed: {error}"
+                last_scan = 0.0
+            elif key in (ord("n"), ord("N"), 27):
+                confirm = None
+                message = "kill cancelled"
+            continue
+
+        if key in (ord("q"), ord("Q")):
+            return
+        if key in (curses.KEY_UP, ord("k")):
+            selected = max(0, selected - 1)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            selected = min(max(0, len(sessions) - 1), selected + 1)
+        elif key in (ord("r"), ord("R")):
+            last_scan = 0.0
+            message = "refreshed"
+        elif key in (ord("x"), ord("X")):
+            if sessions and 0 <= selected < len(sessions):
+                confirm = sessions[selected]["session_dir"]
+        elif key == curses.KEY_RESIZE:
+            continue
+
+
+def doctor_session(args: argparse.Namespace) -> int:
+    try:
+        import curses
+    except ImportError as error:
+        raise RuntimeError(
+            "doctor requires the curses module, which is unavailable on this platform"
+        ) from error
+    if args.once:
+        sessions = [session_snapshot(path) for path in discover_sessions()]
+        print(json.dumps(sessions, indent=2, default=str))
+        return 0
+    curses.wrapper(_doctor_main, args)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(
+        description=(
+            "Manage isolated debug-mode collector sessions. "
+            "Run `doctor` for a live TUI of every session (health, log tail, kill)."
+        ),
+        epilog=(
+            "examples:\n"
+            "  debug_session.py doctor            live TUI: sessions, health, logs, kill\n"
+            "  debug_session.py doctor --once     one-shot JSON snapshot (no TTY needed)\n"
+            "  debug_session.py start             start a new collector session\n"
+            "  debug_session.py status <dir>      status of one session\n"
+            "  debug_session.py logs <dir> --run run-1\n"
+            "  debug_session.py stop <dir>        stop and remove one session\n"
+            "\n"
+            "With the `dm` shell command installed (scripts/install-dm.sh):\n"
+            "  dm            open the doctor TUI\n"
+            "  dm help       show this help\n"
+            "  dm start / dm stop <dir> / ...     same subcommands\n"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True, metavar="command")
 
     start = subparsers.add_parser("start", help="start a new temporary collector")
     start.add_argument("--portless-bin", default="portless")
@@ -270,6 +702,17 @@ def build_parser() -> argparse.ArgumentParser:
     stop.add_argument("session_dir")
     stop.add_argument("--keep", action="store_true", help="keep the session directory")
     stop.set_defaults(func=stop_session)
+
+    doctor = subparsers.add_parser(
+        "doctor",
+        help="live TUI of all debug-mode sessions with health, log tail, and kill",
+    )
+    doctor.add_argument(
+        "--once",
+        action="store_true",
+        help="print a one-shot JSON snapshot instead of launching the TUI",
+    )
+    doctor.set_defaults(func=doctor_session)
     return parser
 
 

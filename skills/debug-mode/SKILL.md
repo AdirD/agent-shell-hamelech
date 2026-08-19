@@ -38,19 +38,29 @@ and use it as the interaction model.
    `portless` are available. If Portless is missing, stop and tell the user to
    install the official Vercel Labs CLI with `npm install -g portless`. Do not
    silently substitute another tunnel or server.
-3. If this machine has not used Portless before, run `portless doctor`. Follow
-   its local trust/setup guidance before starting the background session.
-4. Start the bundled collector:
+3. Source the bundled command once so the short `dm` verb is available for the
+   rest of this session (the shell keeps it across later calls):
 
    ```bash
-   python3 <skill-dir>/scripts/debug_session.py start
+   source <skill-dir>/scripts/dm.sh
+   ```
+
+   Every launcher call below uses `dm`, which is identical to
+   `python3 <skill-dir>/scripts/debug_session.py`. If `dm` is ever undefined in a
+   later step (fresh shell), re-source `dm.sh` or fall back to the full path.
+4. If this machine has not used Portless before, run `portless doctor`. Follow
+   its local trust/setup guidance before starting the background session.
+5. Start the bundled collector:
+
+   ```bash
+   dm start
    ```
 
    Save the returned `session_dir`, `session_id`, `log_endpoint`, `events_file`,
    and `backend_port`. The launcher copies the lean server skeleton into a new
    temporary directory. Portless assigns a different free backend port and a
    unique local route for every session.
-5. Verify the returned `health_url` before editing application code.
+6. Verify the returned `health_url` before editing application code.
 
 ## Add Dynamic Request Probes
 
@@ -113,7 +123,7 @@ replies.
 Read the evidence with:
 
 ```bash
-python3 <skill-dir>/scripts/debug_session.py logs <session-dir> --run run-1
+dm logs <session-dir> --run run-1
 ```
 
 Correlate event order and values against the stated hypotheses, then choose
@@ -125,7 +135,7 @@ one outcome:
 - **Reproduced but inconclusive:** say what the evidence ruled out, revise the
   hypothesis, add or move only the probes needed for `run-2`, and ask for the
   precise workflow again.
-- **No application events:** check session status and send one synthetic event
+- **No application events:** check session status (`dm status <session-dir>`) and send one synthetic event
   to distinguish collector delivery failure from an unvisited code path. Check
   browser CSP/CORS or environment reachability when relevant, then repair the
   instrumentation and retry.
@@ -135,6 +145,59 @@ one outcome:
 
 Do not equate correlation with cause. Cite the specific probe sequence and
 values that support the next action.
+
+## Doctor: Monitor Live Sessions
+
+To inspect every debug-mode collector on the machine at once, run the live TUI:
+
+```bash
+dm doctor    # or bare `dm`
+```
+
+It scans the temp root for all `debug-mode-*` sessions and shows, per session, a
+health status derived from the process state plus the collector's `/health`
+endpoint:
+
+- **running** (green): launcher and collector processes are alive and `/health`
+  returns 200.
+- **degraded** (yellow): processes are alive but `/health` is unreachable or
+  non-200 (hung or wedged port). `starting` means the collector metadata has not
+  been written yet.
+- **dead** (red): the launcher or collector process is gone.
+
+The detail pane live-tails the selected session's `events.jsonl`, auto-scrolling
+to the newest event, shows the live entry count, and surfaces the last error
+line from `runtime.log` when the collector crashed or is throwing.
+
+Keys: `↑`/`↓` or `j`/`k` to move, `x` to kill the selected session (stops its
+processes and deletes its temp directory, same as `stop`; asks `y`/`n` first),
+`r` to force a refresh, `q` to quit. Killing only ever targets a validated
+`debug-mode-*` session directory; it never issues a broad process kill.
+
+For scripting or when no TTY is available, use `dm doctor --once` to print a
+one-shot JSON snapshot of all sessions instead of launching the TUI.
+
+### Installing `dm` persistently for the user
+
+The skill sources `dm.sh` for its own session, but the user gets `dm` in their
+own terminals only after a one-time install. Offer it once per machine:
+
+```bash
+sh <skill-dir>/scripts/install-dm.sh
+```
+
+This appends a single `source <skill-dir>/scripts/dm.sh` line to the user's
+shell rc (`~/.zshrc` or `~/.bashrc`, auto-detected; pass a path to override) and
+is idempotent. After reloading the shell:
+
+- `dm` — open the doctor TUI
+- `dm help` — list every command
+- `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>` — launcher
+  subcommands
+
+`dm.sh` resolves its own location, so it keeps working wherever the skill is
+installed. Users who prefer not to touch their rc can call
+`python3 <skill-dir>/scripts/debug_session.py doctor` directly.
 
 ## Finish Or Abort
 
@@ -148,11 +211,12 @@ Whether the bug is fixed, the user stops, or the session fails:
 3. Tear down only this collector and delete its temporary directory:
 
    ```bash
-   python3 <skill-dir>/scripts/debug_session.py stop <session-dir>
+   dm stop <session-dir>
    ```
 
 4. Confirm the command reports `removed: true`. If teardown fails, report the
    exact session directory and PID instead of using a broad kill command.
 
-If context is interrupted, recover from the saved `session_dir`; use `status`,
-`logs`, and `stop` from the bundled launcher.
+If context is interrupted, recover from the saved `session_dir`; re-source
+`dm.sh` if needed, then use `dm status`, `dm logs`, and `dm stop`, or run
+`dm doctor` to see and manage every live session at once.
