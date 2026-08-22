@@ -62,8 +62,8 @@ trace disappeared or the edit is ambiguous, preserve uncertainty instead of
 inventing the original.
 
 Direct, unambiguous corrections can be applied without asking the human to
-confirm them again. Broader inferences still pass `evidence.md` and
-`calibration.md`.
+confirm them again. Broader inferences still need the support described in
+`evidence.md`.
 
 ## Timing and replacement
 

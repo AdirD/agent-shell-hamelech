@@ -64,7 +64,7 @@ risk, or why they approved.
 
 Read `references/attention-map.md` before ranking repository areas. Repeated
 substantive attention, detailed risk reasoning, follow-up, and direct human
-calibration can raise an area's relative priority. Authorship and ownership are
+answers can raise an area's relative priority. Authorship and ownership are
 supporting familiarity signals only.
 
 Never lower an area because the human left no comments there. Use `unknown` until
@@ -135,7 +135,6 @@ memory or a calibration question.
 Specificity beats false confidence: "often questions externally visible
 retries" is better than "always blocks non-idempotent code."
 
-Calibration choices are also evidence about the trainer's generalization
-threshold. Repeated narrowing, concrete-risk requirements, or `do not encode`
-answers should make later promotion and question gates stricter across topics,
-not only update the individual observations that prompted those answers.
+Human answers also reveal how readily the reviewer wants patterns generalized.
+Repeated narrowing or `do not encode` answers should make later learning more
+cautious across topics, not only update the observation that prompted them.

@@ -147,7 +147,7 @@ completed run.
 - reviewer, repository, start/end times
 - indexed, comment-collected, fetched, and deep-read counts
 - selected and deep-read PR IDs
-- confidence reflections, behavior-changing calibration, and human answers
+- model reflections, calibration questions, and human answers
 - material learning, narrowing, unlearning, and uncertainty
 - attention movement
 - why work stopped and the human decision

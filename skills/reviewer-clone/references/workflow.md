@@ -1,9 +1,8 @@
 # Reviewer Clone workflow
 
-This file owns phase order, main-agent authority, parallel work, human
-interaction, publication, recovery, progress, and hand-off. Other references
-explain collection, evidence, calibration, attention, resync, and output format;
-they do not define another workflow.
+This file owns the whole training workflow, including human questions. Other
+references define GitHub mechanics, evidence, attention, resync facts, and
+output files; they do not add workflow.
 
 ## Who does what
 
@@ -151,8 +150,8 @@ For each iteration, the main agent:
    actions, discussion, later changes, outcome, and limitations.
 4. Adds concise source-backed sections to run `EVIDENCE.md`.
 5. Updates candidate judgment, attention, voice implications, and uncertainty.
-6. Checks whether a confidence checkpoint is due and asks before continuing
-   when it is.
+6. Asks the human when an answer would materially improve the model or redirect
+   the next exploration.
 7. Decides whether to inspect a contrast, launch a focused exploration, choose
    another PR, or propose stopping.
 8. Updates `RUN.md` and the active todo.
@@ -186,30 +185,28 @@ facts and candidate IDs; the main agent chooses and reads any resulting PR.
 Repository and voice jobs continue in parallel. Their completion should not
 block the next PR choice.
 
-## Human interaction during exploration
+## Calibrate with the human
 
-Training is interactive by default. Follow the two interaction types in
-`calibration.md`:
+Once the first useful repository, voice, and PR evidence exists, tell the human
+what seems clear and use `AskQuestion` with title `Calibrate Clone`. Ask one to
+three high-impact questions together. Intervention threshold, block-versus-ask
+behavior, and voice are useful early dimensions when the evidence actually
+raises them.
 
-- Use a confidence checkpoint to show the current repository, voice, attention,
-  or judgment understanding and ask one correction question.
-- Use behavior-changing calibration only when evidence is strong enough to
-  consider activating the pattern.
+Each question should:
 
-Run the first confidence checkpoint as soon as repository/voice work supports a
-personal reflection, or after the first two deep reads. After that, do not
-complete more than three additional deep reads without another human
-interaction. Ask sooner when an insight, contradiction, or likely
-misunderstanding appears, and always checkpoint before proposing publication.
+- begin from a concrete pattern already observed
+- offer choices that would make Clone behave differently
+- include a recommended choice only when the evidence supports it
 
-A checkpoint leads with a concrete, evidence-backed synthesis, then asks one
-question whose answer can redirect exploration. Do not ask empty reassurance
-questions or lower the evidence threshold for active memory merely because a
-checkpoint is due.
+The tool supplies `Other`; do not add another. Avoid generic engineering-policy
+questions and isolated anecdotes. One repeated pattern or a direct human answer
+can shape active memory; keep weaker observations tentative.
 
-The main agent does not wait for unrelated background work before asking.
-Background jobs may continue while the human answers. Human answers affect
-main-agent learning and future jobs; they do not mutate already-running prompts.
+Later, ask again only when new evidence reveals an important uncertainty or
+contradiction. Always show the current model before publication and ask any
+remaining question that could materially change it. Background jobs may
+continue while the human answers.
 
 ## Phase 5 — maintain the candidate model
 
@@ -228,8 +225,9 @@ Only the main agent decides what enters active `VOICE.md` and `MEMORY.md`.
 
 ## Phase 6 — let the human choose depth
 
-Before proposing publication, run a final confidence checkpoint over the
-current repository model, voice, judgment, attention, and important unknowns.
+Before proposing publication, show the current repository model, voice,
+judgment, attention, and important unknowns. Calibrate again only if an answer
+could materially change them.
 
 Before changing active memory, show the smallest useful delta:
 
@@ -291,8 +289,7 @@ Use todos for routine progress. Do not narrate tool selection, phase mechanics,
 or what just completed. Send a conversational update only when:
 
 - access or another blocker requires action
-- a confidence checkpoint is due
-- completed evidence earns behavior-changing calibration
+- a useful calibration question is ready
 - a meaningful result changes the next exploration
 - the human must choose depth or publication
 

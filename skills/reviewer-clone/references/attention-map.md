@@ -20,7 +20,7 @@ This is attention priority, not code quality, ownership, or objective risk.
 The autonomous repository writer creates a factual system/architecture graph in
 the run's `repository-system.md`. That graph shows how the repository is built.
 It does not rank reviewer attention. The main agent derives the attention tree
-below from review behavior, corrections, and calibration.
+below from review behavior, corrections, and human answers.
 
 ## Build the tree
 
@@ -69,15 +69,15 @@ Strong importance signals include:
 - detailed reasoning about blast radius, architecture, or failure modes
 - repeated references to existing implementations or infrastructure
 - the human adding a concern there after Clone missed it
-- explicit human ranking during calibration
+- explicit human guidance
 
 Authorship, review requests, `CODEOWNERS`, and maintenance history support
 familiarity but do not prove importance. Silent approvals or absence of comments
 must never lower an area by themselves.
 
 Assign low priority only from affirmative evidence: the human explicitly says
-they usually let it pass, repeatedly removes Clone comments there, or calibrates
-a higher intervention threshold.
+they usually let it pass, repeatedly removes Clone comments there, or states a
+higher intervention threshold.
 
 ## Use the map
 
@@ -107,7 +107,6 @@ Attention changes
 ```
 
 When a rank change would materially alter review depth, search for targeted
-corroboration and contrast first. Ask the human only when the resulting
-attention relationship passes the fingerprint gate in `calibration.md`;
-otherwise preserve it as unknown. Keep the prior rank in the run record rather
-than silently rewriting the past.
+corroboration and contrast first. Ask the human if the uncertainty still
+matters; otherwise preserve it as unknown. Keep the prior rank in the run record
+rather than silently rewriting the past.

@@ -15,44 +15,18 @@ description: >-
 
 Build and maintain a private personal reviewer, not a generic checklist bot.
 
-## Trainer and reviewer
+## Run one workflow
 
-This skill runs training and updates. The generated Clone reviews pull requests.
+Read `references/workflow.md` first and follow it as the single source of truth.
+Do not reconstruct phase order or human-question behavior elsewhere.
 
-- `VOICE.md` holds the person's transferable tone and communication.
-- Each repository is a drawer with its own `MEMORY.md`.
-- Current PR/repository context always outranks cached memory.
-- Evidence and completed runs explain how active memory was learned.
+Open the other references only when the workflow needs their subject:
 
-Only this training skill turns evidence into learned updates. Direct human
-edits to active voice or memory remain authoritative.
-
-## Follow one workflow
-
-Read `references/workflow.md` first. It is the single source of truth for:
-
-- init, repo-init, resync, and no-op routing
-- lightweight repository choice before repository-specific work
-- main-agent authority over iterative PR selection, deep reads, and learning
-- fresh bounded repository/voice jobs and focused exploration
-- phase order, run recording, resume, and simple recovery
-- choosing which PRs to learn from and when to read more
-- work/human concurrency
-- recurring confidence checkpoints and behavior-changing calibration
-- built-in todo progress and concise human updates
-- calibration and plateau decision points
-- staging, publication, and hand-off
-
-Do not reconstruct or duplicate phase order from the other references. Read
-them only when `workflow.md` calls for their subject:
-
-- `references/github.md`: GitHub collection, pagination, and coverage semantics
-- `references/evidence.md`: signal strength, uncertainty, and promotion
-- `references/calibration.md`: distinctive fingerprint/question gate
-- `references/attention-map.md`: relative code-area attention
-- `references/resync.md`: incremental Clone-feedback evidence and reconciliation
-- `references/output-contract.md`: generated files, state, provenance, comment
-  trace, and publication
+- `references/github.md` — collection and honest coverage labels
+- `references/evidence.md` — what activity can and cannot establish
+- `references/attention-map.md` — relative code-area attention
+- `references/resync.md` — new human and Clone-feedback events
+- `references/output-contract.md` — generated files and publication
 
 Use the bundled GitHub collectors whenever `workflow.md` assigns those jobs:
 
@@ -66,56 +40,27 @@ their source before the first run, or recreate them as improvised Python or
 shell. The main agent personally interprets selected-PR output; never delegate
 those deep reads.
 
-Every subagent starts fresh with a complete prompt, owns at most one output, and
-rewrites that output rather than appending. It never edits active memory or
-decides what the Clone learns. If it fails, run the complete job again.
+## Keep the learned model compact
 
-The main agent keeps training interactive. It reflects current understanding and
-asks one correction question early, after no more than three further deep reads,
-when a material insight or contradiction appears, and before publication.
-These confidence checkpoints redirect exploration; stricter corroboration still
-controls what becomes active memory.
+This skill trains and updates; the generated Clone reviews PRs.
 
-## Model the human compactly
-
-Do not reduce the human to rigid per-rule objects. Infer a concise,
-plain-language picture:
-
-- what they notice and why
-- what makes them comment, block, praise, or stay silent
-- where repository structure or stack changes their judgment
-- what they intentionally let pass
-- how they phrase feedback
-- what remains uncertain or contradicted
+- `VOICE.md` holds transferable communication.
+- Each repository has one `MEMORY.md` for context, attention, and judgment.
+- Completed runs explain the evidence but are not active policy.
+- Current code and explicit human corrections outrank learned files.
 
 Repository context is the stack as a working system—runtime, frameworks, data
 stores, infrastructure, deployment, architecture, and conventions—not merely
-programming languages. Existing code proves what exists, not what the reviewer
-endorses.
+languages. Learn a plain-language picture of what the human notices, tolerates,
+blocks, praises, and how they say it. Do not build a rigid personality rule
+engine.
 
-Maintain a compact ASCII attention tree in repository memory. Rank areas and
-system boundaries as high, medium, unknown, or explicitly low. Leave unsupported
-areas unknown. The map allocates review depth; it never suppresses clear defects.
+## Essential boundaries
 
-`VOICE.md` and each repository's `MEMORY.md` are the only active truth. Runs and
-evidence are provenance, not competing policy. Current explicit human answers
-and direct active-file edits outrank historical inference.
-
-## Guardrails
-
-- Never publish personalized memory, private code evidence, tokens, or account
-  details into a project repository.
-- Never store credentials in the generated skill.
-- Never infer disinterest, lack of expertise, or approval rationale from silence.
-- Never promote one comment into doctrine without corroboration or confirmation.
-- Never turn trainer uncertainty or a question allowance into a human survey.
-- Never make authored code alone prove endorsement.
-- Never describe a comment-body sweep as fully deep-reading its PRs.
-- Never assign low importance from silence or missing review activity.
-- Never declare plateau or publish without explicit human choice.
-- Never delete completed runs; remove only disposable scratch after publication
-  or recorded abandonment.
-- Never let the generated Clone rewrite its own active memory.
-- Never hide Clone authorship from PR participants.
-- Never claim the Clone is the human; it is a transparent, correctable
-  approximation.
+- Keep private evidence and memory out of project repositories; never store
+  credentials.
+- Treat silence and authorship as weak evidence, not proof of preference.
+- Publish only after the human chooses it, and preserve completed runs.
+- Only this trainer edits active memory.
+- Mark Clone authorship visibly; it is a correctable approximation, not the
+  human.
