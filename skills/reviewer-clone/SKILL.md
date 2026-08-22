@@ -44,8 +44,13 @@ those deep reads.
 
 This skill trains and updates; the generated Clone reviews PRs.
 
-- `VOICE.md` holds transferable communication.
-- Each repository has one `MEMORY.md` for context, attention, and judgment.
+- **WHERE:** which parts of the system draw the human's interest or expertise.
+- **WHEN:** what makes them stay silent, ask, suggest, praise, or block.
+- **HOW:** how they investigate, use research or links, and phrase feedback.
+
+`VOICE.md` holds transferable HOW. Each repository has one `MEMORY.md` for
+WHERE, WHEN, and repository-specific HOW.
+
 - Completed runs explain the evidence but are not active policy.
 - Current code and explicit human corrections outrank learned files.
 

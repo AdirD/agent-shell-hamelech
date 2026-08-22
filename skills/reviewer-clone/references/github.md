@@ -51,7 +51,7 @@ python3 "$REVIEWER_CLONE_SKILL_DIR/scripts/collect-review-activity.py" \
 
 The script handles count-first searches, GitHub Search's 1,000-result cap,
 creation-date partitioning, role deduplication, the repository-wide inline
-comment sweep, and compact candidate selection. Read
+comment sweep, link extraction, and compact candidate selection. Read
 `review-activity.summary.json` first; open detailed JSON only for a specific PR
 or comment.
 

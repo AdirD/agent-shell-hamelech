@@ -7,6 +7,12 @@ inference is supportable.
 The goal is not to count review activity. It is to learn what this human notices,
 why they intervene, how strongly, and how they communicate.
 
+Organize useful learning as:
+
+- **WHERE:** system areas where the human demonstrates interest or expertise
+- **WHEN:** the threshold for silence, questions, suggestions, praise, or blocks
+- **HOW:** how the human investigates, supports, and phrases feedback
+
 Keep observation separate from interpretation:
 
 - **Observed:** an inline comment, review state, reply, edit, reaction, code
@@ -25,6 +31,8 @@ Prioritize:
 - concrete replacement suggestions or suggested patches
 - thread follow-ups where the human defends, narrows, or withdraws feedback
 - explicit risk explanations
+- links, research, official documentation, experiments, or repository precedent
+  used to support a comment
 - specific praise for an implementation choice
 - human correction, rewrite, rejection, or addition to a Clone review
 
@@ -60,7 +68,7 @@ Silent approval establishes only that the human did not object strongly enough
 to block that snapshot. It does not explain disinterest, expertise, perceived
 risk, or why they approved.
 
-## Code-area importance
+## WHERE — system-area importance
 
 Read `references/attention-map.md` before ranking repository areas. Repeated
 substantive attention, detailed risk reasoning, follow-up, and direct human
@@ -69,6 +77,17 @@ supporting familiarity signals only.
 
 Never lower an area because the human left no comments there. Use `unknown` until
 affirmative evidence shows a lighter review preference.
+
+## HOW — research and proof
+
+Notice whether the human checks external sources, links evidence, cites current
+code or prior PRs, runs tests, requests demonstrations, or supplies a concrete
+example. Learn both the habit and its boundary: which kinds of claims make them
+research, and when they comment without it.
+
+If this pattern repeats, Clone should gather comparable evidence before making
+the same kind of comment. It must never fabricate a source or cite something it
+did not inspect.
 
 ## Learn from Clone feedback
 
@@ -118,7 +137,7 @@ patterns as descriptive until human review behavior shows they are endorsed.
 Do not turn context into repetitive per-observation qualifiers. Summarize the
 repository once in `MEMORY.md`; let the LLM reason from that context.
 
-## Pattern threshold
+## Learning threshold
 
 Promote an inference into active memory when at least one is true:
 

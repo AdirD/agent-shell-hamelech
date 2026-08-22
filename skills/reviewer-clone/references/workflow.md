@@ -20,7 +20,7 @@ The main agent is the continuous trainer. Only it:
 Use subagents only for independent bounded work:
 
 - map the chosen repository and write `repository-system.md`
-- analyze review wording and write `voice.md`
+- analyze review method and wording and write `voice.md`
 - collect a narrow missing fact or find candidate contrasting PRs
 
 Subagents are disposable, not long-lived collaborators. Give each a complete
@@ -117,23 +117,29 @@ In the first tool turn after creating the run:
   its detailed and compact outputs in run `scratch/`
 - concurrently, dispatch **Map repository system** to inspect current code,
   configuration, and docs and write `repository-system.md` with a compact
-  architecture graph, important boundaries, source paths, and gaps
+  architecture graph, important boundaries, source paths, and gaps. This graph
+  is the scaffold for learning WHERE the human shows repeated interest or
+  expertise
 - on resync, also dispatch **Collect Clone feedback** to return only observed
   traced comments, human edits/replies, missed concerns, changed outcomes, and
   direct active-file edits
 
 Do not read the collector source before invoking its documented command. As soon
-as the activity index exists, dispatch **Analyze review voice** over the shared
-comment material. It writes `voice.md` with exact examples, counterexamples,
-uncertainty, and a complete candidate `VOICE.md`. If later deep reads materially
-change the evidence, start a fresh voice job with the full current evidence and
-replace `voice.md`.
+as the activity index exists, dispatch **Analyze review method and voice** over
+the shared comment material. It studies HOW the human investigates and supports
+feedback—not only wording—including links, external research, repository
+precedents, tests, examples, and demonstrations. It writes `voice.md` with exact
+examples, counterexamples, uncertainty, and a complete candidate `VOICE.md`. If
+later deep reads materially change the evidence, start a fresh job with the full
+current evidence and replace `voice.md`.
 
 The main agent does not wait for repository or voice analysis. It builds an
 initial menu of roughly 8–12 promising PRs from:
 
 - substantive inline comments and change requests
 - follow-up, withdrawal, defense, re-review, or specific praise
+- comments containing research, links, proof, or a request for evidence
+- repeated activity in the same system area
 - varied areas, authors, change types, and time periods
 - authored PRs only as supporting familiarity evidence
 
@@ -149,7 +155,8 @@ For each iteration, the main agent:
 3. Personally reads the saved evidence, relevant diff and live code, exact human
    actions, discussion, later changes, outcome, and limitations.
 4. Adds concise source-backed sections to run `EVIDENCE.md`.
-5. Updates candidate judgment, attention, voice implications, and uncertainty.
+5. Updates WHERE the human focuses, WHEN they intervene, HOW they investigate
+   and communicate, and what remains uncertain.
 6. Asks the human when an answer would materially improve the model or redirect
    the next exploration.
 7. Decides whether to inspect a contrast, launch a focused exploration, choose
@@ -187,11 +194,11 @@ block the next PR choice.
 
 ## Calibrate with the human
 
-Once the first useful repository, voice, and PR evidence exists, tell the human
-what seems clear and use `AskQuestion` with title `Calibrate Clone`. Ask one to
-three high-impact questions together. Intervention threshold, block-versus-ask
-behavior, and voice are useful early dimensions when the evidence actually
-raises them.
+Once the first useful repository, voice, and PR evidence exists, summarize the
+current **WHERE, WHEN, and HOW**, then use `AskQuestion` with title `Calibrate
+Clone`. Ask one to three high-impact questions together. Useful early questions
+test system-area attention, intervention threshold, block-versus-ask behavior,
+research habits, and voice when the evidence actually raises them.
 
 Each question should:
 
@@ -200,8 +207,8 @@ Each question should:
 - include a recommended choice only when the evidence supports it
 
 The tool supplies `Other`; do not add another. Avoid generic engineering-policy
-questions and isolated anecdotes. One repeated pattern or a direct human answer
-can shape active memory; keep weaker observations tentative.
+questions and isolated anecdotes. Repeated behavior or a direct human answer can
+shape active memory; keep weaker observations tentative.
 
 Later, ask again only when new evidence reveals an important uncertainty or
 contradiction. Always show the current model before publication and ask any
@@ -214,9 +221,9 @@ After every deep read, the main agent:
 
 - separates observation from interpretation using `evidence.md`
 - looks for matched contrasts rather than topic counts
-- updates the attention tree using `attention-map.md`
-- combines repository context, voice analysis, judgment, threshold, corrections,
-  and uncertainty
+- overlays demonstrated interest and expertise onto the repository architecture
+  using `attention-map.md`
+- updates WHERE, WHEN, HOW, and uncertainty
 - applies explicit human answers and direct active-file edits as authoritative
 - records only material changes in `RUN.md`
 
@@ -225,23 +232,22 @@ Only the main agent decides what enters active `VOICE.md` and `MEMORY.md`.
 
 ## Phase 6 — let the human choose depth
 
-Before proposing publication, show the current repository model, voice,
-judgment, attention, and important unknowns. Calibrate again only if an answer
-could materially change them.
+Before proposing publication, show the current WHERE, WHEN, HOW, and important
+unknowns. Calibrate again only if an answer could materially change them.
 
 Before changing active memory, show the smallest useful delta:
 
 ```text
-Learned
+WHERE — system attention
+- ...
+
+WHEN — intervention threshold
+- ...
+
+HOW — investigation and communication
 - ...
 
 Unlearned or narrowed
-- ...
-
-Voice adjustment
-- ...
-
-Attention movement
 - ...
 
 Still uncertain
@@ -298,8 +304,8 @@ Finish with:
 - initialized, resynced, no-op, paused, or failed status
 - exact indexed/collected/fetched/deep-read coverage
 - why work stopped and what the human chose
-- accepted learning, unlearning, and voice changes
-- attention strengths and unknowns
+- accepted WHERE, WHEN, HOW, and unlearning
+- system-area strengths and unknowns
 - active Clone path and run path
 
 The Clone is a transparent, correctable approximation of the human, never the

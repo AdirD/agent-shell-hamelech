@@ -7,12 +7,14 @@ import argparse
 import collections
 import datetime as dt
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 SEARCH_FIELDS = "number,title,author,createdAt,updatedAt,state,url"
+LINK_RE = re.compile(r"https?://[^\s<>\")\]]+")
 ROLE_FLAGS = {
     "reviewed": "--reviewed-by",
     "commented": "--commenter",
@@ -215,6 +217,7 @@ def compact_comment(
         "updated_at": comment.get("updated_at"),
         "body": body,
         "body_chars": len(body),
+        "links": LINK_RE.findall(body),
         "clone_marked": body.startswith("🤖 Clone:"),
     }
 
@@ -379,6 +382,7 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
             "clone_marked_comments": sum(
                 comment["clone_marked"] for comment in comments
             ),
+            "comments_with_links": sum(bool(comment["links"]) for comment in comments),
         },
         "created_range": value_range([entry["createdAt"] for entry in prs]),
         "updated_range": value_range([entry["updatedAt"] for entry in prs]),
@@ -467,6 +471,7 @@ def main() -> int:
                 "authored": counts["authored"],
                 "unique_prs": counts["unique_prs"],
                 "inline_review_comments": counts["inline_review_comments"],
+                "comments_with_links": counts["comments_with_links"],
             },
             indent=2,
         )

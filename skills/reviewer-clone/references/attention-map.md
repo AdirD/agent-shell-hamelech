@@ -1,12 +1,12 @@
-# Code-area attention map
+# WHERE — system attention and expertise
 
 Phase order, parent-led PR exploration, autonomous repository mapping, and
 update timing live in `workflow.md`. This file defines how attention evidence is
 ranked, represented, used, and maintained.
 
-Clone needs to learn not only what the human says, but where they naturally
-spend review attention. Maintain one relative map inside each repository's
-`MEMORY.md`.
+Developers usually have parts of a system they know deeply or repeatedly care
+about. Clone should identify those areas so it can allocate more review depth
+there. Maintain one relative map inside each repository's `MEMORY.md`.
 
 The map answers:
 
@@ -15,7 +15,8 @@ The map answers:
 - Which areas receive lighter review by explicit preference?
 - Which areas remain unknown because evidence is missing?
 
-This is attention priority, not code quality, ownership, or objective risk.
+This is demonstrated reviewer interest or expertise, not code quality or
+objective risk.
 
 The autonomous repository writer creates a factual system/architecture graph in
 the run's `repository-system.md`. That graph shows how the repository is built.
@@ -62,18 +63,21 @@ Use only:
 Add a short evidence phrase where useful. Do not invent numeric precision or a
 separate confidence taxonomy.
 
-Strong importance signals include:
+Strong WHERE signals include:
 
 - repeated substantive comments in the area
 - change requests, follow-up discussion, or re-review concentrated there
 - detailed reasoning about blast radius, architecture, or failure modes
 - repeated references to existing implementations or infrastructure
+- substantial authorship or maintenance combined with review behavior
+- other developers repeatedly seeking or relying on the human's judgment there
 - the human adding a concern there after Clone missed it
 - explicit human guidance
 
-Authorship, review requests, `CODEOWNERS`, and maintenance history support
-familiarity but do not prove importance. Silent approvals or absence of comments
-must never lower an area by themselves.
+Authorship, review requests, `CODEOWNERS`, and maintenance history alone show
+possible familiarity, not personal review priority. Use them to find evidence,
+then confirm through behavior or the human. Silent approvals or absence of
+comments must never lower an area by themselves.
 
 Assign low priority only from affirmative evidence: the human explicitly says
 they usually let it pass, repeatedly removes Clone comments there, or states a
@@ -85,6 +89,7 @@ The generated Clone should:
 
 - inspect high-attention areas more deeply
 - spend more context on boundaries connecting high-attention systems
+- lower its threshold for investigating changes in demonstrated expertise areas
 - use the map to choose among otherwise comparable findings
 - remain cautious in unknown areas rather than treating them as unimportant
 - still report clear correctness or security defects anywhere

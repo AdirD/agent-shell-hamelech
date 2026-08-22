@@ -340,7 +340,7 @@ Use it when:
 
 ### `reviewer-clone`
 
-Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. The main agent runs a cheap recent-activity query and asks which repository to use before inspecting code or history. After selection it invokes the bundled activity collector while a fresh subagent maps the repository; voice analysis starts when comments are available. The main agent alone chooses and deeply reads PRs, talks with the human, decides learning, and publishes. Once useful evidence exists, it summarizes what seems clear and uses a compact `Calibrate Clone` question set to settle the few choices that would materially change reviewer behavior. Built-in todos replace routine narration. Durable run records retain exact coverage, decisions, and source IDs; compact active files retain voice and repository judgment. The human always chooses whether to publish, continue, deep-dive, or pause. Later corrections to traced `🤖 Clone` comments teach it what to learn or unlearn.
+Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. It learns a compact model: **WHERE** the human demonstrates system interest or expertise, **WHEN** they stay silent, ask, suggest, praise, or block, and **HOW** they investigate and communicate—including whether they research, cite links, use repository precedent, or provide proof. The main agent runs a cheap recent-activity query and asks which repository to use before inspecting code or history. After selection it invokes the bundled activity collector while a fresh subagent maps the repository; method and voice analysis starts when comments are available. The main agent alone chooses and deeply reads PRs, talks with the human, decides learning, and publishes. Once useful evidence exists, it summarizes WHERE, WHEN, and HOW and uses a compact `Calibrate Clone` question set for choices that would materially change behavior. Built-in todos replace routine narration. Durable runs retain exact coverage and source IDs. Reviews stay draft-first; explicit approval, change requests, and comments are posted through the authenticated `gh` CLI. The human always chooses whether to publish, continue, deep-dive, or pause. Later corrections to traced `🤖 Clone` comments teach it what to learn or unlearn.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill reviewer-clone
@@ -352,6 +352,9 @@ Use it when:
 - you want activity collection and repository mapping to begin together while the main agent iteratively reasons through selected PRs with you
 - you want the parent to own repository choice, collectors, deep reads, questions, learning, and publication
 - you want fresh bounded subagents only for repository mapping, voice, and narrow factual searches
+- you want the Clone to learn WHERE you focus, WHEN you intervene, and HOW you investigate and write
+- you want repeated research, citation, proof, and repository-precedent habits reproduced
+- you want approvals, change requests, and comments performed through the GitHub CLI
 - you want a compact evidence-backed calibration instead of a long interview
 - you want code areas ranked by relative review importance without treating missing evidence as low importance
 - you want the human—not the trainer—to choose whether to publish, continue broadly, or deep dive

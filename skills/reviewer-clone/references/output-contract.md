@@ -53,7 +53,7 @@ code and explicit human edits outrank both.
 
 ## `VOICE.md`
 
-Keep transferable human communication here:
+Keep the transferable **HOW** here:
 
 ```markdown
 ---
@@ -61,16 +61,20 @@ revision: 4
 updated_at: 2026-08-22T10:00:00Z
 ---
 
-# Voice
+# HOW — transferable review style
 
 ## Default posture
 Curious, direct, cautious, encouraging, etc.
+
+## Investigation and evidence
+Whether the human researches before commenting, follows links, cites official
+docs or code, points to in-repo precedent, runs checks, or provides examples.
 
 ## Comment shape
 Typical length, questions versus statements, explanation depth, examples,
 patches, praise, humor, and recurring phrasing.
 
-## Severity language
+## Delivery
 How blockers, ordinary concerns, nits, and approval are communicated.
 
 ## Avoid
@@ -85,7 +89,8 @@ differently in a particular context.
 
 ## Repository `MEMORY.md`
 
-Keep repo-specific judgment compact enough to load on every review:
+Keep the repository-specific **WHERE, WHEN, and HOW** compact enough to load on
+every review:
 
 ```markdown
 ---
@@ -94,24 +99,21 @@ updated_at: 2026-08-22T10:00:00Z
 repository: github.com/example-org/order-service
 ---
 
-# Repository memory
+# Repository reviewer model
 
-## How this repository works
-Runtime, frameworks, services, persistence, deployment, major boundaries, and
-anything needed to reason about changes.
+## WHERE — system attention
+A compact architecture view overlaid with where the human demonstrates repeated
+interest, familiarity, or expertise. Include the ranked attention tree and the
+evidence behind important areas.
 
-## What deserves extra attention
-Concise concerns and the concrete risks behind them.
+## WHEN — intervention threshold
+What makes the human comment, ask, suggest, block, praise, or approve silently.
+Capture meaningful risk boundaries and demonstrated tolerance.
 
-## What usually does not deserve a comment
-Demonstrated tolerance, accepted conventions, and prior Clone overreach.
-
-## Attention map
-A ranked tree using `high`, `medium`, `unknown`, and `explicitly low`.
-
-## Review instincts
-Patterns in when the human questions, blocks, praises, or intentionally lets
-something pass.
+## HOW — review method in this repository
+Repo-specific investigation habits: preferred internal precedents, docs,
+research, links, tests, demonstrations, or evidence used before commenting.
+`VOICE.md` supplies the transferable communication style.
 
 ## Known corrections
 What Clone previously misunderstood.
@@ -120,8 +122,8 @@ What Clone previously misunderstood.
 What the evidence has not settled.
 ```
 
-Do not repeat stack qualifiers on every instinct or encode personality as a
-large rule engine. Let the runtime reason from the whole memory and current PR.
+Do not turn WHERE, WHEN, and HOW into a rule matrix. Let the runtime reason from
+the compact model and current PR.
 
 ## `state.json`
 
@@ -148,8 +150,9 @@ completed run.
 - indexed, comment-collected, fetched, and deep-read counts
 - selected and deep-read PR IDs
 - model reflections, calibration questions, and human answers
-- material learning, narrowing, unlearning, and uncertainty
-- attention movement
+- material WHERE, WHEN, and HOW learning, narrowing, and unlearning
+- remaining uncertainty
+- system-attention movement
 - why work stopped and the human decision
 - publication result or failure
 
@@ -158,9 +161,10 @@ stable PR/comment/review IDs. This is the minimum source trace needed to avoid
 relearning the same event and to verify future corrections. Do not create a
 large folder hierarchy or retain entire private diffs.
 
-`repository-system.md` and `voice.md` are complete outputs from their bounded
-parallel jobs. `scratch/` holds disposable collector JSON, diffs, and staged
-active files. Everything except `scratch/` remains useful run provenance.
+`repository-system.md` and `voice.md` are complete outputs from the repository
+mapping and review-method jobs. `scratch/` holds disposable collector JSON,
+diffs, and staged active files. Everything except `scratch/` remains useful run
+provenance.
 
 ## Publication
 
@@ -185,15 +189,22 @@ must:
 2. Resolve the PR's canonical base repository and load matching `MEMORY.md`.
 3. Ask for initialization through `reviewer-clone` when memory is missing.
 4. Read the live PR and relevant current code before trusting cached context.
-5. Use the attention tree to allocate depth, while reporting clear defects
-   anywhere.
-6. Review at this human's likely intervention threshold and in their voice.
-7. Prefer a few authentic comments over generic checklist coverage.
-8. Draft unless the user explicitly requested posting.
-9. Mark Clone-authored comments visibly as `🤖 Clone:`.
-10. Add the compact trace below to posted or pending comments.
-11. Never edit its own active memory or claim to be the human.
-12. Recommend trainer resync when memory is stale without blocking urgent review.
+5. Use WHERE to allocate review depth, while reporting clear defects anywhere.
+6. Use WHEN to decide whether a finding deserves silence, a question, a
+   suggestion, or a block.
+7. Use HOW to investigate and communicate. When the learned style relies on
+   research or citations, check comparable sources before commenting and link
+   only evidence actually inspected.
+8. Prefer a few authentic comments over generic checklist coverage.
+9. Draft unless the user explicitly requested posting.
+10. When posting is explicitly requested, use the authenticated `gh` CLI:
+    `gh pr review --approve`, `--request-changes`, or `--comment` for review
+    decisions; `gh pr comment` for a general PR comment; and `gh api` when an
+    anchored inline comment is required.
+11. Mark Clone-authored comments visibly as `🤖 Clone:`.
+12. Add the compact trace below to posted or pending comments.
+13. Never edit its own active memory or claim to be the human.
+14. Recommend trainer resync when memory is stale without blocking urgent review.
 
 ## Compact comment trace
 
