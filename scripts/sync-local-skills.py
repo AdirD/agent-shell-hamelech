@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sync local skill edits across all local repos and global agent directories.
 
-Goal: Zero deviations. Whenever a skill in this repo (skills/<name>) is edited,
+Goal: Zero deviations. After skills in this repo (skills/<name>) are updated and pushed,
 this script finds all usages/installations of that skill across:
   1. Global agent skill directories (~/.agents/skills, ~/.cursor/skills, ~/.claude/skills, ~/.codex/skills, ~/.gemini/skills, etc.)
   2. Local repositories in ~/Dev (and configured dev roots) containing agent skill folders (.agents/skills, .cursor/skills, .claude/skills, .codex/skills, .gemini/skills, .opencode/skills, .agent/skills, skills/)

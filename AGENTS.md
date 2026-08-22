@@ -15,10 +15,10 @@ Do not leave the repo in a state where the catalog in `README.md` is stale.
 
 ## Local Skill Sync & Zero-Deviation Rule
 
-Whenever modifying, adding, or deleting a skill under `skills/`:
+After committing and pushing modifications, additions, or deletions under `skills/`:
 
 1. All local installations across global agent directories (`~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`, `~/.codex/skills`, etc.) and sibling repositories under `~/Dev` must remain 100% in sync with zero deviation.
-2. The agent must immediately run the sync script to update all usages:
+2. Run the sync script after pushing to update all usages (do not sync inline on unstaged changes):
    ```bash
    python3 scripts/sync-local-skills.py --apply
    ```
@@ -75,6 +75,14 @@ Optional git hook (runs the same audit on every push):
 ```bash
 chmod +x scripts/pre-push-audit.sh
 ln -sf ../../scripts/pre-push-audit.sh .git/hooks/pre-push
+```
+
+## After You Push
+
+After pushing changes under `skills/`, sync all local installations across global directories and sibling repos:
+
+```bash
+python3 scripts/sync-local-skills.py --apply
 ```
 
 ## Before Making the Repo Public

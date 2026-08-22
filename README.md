@@ -60,6 +60,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient, including driving an already-open logged-in Chrome tab. |
 | [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
+| [`reviewer-clone`](#reviewer-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone through parent-led PR exploration, parallel repository/voice analysis, and calibration. |
 | [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
 ### Specialized production
@@ -85,6 +86,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
 | "Drive the Chrome tab I'm already logged into while we debug." | [`debug-mode`](#debug-mode) | Optional `agent-browser --auto-connect` attach; one-time `chrome://inspect/#remote-debugging` toggle. |
+| "Learn how I review PRs and make me a reviewer Clone." | [`reviewer-clone`](#reviewer-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
@@ -149,7 +151,7 @@ Invoke it with:
 Use it when:
 - you want remote → local comparison per skill (including brand-new remote skills)
 - you ask "should I update?" before running `npx skills update`
-- you edit skills locally and want all usages across sibling repos & global agent dirs synced immediately
+- you pushed skill changes and want all usages across sibling repos & global agent dirs synced
 - a skill's lock still points at the typo slug `AdirD/agent-shel-hamelech`
 
 ---
@@ -336,6 +338,30 @@ Use it when:
 
 ---
 
+### `reviewer-clone`
+
+Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. The main agent directly runs a cheap recent-activity query and asks which repository to use before inspecting code or history. After selection it invokes the bundled activity collector while a fresh subagent maps the repository; voice analysis starts when comments are available. The main agent alone chooses and deeply reads PRs, talks with the human, decides learning, and publishes. Built-in todos replace routine narration. Evidence-backed confidence checkpoints redirect exploration, while stricter corroboration controls behavior-changing calibration. Durable run records retain exact coverage, decisions, and source IDs; compact active files retain voice and repository judgment. The human always chooses whether to publish, continue, deep-dive, or pause. Later corrections to traced `🤖 Clone` comments teach it what to learn or unlearn.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill reviewer-clone
+```
+
+Use it when:
+- you want an agent to review PRs with your attention, judgment threshold, and writing voice
+- you want to initialize another repository inside the same personal Clone
+- you want activity collection and repository mapping to begin together while the main agent iteratively reasons through selected PRs with you
+- you want the parent to own repository choice, collectors, deep reads, questions, learning, and publication
+- you want fresh bounded subagents only for repository mapping, voice, and narrow factual searches
+- you want regular evidence-backed confidence checkpoints plus stricter behavior-changing calibration
+- you want code areas ranked by relative review importance without treating missing evidence as low importance
+- you want the human—not the trainer—to choose whether to publish, continue broadly, or deep dive
+- you want each run's evidence, decisions, and learning delta retained without separate log systems
+- a week of new human and Clone review activity is ready to resync
+- you want direct edits, rejected comments, missed concerns, and replies to teach the Clone what to learn or unlearn
+- you need personalized review memory to stay private and out of project git
+
+---
+
 ### `smart-comments`
 
 Makes the agent write selective, intent-preserving inline comments and respect existing ones as load-bearing memory. Kills "what" comments, preserves "why" comments, and refuses to silently delete comments during refactors.
@@ -384,6 +410,7 @@ skills/
   pre-plan/
   problem-discovery/
   product-ideation/
+  reviewer-clone/
   smart-comments/
   visualize/
 ```
@@ -395,6 +422,11 @@ Every skill is self-contained: a `SKILL.md` with frontmatter, optional `scripts/
 Add a new skill by creating `skills/<name>/SKILL.md` with proper frontmatter (`name`, `description`). Then update the catalog above — the `AGENTS.md` maintenance rule enforces this.
 
 Before pushing, run `bash scripts/pre-push-audit.sh` (see `AGENTS.md` for commit/push safety rules and optional git hook setup).
+
+After pushing, sync local installations across sibling repos and global agent dirs:
+```bash
+python3 scripts/sync-local-skills.py --apply
+```
 
 ## License
 

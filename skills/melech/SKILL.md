@@ -136,7 +136,7 @@ the script and show the new summary.
 
 ### Local development & multi-repo zero-deviation sync
 
-When developing or editing skills locally in this repository, use the local sync tool to guarantee zero deviations across all your dev repos and agent folders:
+After pushing skill updates in this repository, use the local sync tool to guarantee zero deviations across all your dev repos and agent folders:
 
 ```bash
 # Check if any local dev repos or global agent dirs have deviated:
@@ -144,7 +144,7 @@ python3 scripts/sync-local-skills.py --check
 # or:
 python3 skills/melech/scripts/status.py --local-check
 
-# Synchronize all local usages immediately:
+# Synchronize all local usages after pushing:
 python3 scripts/sync-local-skills.py --apply
 # or:
 python3 skills/melech/scripts/status.py --sync-local
