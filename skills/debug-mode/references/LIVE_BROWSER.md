@@ -1,8 +1,12 @@
-# Live browser attach
+# Autopilot (live browser attach)
 
-Optional reproduction track: drive the user's already-open Chrome (same tabs,
-same cookies, same logged-in apps) through Vercel Labs `agent-browser`. This
+Autopilot mode: the agent drives the user's already-open Chrome (same tabs,
+same cookies, same logged-in apps) through Vercel Labs `agent-browser`. Manual
+mode is the opposite — the user holds the wheel and replies `proceed`. This
 repo does not ship a Chrome extension.
+
+The agent must announce autopilot and the Chrome steps before the first
+`browser-check`. Do not attach silently.
 
 ## What the user does
 

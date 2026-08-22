@@ -1,6 +1,16 @@
 The intended developer experience is a guided loop where infrastructure stays mostly invisible.
 
-## First-ever activation
+Two reproduction modes share the same collector and probes:
+
+- **Manual** — the developer holds the wheel, then replies `proceed`.
+- **Autopilot** — the agent drives the already-open Chrome tab end-to-end.
+  The developer only enables remote debugging and clicks Allow.
+
+If the bug is a UI and the developer did not pick, the agent names both
+modes and waits. It does not attach and does not hand over clicks until
+they answer.
+
+## First-ever activation (manual)
 
 The developer says something like:
 
@@ -19,16 +29,16 @@ The agent then:
 
 The developer then sees something like:
 
-> Debug mode is active.  
+> Debug mode is active in **manual**. You hold the wheel.  
 > Open Settings, change the display name, disconnect the network, and click Save once.  
 > The bug is reproduced if the spinner disappears but the name does not update.  
 > Reply `proceed` when finished.
 
 No manual log setup or URL copying should normally be required.
 
-## First-ever activation (already logged in)
+## First-ever activation (autopilot)
 
-When the developer already has the failing app open in Chrome:
+When the developer wants the agent to drive an already-open Chrome tab:
 
 > Use debug mode. I already have Settings open and I'm logged in. Save still
 > does nothing.
@@ -46,15 +56,16 @@ handing over the clicks:
 
 The developer then sees something like:
 
-> Debug mode is active.  
-> I can drive the Settings tab you already have open.  
-> Enable remote debugging at chrome://inspect/#remote-debugging if you have
-> not already, then click Allow when Chrome prompts.  
+> Autopilot is on. I will drive the Settings tab you already have open.  
+> One-time: open chrome://inspect/#remote-debugging and enable Allow remote
+> debugging for this browser instance (Chrome 144+).  
+> When Chrome prompts, click Allow. A “controlled by automated test software”
+> banner is expected. I will not quit Chrome or close other tabs.  
 > I will change the display name, drop the network, and click Save once.
 
 If attach fails (checkbox off, Allow dismissed, Chrome too old), the agent
-falls back to the human reproduction text above and waits for `proceed`.
-The collector still runs either way.
+switches to **manual**, uses the hold-the-wheel text above, and waits for
+`proceed`. The collector still runs either way.
 
 After a successful driven run, the agent reads `dm logs` without waiting
 for `proceed`, then follows the same evidence paths as below.
@@ -105,14 +116,15 @@ So the normal recurring experience becomes:
 ```text
 Ask to debug
   → agent instruments
-  → agent attaches to open Chrome (Allow once) or developer reproduces
-  → developer says "proceed" only if attach was not used
+  → pick manual or autopilot (ask if unclear)
+  → manual: developer reproduces, then "proceed"
+    or autopilot: Allow once, agent drives the tab
   → agent inspects evidence
   → refine or fix
   → optionally verify
   → agent detaches (Chrome stays open), removes probes, and tears down
 ```
 
-The developer should interact only at the reproduction gates (Allow dialog
-or `proceed`); the agent owns the collector, instrumentation, evidence
-analysis, and cleanup.
+The developer should interact only at the mode pick and the reproduction
+gates (Allow dialog or `proceed`); the agent owns the collector,
+instrumentation, evidence analysis, and cleanup.

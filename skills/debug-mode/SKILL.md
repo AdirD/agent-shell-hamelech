@@ -1,6 +1,6 @@
 ---
 name: debug-mode
-description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Optionally attach to the user's already-open Chrome (logged-in tabs) via agent-browser --auto-connect. Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
+description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Two reproduction modes: manual (user holds the wheel, then replies proceed) and autopilot (agent drives the user's already-open Chrome via agent-browser --auto-connect). Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, autopilot, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
 ---
 
 # Debug Mode
@@ -10,9 +10,8 @@ evidence before proposing a fix.
 
 For the intended first-use, reproduction, iteration, verification, and later-use
 experience, read [DEVELOPER_JOURNEY_EXAMPLE.md](references/DEVELOPER_JOURNEY_EXAMPLE.md)
-and use it as the interaction model. For attaching to an already-open Chrome
-session, read [LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that track
-starts.
+and use it as the interaction model. For autopilot attach, read
+[LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that mode starts.
 
 ## Guardrails
 
@@ -112,11 +111,35 @@ objects when a few fields answer the question.
 Run the cheapest compile, type, or syntax check needed to ensure the temporary
 instrumentation itself did not break the workflow.
 
-## Live Browser Reproduction
+## Pick A Reproduction Mode
 
-If the failing path is a UI the user already has open and logged in, prefer
-driving that tab over asking them to click through the workflow. Keep probes
-in place. Snapshots are extra evidence, not a substitute for `dm logs`.
+Same collector and probes either way. Only who drives the repro changes.
+
+- **Manual** — the user holds the wheel. You instrument, tell them the exact
+  clicks, then stop until they reply `proceed`.
+- **Autopilot** — you drive their already-open Chrome end-to-end with
+  `agent-browser` (same tabs, same logins). They only enable remote debugging
+  and click Allow.
+
+Choose once, then announce it in the user-facing message:
+
+1. User said they will reproduce, hold the wheel, or reply `proceed` →
+   **manual**.
+2. User said autopilot, drive my browser, already logged in, or do it for me →
+   **autopilot**.
+3. UI bug and they did not pick → announce both modes in one short message
+   and wait. Do not attach and do not hand them a `proceed` script until they
+   answer.
+4. Not a UI bug, or the tab looks like production you should not touch →
+   **manual**.
+
+Never silently attach. Before any `browser-check` or `agent-browser` call,
+tell the user they are in autopilot and what they must do in Chrome.
+
+## Autopilot
+
+Keep probes in place. Snapshots are extra evidence, not a substitute for
+`dm logs`. Read [LIVE_BROWSER.md](references/LIVE_BROWSER.md).
 
 1. Confirm `agent-browser` is on PATH. If it is missing, stop the attach track
    and tell the user to install the official Vercel Labs CLI:
@@ -134,11 +157,20 @@ in place. Snapshots are extra evidence, not a substitute for `dm logs`.
    ```
 
    That is identical to `agent-browser --auto-connect --json tab list` plus
-   setup hints on failure. Chrome 144+ must have remote debugging enabled at
-   `chrome://inspect/#remote-debugging`. The first attach shows an Allow
-   dialog; tell the user to click **Allow** and wait.
+   setup hints on failure.
+
+   Before this command, tell the user verbatim:
+
+   > Autopilot is on. I will drive the tab you already have open.  
+   > One-time: open chrome://inspect/#remote-debugging and enable Allow
+   > remote debugging for this browser instance (Chrome 144+).  
+   > When Chrome prompts, click Allow. A “controlled by automated test
+   > software” banner is expected. I will not quit Chrome or close other tabs.
+
+   Then wait only if they have not confirmed they can click Allow. If they
+   already said to go, run `browser-check` and keep those steps visible.
 3. If `browser-check` fails, print the inspect-page + Allow steps from its
-   output and fall back to [Hand Control To The User](#hand-control-to-the-user).
+   output and switch to [Manual](#manual).
 4. Bind the existing app tab. Do not `open` a new URL unless the repro needs
    a fresh navigation. Do not close Chrome or other tabs.
 5. Drive the workflow with `agent-browser` directly, always passing the same
@@ -154,17 +186,12 @@ in place. Snapshots are extra evidence, not a substitute for `dm logs`.
 6. After one reproduction attempt, read `dm logs` the same as on `proceed`.
    Do not claim a reproduction from a snapshot alone.
 
-Use the human `proceed` gate instead when the bug is not a UI, attach is
-denied, Chrome is too old, or the relevant tab looks like production you
-should not touch. Command details, the Allow dialog, and the failure matrix
-are in [LIVE_BROWSER.md](references/LIVE_BROWSER.md).
+## Manual
 
-## Hand Control To The User
+Use this path when the user holds the wheel, autopilot is unavailable or
+denied, or you should not touch the open tabs. Tell the user:
 
-Use this path when live attach is unavailable, was denied, or should not
-touch the open tabs. Tell the user:
-
-1. Debug mode is active.
+1. Debug mode is active in **manual**. They hold the wheel.
 2. The exact workflow to perform, including any reset or starting state.
 3. Which visible outcome identifies the bug.
 4. To reply exactly `proceed` after one reproduction attempt.
@@ -174,7 +201,7 @@ replies.
 
 ## Inspect On `proceed`
 
-After a live-browser reproduction, use this same command and the same
+After an autopilot reproduction, use this same command and the same
 outcomes without waiting for `proceed`.
 
 Read the evidence with:
