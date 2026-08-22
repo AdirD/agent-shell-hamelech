@@ -22,6 +22,21 @@ from urllib.request import urlopen
 SESSION_PREFIX = "debug-mode-"
 START_TIMEOUT_SECONDS = 20.0
 STOP_TIMEOUT_SECONDS = 5.0
+BROWSER_CHECK_TIMEOUT_SECONDS = 30.0
+BROWSER_SETUP_HINT = {
+    "install": "npm i -g agent-browser && agent-browser install",
+    "enable_remote_debugging": (
+        "Open chrome://inspect/#remote-debugging and enable "
+        "Allow remote debugging for this browser instance (Chrome 144+)."
+    ),
+    "allow_dialog": (
+        "When Chrome prompts, click Allow. Dismissing the dialog denies attach."
+    ),
+    "fallback": (
+        "If attach still fails, keep the collector running and use the human "
+        "proceed reproduction path."
+    ),
+}
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -392,6 +407,107 @@ def stop_session(args: argparse.Namespace) -> int:
     return 0
 
 
+def _browser_setup_failure(error: str, **extra: Any) -> int:
+    payload: dict[str, Any] = {
+        "ok": False,
+        "error": error,
+        "hint": BROWSER_SETUP_HINT,
+    }
+    payload.update(extra)
+    print(json.dumps(payload, indent=2))
+    return 1
+
+
+def _tab_record(item: Any) -> dict[str, Any] | None:
+    if not isinstance(item, dict):
+        return None
+    title = item.get("title") or item.get("name")
+    url = item.get("url") or item.get("targetUrl")
+    if title is None and url is None:
+        return None
+    record: dict[str, Any] = {}
+    if title is not None:
+        record["title"] = title
+    if url is not None:
+        record["url"] = url
+    for key in ("id", "index", "targetId", "type"):
+        if key in item:
+            record[key] = item[key]
+    return record
+
+
+def _extract_tabs(parsed: Any) -> list[dict[str, Any]] | None:
+    if isinstance(parsed, list):
+        records = [record for item in parsed if (record := _tab_record(item))]
+        return records or None
+    if not isinstance(parsed, dict):
+        return None
+    for key in ("tabs", "data", "result", "targets"):
+        value = parsed.get(key)
+        if isinstance(value, list):
+            records = [record for item in value if (record := _tab_record(item))]
+            if records:
+                return records
+        if isinstance(value, dict):
+            nested = _extract_tabs(value)
+            if nested:
+                return nested
+    record = _tab_record(parsed)
+    return [record] if record else None
+
+
+def browser_check_session(args: argparse.Namespace) -> int:
+    binary = shutil.which("agent-browser")
+    if binary is None:
+        return _browser_setup_failure(
+            "agent-browser not found on PATH",
+        )
+
+    command = [binary, "--auto-connect", "--json"]
+    if args.session:
+        command.extend(["--session", args.session])
+    command.extend(["tab", "list"])
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=args.timeout,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return _browser_setup_failure(
+            f"agent-browser timed out after {args.timeout}s waiting to attach",
+            command=command[1:],
+        )
+
+    stdout = (result.stdout or "").strip()
+    stderr = (result.stderr or "").strip()
+    parsed: Any = None
+    if stdout:
+        try:
+            parsed = json.loads(stdout)
+        except json.JSONDecodeError:
+            parsed = None
+
+    tabs = _extract_tabs(parsed) if parsed is not None else None
+    if result.returncode == 0 and tabs is not None:
+        print(json.dumps({"ok": True, "tabs": tabs}, indent=2))
+        return 0
+
+    if result.returncode == 0 and parsed is not None:
+        print(json.dumps({"ok": True, "tabs": parsed}, indent=2))
+        return 0
+
+    error = stderr or stdout or f"agent-browser exited with {result.returncode}"
+    return _browser_setup_failure(
+        error,
+        command=command[1:],
+        exit_code=result.returncode,
+    )
+
+
 STATUS_GLYPHS = {
     "running": "\u25cf",
     "degraded": "\u25d0",
@@ -672,11 +788,13 @@ def build_parser() -> argparse.ArgumentParser:
             "  debug_session.py status <dir>      status of one session\n"
             "  debug_session.py logs <dir> --run run-1\n"
             "  debug_session.py stop <dir>        stop and remove one session\n"
+            "  debug_session.py browser-check     attach via agent-browser --auto-connect\n"
             "\n"
             "With the `dm` shell command installed (scripts/install-dm.sh):\n"
             "  dm            open the doctor TUI\n"
             "  dm help       show this help\n"
             "  dm start / dm stop <dir> / ...     same subcommands\n"
+            "  dm browser-check [--session name]  list open Chrome tabs or print setup hints\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -713,6 +831,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="print a one-shot JSON snapshot instead of launching the TUI",
     )
     doctor.set_defaults(func=doctor_session)
+
+    browser_check = subparsers.add_parser(
+        "browser-check",
+        help="attach to the user's Chrome via agent-browser --auto-connect and list tabs",
+    )
+    browser_check.add_argument(
+        "--session",
+        help="agent-browser session name (use dm-<debug-mode session_id>)",
+    )
+    browser_check.add_argument(
+        "--timeout",
+        type=float,
+        default=BROWSER_CHECK_TIMEOUT_SECONDS,
+        help="seconds to wait for Chrome Allow / auto-connect",
+    )
+    browser_check.set_defaults(func=browser_check_session)
     return parser
 
 

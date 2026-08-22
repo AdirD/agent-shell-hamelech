@@ -1,6 +1,6 @@
 ---
 name: debug-mode
-description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
+description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Optionally attach to the user's already-open Chrome (logged-in tabs) via agent-browser --auto-connect. Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
 ---
 
 # Debug Mode
@@ -10,7 +10,9 @@ evidence before proposing a fix.
 
 For the intended first-use, reproduction, iteration, verification, and later-use
 experience, read [DEVELOPER_JOURNEY_EXAMPLE.md](references/DEVELOPER_JOURNEY_EXAMPLE.md)
-and use it as the interaction model.
+and use it as the interaction model. For attaching to an already-open Chrome
+session, read [LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that track
+starts.
 
 ## Guardrails
 
@@ -29,6 +31,10 @@ and use it as the interaction model.
   explicitly asks to skip diagnosis.
 - Stop only this session. Never run `portless proxy stop`, `portless clean`, or
   broad process-kill commands.
+- When driving Chrome, attach only. Never `state save` cookies or tokens, never
+  collect credentials from the page, never quit the user's Chrome, and never
+  close tabs you did not open. Do not tunnel CDP through Portless or any remote
+  exposure.
 
 ## Start A Session
 
@@ -106,9 +112,57 @@ objects when a few fields answer the question.
 Run the cheapest compile, type, or syntax check needed to ensure the temporary
 instrumentation itself did not break the workflow.
 
+## Live Browser Reproduction
+
+If the failing path is a UI the user already has open and logged in, prefer
+driving that tab over asking them to click through the workflow. Keep probes
+in place. Snapshots are extra evidence, not a substitute for `dm logs`.
+
+1. Confirm `agent-browser` is on PATH. If it is missing, stop the attach track
+   and tell the user to install the official Vercel Labs CLI:
+
+   ```bash
+   npm i -g agent-browser && agent-browser install
+   ```
+
+   Do not silently switch to Playwright, Puppeteer, a fresh empty Chrome, a
+   cloud browser, or a custom extension.
+2. Discover tabs. Use the saved `session_id` so later commands share one pin:
+
+   ```bash
+   dm browser-check --session dm-<session-id>
+   ```
+
+   That is identical to `agent-browser --auto-connect --json tab list` plus
+   setup hints on failure. Chrome 144+ must have remote debugging enabled at
+   `chrome://inspect/#remote-debugging`. The first attach shows an Allow
+   dialog; tell the user to click **Allow** and wait.
+3. If `browser-check` fails, print the inspect-page + Allow steps from its
+   output and fall back to [Hand Control To The User](#hand-control-to-the-user).
+4. Bind the existing app tab. Do not `open` a new URL unless the repro needs
+   a fresh navigation. Do not close Chrome or other tabs.
+5. Drive the workflow with `agent-browser` directly, always passing the same
+   attach flags:
+
+   ```bash
+   agent-browser --auto-connect --pin-tab --session dm-<session-id> snapshot
+   agent-browser --auto-connect --pin-tab --session dm-<session-id> click @eN
+   agent-browser --auto-connect --pin-tab --session dm-<session-id> type @eN "…"
+   ```
+
+   Load `agent-browser skills get core` if you need command details.
+6. After one reproduction attempt, read `dm logs` the same as on `proceed`.
+   Do not claim a reproduction from a snapshot alone.
+
+Use the human `proceed` gate instead when the bug is not a UI, attach is
+denied, Chrome is too old, or the relevant tab looks like production you
+should not touch. Command details, the Allow dialog, and the failure matrix
+are in [LIVE_BROWSER.md](references/LIVE_BROWSER.md).
+
 ## Hand Control To The User
 
-Tell the user:
+Use this path when live attach is unavailable, was denied, or should not
+touch the open tabs. Tell the user:
 
 1. Debug mode is active.
 2. The exact workflow to perform, including any reset or starting state.
@@ -119,6 +173,9 @@ Then stop. Do not poll the event file or claim a reproduction before the user
 replies.
 
 ## Inspect On `proceed`
+
+After a live-browser reproduction, use this same command and the same
+outcomes without waiting for `proceed`.
 
 Read the evidence with:
 
@@ -192,8 +249,8 @@ is idempotent. After reloading the shell:
 
 - `dm` — open the doctor TUI
 - `dm help` — list every command
-- `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>` — launcher
-  subcommands
+- `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>`,
+  `dm browser-check` — launcher subcommands
 
 `dm.sh` resolves its own location, so it keeps working wherever the skill is
 installed. Users who prefer not to touch their rc can call
@@ -208,13 +265,17 @@ Whether the bug is fixed, the user stops, or the session fails:
    regression tests.
 2. Search the touched files for `DEBUG_MODE:` and inspect the diff to confirm
    no temporary instrumentation remains.
-3. Tear down only this collector and delete its temporary directory:
+3. Stop issuing `agent-browser` commands. Do not run `agent-browser close`,
+   quit Chrome, or close the user's other tabs. Remind them they can disable
+   remote debugging at `chrome://inspect/#remote-debugging` if they no longer
+   want local processes to attach.
+4. Tear down only this collector and delete its temporary directory:
 
    ```bash
    dm stop <session-dir>
    ```
 
-4. Confirm the command reports `removed: true`. If teardown fails, report the
+5. Confirm the command reports `removed: true`. If teardown fails, report the
    exact session directory and PID instead of using a broad kill command.
 
 If context is interrupted, recover from the saved `session_dir`; re-source

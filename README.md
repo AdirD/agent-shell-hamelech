@@ -58,7 +58,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. |
+| [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient, including driving an already-open logged-in Chrome tab. |
 | [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
@@ -84,6 +84,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Turn this design doc into a Canvas the team can absorb." | [`design-to-canvas`](#design-to-canvas) | Knowledge transfer from a design doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
+| "Drive the Chrome tab I'm already logged into while we debug." | [`debug-mode`](#debug-mode) | Optional `agent-browser --auto-connect` attach; one-time `chrome://inspect/#remote-debugging` toggle. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
@@ -185,7 +186,7 @@ Use it when:
 
 ### `debug-mode`
 
-Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port, guides the agent to add minimal temporary POST probes, waits for the user to reproduce and reply `proceed`, then inspects evidence, iterates or fixes, removes every probe, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience. A built-in `doctor` TUI (`debug_session.py doctor`) shows every live session with per-session health (running/degraded/dead from process state plus the collector `/health` endpoint), a real-time event tail, surfaced collector errors, and a hotkey to kill a session.
+Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port, guides the agent to add minimal temporary POST probes, then either attaches to the user's already-open Chrome via Vercel Labs `agent-browser --auto-connect` (same tabs and logins; Chrome 144+ one-time toggle at `chrome://inspect/#remote-debugging`, then Allow) or waits for the user to reproduce and reply `proceed`. It inspects evidence, iterates or fixes, removes every probe, detaches without quitting Chrome, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience. A built-in `doctor` TUI (`debug_session.py doctor`) shows every live session with per-session health (running/degraded/dead from process state plus the collector `/health` endpoint), a real-time event tail, surfaced collector errors, and a hotkey to kill a session. `dm browser-check` lists open tabs or prints the inspect-page / Allow setup hints.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill debug-mode
@@ -197,10 +198,11 @@ Use it when:
 - you want hypothesis-driven instrumentation with an explicit user reproduction gate
 - temporary probes and the local collector must be removed cleanly afterward
 - you want a live view of running collectors, their health, and streamed logs, with the ability to kill one manually (`doctor`)
+- you want the agent to drive a UI you already have open and logged into, without a second browser or extension
 
-Requires Python 3.9+ and the official Vercel Labs `portless` CLI.
+Requires Python 3.9+ and the official Vercel Labs `portless` CLI. Live-Chrome attach additionally needs the official Vercel Labs `agent-browser` CLI (`npm i -g agent-browser && agent-browser install`); the collector still works without it.
 
-Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, `dm start`/`dm stop <dir>` forward to the launcher):
+Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, `dm start`/`dm stop <dir>`/`dm browser-check` forward to the launcher):
 
 ```bash
 sh <skill-dir>/scripts/install-dm.sh

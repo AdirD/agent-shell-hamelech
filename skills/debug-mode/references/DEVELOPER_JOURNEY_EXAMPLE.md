@@ -26,6 +26,39 @@ The developer then sees something like:
 
 No manual log setup or URL copying should normally be required.
 
+## First-ever activation (already logged in)
+
+When the developer already has the failing app open in Chrome:
+
+> Use debug mode. I already have Settings open and I'm logged in. Save still
+> does nothing.
+
+The agent still instruments as above, then tries live attach instead of
+handing over the clicks:
+
+1. Checks for `agent-browser`. If it is missing, asks the developer to
+   install it (`npm i -g agent-browser && agent-browser install`) and
+   continues with the human `proceed` path until it is available.
+2. Runs `dm browser-check --session dm-<session-id>`.
+3. If this is the first attach on the machine, tells the developer to open
+   `chrome://inspect/#remote-debugging` once and enable remote debugging.
+4. Asks them to click **Allow** on the Chrome permission dialog.
+
+The developer then sees something like:
+
+> Debug mode is active.  
+> I can drive the Settings tab you already have open.  
+> Enable remote debugging at chrome://inspect/#remote-debugging if you have
+> not already, then click Allow when Chrome prompts.  
+> I will change the display name, drop the network, and click Save once.
+
+If attach fails (checkbox off, Allow dismissed, Chrome too old), the agent
+falls back to the human reproduction text above and waits for `proceed`.
+The collector still runs either way.
+
+After a successful driven run, the agent reads `dm logs` without waiting
+for `proceed`, then follows the same evidence paths as below.
+
 ## After the developer replies `proceed`
 
 The agent reads the collected events and reports evidence:
@@ -72,12 +105,14 @@ So the normal recurring experience becomes:
 ```text
 Ask to debug
   → agent instruments
-  → developer reproduces
-  → developer says "proceed"
+  → agent attaches to open Chrome (Allow once) or developer reproduces
+  → developer says "proceed" only if attach was not used
   → agent inspects evidence
   → refine or fix
   → optionally verify
-  → agent removes probes and tears down
+  → agent detaches (Chrome stays open), removes probes, and tears down
 ```
 
-The developer should interact only at the reproduction gates; the agent owns the collector, instrumentation, evidence analysis, and cleanup.
+The developer should interact only at the reproduction gates (Allow dialog
+or `proceed`); the agent owns the collector, instrumentation, evidence
+analysis, and cleanup.

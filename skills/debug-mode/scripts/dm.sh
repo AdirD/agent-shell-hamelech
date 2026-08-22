@@ -12,6 +12,7 @@
 #   dm status <dir>   show one session's status
 #   dm logs <dir>     print collected events
 #   dm stop <dir>     stop and remove one session
+#   dm browser-check  attach to open Chrome via agent-browser and list tabs
 
 # Resolve this file's own directory so `dm` finds the co-located launcher,
 # regardless of where the skill is installed.
