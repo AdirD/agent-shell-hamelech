@@ -67,13 +67,6 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`reviewer-clone`](#reviewer-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone by correlating your real review comments to the local code and git history in the repo you run it from. |
 | [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
-### Specialized production
-
-| Skill | What it does | Reach for it when |
-|---|---|---|
-| [`podcast-production`](#podcast-production) | Turns long recordings into an approved short story and finished video. | Interview/meeting/webinar → storyline, script, clips, or rendered cut. |
-| [`hebrew-rtl-writing`](#hebrew-rtl-writing) | Fixes mixed RTL/LTR rendering in Hebrew text with embedded English. | English terms make primarily Hebrew prose render incorrectly. |
-
 ---
 
 ## Which skill do I need?
@@ -299,21 +292,6 @@ Use it when:
 
 ---
 
-### [`hebrew-rtl-writing`](skills/hebrew-rtl-writing)
-
-Fixes mixed RTL/LTR rendering for any textual artifact that is primarily Hebrew but includes embedded English terms. Wraps English spans with Unicode bidi isolates without touching code blocks, links, or frontmatter.
-
-```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill hebrew-rtl-writing
-```
-
-Use it when:
-- the text is primarily Hebrew
-- English words or technical terms make raw Markdown hard to read
-- you want bidi isolation applied without touching code blocks or links
-
----
-
 ### [`market-validation`](skills/market-validation)
 
 Runs an end-to-end market-validation workflow for one concrete hypothesis. It locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
@@ -348,22 +326,6 @@ Use it when:
 - you're deciding what to build or preparing a pitch
 - you want research, lightweight working notes, or a decision artifact without being forced through a validation pipeline
 - you do **not** yet have one market hypothesis ready for end-to-end validation; once you do, hand it to `market-validation`
-
----
-
-### [`podcast-production`](skills/podcast-production)
-
-Turns long interviews, meetings, webinars, panels, or recorded conversations into a short, user-approved podcast story and finished video. Two independently invokable intents: collaborative storyline development from raw media/transcripts, and source-faithful FFmpeg production from an approved script.
-
-```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill podcast-production
-```
-
-Use it when:
-- you have raw media or a transcript and want themes, editorial angles, a script, or the strongest clips
-- you want to iterate on an interview narrative before locking a cut
-- you already have an approved script and need to cut, render, assemble, or verify video
-- you want end-to-end help from a long recording to a finished short
 
 ---
 
@@ -451,10 +413,8 @@ skills/
   idea-to-canvas/
   distill-need/
   debug-mode/
-  hebrew-rtl-writing/
   sync-melech-skills/
   market-validation/
-  podcast-production/
   pre-plan/
   product-ideation/
   prune/
