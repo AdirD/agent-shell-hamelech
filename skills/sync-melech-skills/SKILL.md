@@ -1,11 +1,6 @@
 ---
 name: sync-melech-skills
-description: >-
-  Sync every AdirD/agent-shell-hamelech skill into the user-global
-  ~/.agents/skills lock and fan it out to every coding agent. Use when the
-  user says sync-melech-skills, sync melech skills, melech sync, keep my
-  melech skills up to date, or asks whether hamelech skills are installed.
-  sync-melech-skills list is dry catalog only.
+description: Sync this skill library globally across supported coding agents.
 ---
 
 # Sync Melech Skills — global library sync

@@ -1,11 +1,6 @@
 ---
 name: visualize
-description: >-
-  Render the current idea, flow, structure, screen, sequence, boundary, or
-  mental model as a compact ASCII diagram. Use when the user asks to
-  "visualize", "draw", "diagram", "sketch", or "map out" something, or when
-  structural/flow ambiguity in the conversation would be easier to reason about
-  visually than in prose.
+description: Turn an idea, flow, or structure into a compact ASCII diagram.
 disable-model-invocation: true
 ---
 

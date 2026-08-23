@@ -141,7 +141,7 @@ Use when the work is decided and the remaining job is cleaning iteration residue
 
 ### [`sync-melech-skills`](skills/sync-melech-skills)
 
-Keeps this library current on the machine: every skill on GitHub is present under `~/.agents/skills` and reachable from every coding agent. Ships no scripts — it teaches the agent to drive the Skills CLI correctly, which is one command: `cd ~ && npx skills add AdirD/agent-shell-hamelech --all -g`. Naming the repo is what keeps the sync melech-only, so unrelated global skills are never upgraded behind your back. Also documents the two outputs that look like failures and are not (Eve and PromptScript cannot do global installs; Cursor and Codex read `~/.agents/skills` directly instead of getting a symlink). Renamed from `melech`; remove the old global skill with `npx skills remove melech -g -y`.
+Syncs this skill library globally across supported coding agents.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill sync-melech-skills -g -y -a '*'
@@ -161,7 +161,7 @@ Use it when:
 
 ### [`8020`](skills/8020)
 
-Helps decide on the smallest useful way to reach a product goal before writing code. Explores technical, UX, product, and strategy trade-offs, favors existing integration points over new code, and surfaces 80/20 alternatives.
+Finds the smallest useful path to a product or engineering outcome.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill 8020
@@ -176,7 +176,7 @@ Use it when:
 
 ### [`babysit`](skills/babysit)
 
-Keeps a PR merge-ready by looping over comments, merge conflicts, and CI on a recurring cadence (default 5 min) until the PR is green and mergeable — or a real blocker needs you. Delegates the loop to a `/loop` primitive if available, otherwise arms a background heartbeat.
+Keeps a PR moving through review, conflicts, and CI until merge-ready.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill babysit
@@ -191,7 +191,7 @@ Use it when:
 
 ### [`debug-mode`](skills/debug-mode)
 
-Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port and adds minimal temporary POST probes. Reproduction is one of two modes: **manual** (you hold the wheel, then reply `proceed`) or **autopilot** (the agent drives your already-open Chrome via Chrome DevTools MCP `--autoConnect` — same tabs and logins; Chrome 144+ one-time toggle at `chrome://inspect/#remote-debugging`, then Allow). If the host has no `chrome-devtools` MCP, `dm mcp-setup` writes the official `--autoConnect` config and asks for a reload so the host can start the server. If you do not pick, the agent names both modes and waits. It inspects evidence, iterates or fixes, removes every probe, detaches without quitting Chrome, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience. A built-in `doctor` TUI (`debug_session.py doctor`) shows every live session with per-session health (running/degraded/dead from process state plus the collector `/health` endpoint), a real-time event tail, surfaced collector errors, and a hotkey to kill a session. `dm browser-check` is a CLI fallback only.
+Diagnoses reproducible bugs using temporary runtime probes and captured evidence.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill debug-mode
@@ -217,7 +217,7 @@ sh <skill-dir>/scripts/install-dm.sh
 
 ### [`challenge`](skills/challenge)
 
-Pressure-tests an existing direction before implementation. Asks one high-value question at a time, revises assumptions as you answer, and flags over-engineering risk. Does not restart from zero; does not turn into a PRD.
+Pressure-tests an existing direction before implementation.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill challenge
@@ -232,7 +232,7 @@ Use it when:
 
 ### [`pre-plan`](skills/pre-plan)
 
-Reaches a shared buildable design concept before plan mode or code. Auto-calibrates question density (`light` / `standard` / `deep`), keeps domain nouns aligned, kills premature scale/architecture, and optionally pressure-tests the concept. Stops at a short decision log unless you explicitly lock a plan.
+Aligns on a buildable design concept before planning or coding.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill pre-plan
@@ -248,7 +248,7 @@ Use it when:
 
 ### [`consult`](skills/consult)
 
-Double-checks, proofs, and stress-tests an AI-proposed implementation, architecture, plan, or product idea before committing. Isolates the proposal, briefs fresh subagents or an expert council without grading its own homework, and synthesizes consensus vs. flaws into concrete adjustments. Every consultant runs a different model from a different provider — never the main thread's model, never two on the same one — so agreement means corroboration, not an echo.
+Gets independent model opinions on an AI-proposed plan, fix, architecture, or idea.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
@@ -264,7 +264,7 @@ Use it when:
 
 ### [`idea-to-canvas`](skills/idea-to-canvas)
 
-Turns any starting point — a rough idea, meeting notes, product brief, RFC, design doc, or bullet list — into a standalone Cursor Canvas for team knowledge transfer. Not an approval workflow or a prettier copy of the input. Shapes the idea if unstructured, then surfaces mental model, system shape, decisions, constraints, and rollout with strong hierarchy and progressive disclosure.
+Turns rough ideas or docs into a standalone Cursor Canvas for team understanding.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill idea-to-canvas
@@ -280,7 +280,7 @@ Use it when:
 
 ### [`distill-need`](skills/distill-need)
 
-Treats the literal ask as a proposed solution, not scripture. Distills the outcome that must be true, checks context and existing alternatives, and surfaces better solution categories — including reuse or don't-build. Hands off to `pre-plan` / `8020` only when the work is still build-shaped.
+Uncovers the real need behind a requested solution before building it.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill distill-need
@@ -296,7 +296,7 @@ Use it when:
 
 ### [`market-validation`](skills/market-validation)
 
-Shapes an open product or business opportunity into a testable market hypothesis, then runs validation end to end. It can clarify the aim, relationship to a current product, customer, problem, product shape, and value mechanism without forcing an early verdict. Once the premise is testable, it locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes full validation with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
+Tests whether a product or market opportunity has real demand and willingness to pay.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill market-validation
@@ -316,7 +316,7 @@ For a concrete feature or implementation request, use `distill-need` first. For 
 
 ### [`code-review-clone`](skills/code-review-clone)
 
-Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. Every reviewer has their own themes and biases—this mimics them, it doesn't correct them. It trains on the repository you run it from—no menu—and learns a compact model across six lenses: **IF** they weigh in at all, **WHAT** they flag, **WHERE** they focus and own, **WHEN** they escalate (ask / suggest / block), **WHO** they push on, and **WHY** they care—plus **HOW** they say it (their voice). Instead of deep-reading whole PRs (which overfits), it **correlates over the whole comment corpus**: the bundled collector sweeps every review comment with its file+line anchor and splits them into ordered chunk-files, and the main agent reads the chunks one by one—building a running model and grounding real patterns against the actual local code and read-only git (`log`, `blame`, `shortlog`)—until new chunks stop teaching it anything. The lenses are how the *trainer* learns; what it publishes is the *Clone's* brain, filed the way a review actually happens: an attention map (where to look), reflexes (trigger → reaction → how hard → why), negative space (what to wave through), and default posture. Once a real pattern exists, a compact `Calibrate Clone` question set—each question naming a real package/file/area—settles the few choices that would change behavior. Built-in todos replace narration. Reviews stay draft-first; approvals, change requests, and comments post through the authenticated `gh` CLI. The human always chooses whether to publish, continue, or pause. Its comments read in the person's own voice (no bot prefix) and carry only a hidden HTML trace, so later human corrections to them teach it what to learn or unlearn.
+Builds or resyncs a private reviewer that learns your GitHub code-review style.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill code-review-clone
@@ -341,7 +341,7 @@ Use it when:
 
 ### [`scout`](skills/scout)
 
-Finds the prior art before you pay to rebuild it: whether the capability already ships as a library, OSS project, dev tool, managed service, cloud primitive, or a dependency already installed and already billed. Its first move is translating the implementation into the capability's canonical name (a `tasks` table plus a polling worker is a **job queue**), because searching the local vocabulary is why this research usually fails. It then fans out parallel research lanes — canon, ecosystem, commercial, already-in-your-stack, practitioner verdicts, counter-case, and a frontier lane for what shipped in the last 6–12 months — each subagent running several live web searches down its own path. Always searches; memory only generates hypotheses, and no candidate reaches the shortlist without a URL seen in this run and a liveness signal, so it cannot invent a plausible package that does not exist. Dead and unverified entries are killed, rebrands and forks deduplicated, options clustered by approach, and the result is a 3–6 row shortlist with cost, what you give up, what no option covers, and an honest case for when rolling your own still wins. Reports and recommends via `ask_question` — it never rips out working code on its own.
+Finds and compares existing tools before building a capability from scratch.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill scout
@@ -359,7 +359,7 @@ Use it when:
 
 ### [`smart-comments`](skills/smart-comments)
 
-Makes the agent write selective, intent-preserving inline comments and respect existing ones as load-bearing memory. Kills "what" comments, preserves "why" comments, and refuses to silently delete comments during refactors.
+Preserves code intent with selective comments and protects meaningful existing comments.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill smart-comments
@@ -374,7 +374,7 @@ Use it when:
 
 ### [`prune`](skills/prune)
 
-Audits and strips AI residue, dead code, zombie workflows, and YAGNI bloat after heavy multi-turn iteration. Operates on an **inverted burden of proof**: every added or modified symbol is assumed unneeded until proven necessary with concrete evidence (reachability, explicit requirement, non-duplication, and breakage tests). Prompts for diff scope via `ask_question`, presents a clear evidence table, and requires explicit user approval before safely pruning and verifying the test suite.
+Audits and removes dead code, AI residue, and unnecessary complexity after iteration.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill prune
@@ -390,7 +390,7 @@ Use it when:
 
 ### [`visualize`](skills/visualize)
 
-Renders the current idea as a compact ASCII diagram — architecture, flows, screens, sequences, boundaries, comparisons, or current mental models. Marks assumptions, separates confirmed from inferred, and calls out anything the drawing exposes.
+Turns an idea, flow, or structure into a compact ASCII diagram.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill visualize

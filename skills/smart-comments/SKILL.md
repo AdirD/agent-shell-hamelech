@@ -1,10 +1,6 @@
 ---
 name: smart-comments
-description: >-
-  Write selective, intent-preserving inline code comments and respect existing
-  ones as load-bearing memory. Use when authoring, editing, refactoring, or
-  reviewing code with comments — especially when tempted to add "what" comments,
-  remove "redundant" comments during a refactor, or rewrite existing warnings.
+description: Preserve code intent with selective comments and protect meaningful existing comments.
 ---
 
 # Smart Comments

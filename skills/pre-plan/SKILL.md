@@ -1,12 +1,6 @@
 ---
 name: pre-plan
-description: >-
-  Reach a shared buildable design concept before writing a plan or code.
-  Calibrate question density (light / standard / deep), keep domain nouns
-  aligned, kill premature scale/architecture, and optionally pressure-test
-  the concept. Use when the user asks for "pre-plan", "pre-build", "align
-  before we plan", or wants grilling/shared understanding without jumping
-  straight into plan mode.
+description: Align on a buildable design concept before planning or coding.
 disable-model-invocation: true
 ---
 
@@ -150,8 +144,7 @@ Pressure-test with **sparse** high-value questions:
 Do not restart from zero unless the concept clearly breaks.
 Do not turn this into a PRD.
 
-If structure is easier to see than to prose, sketch compact ASCII or use
-`visualize`.
+If structure is easier to see than to prose, sketch compact ASCII.
 
 ### 6. Stop at shared understanding
 
@@ -162,7 +155,7 @@ Default output is a short **decision log**, not a plan:
 - assumed defaults
 - scale-gate outcome
 - remaining risks / non-guessables
-- recommended next move: implement via `8020`, measure a boundary, or `lock it`
+- recommended next move: implement the smallest useful shape, measure a boundary, or `lock it`
 
 **Do not** auto-write a full plan, PRD, or issue breakdown.
 Only write those when the user explicitly says to lock it / plan it / write
@@ -171,16 +164,6 @@ issues.
 If a boundary choice still needs numbers (cache key shape, index, access
 pattern, queue semantics), say so and stop — recommend a measured comparison
 rather than vibes. Do not pretend Q&A replaces benchmarks.
-
-## Relationship To Sibling Skills
-
-| Skill | Relationship |
-|---|---|
-| `challenge` | Standalone poke at an **existing** plan/direction. `pre-plan` may run a late challenge pass; use standalone `challenge` when ceremony is unnecessary. |
-| `distill-need` | Run first when the ask may be a proposed solution / faster horse. `pre-plan` assumes the work is already build-shaped. |
-| `8020` | After alignment: pick the smallest useful implementation shape. |
-| `market-validation` | Earlier product and market premise work when customer evidence carries the decision. Hand off to `pre-plan` once the direction is ready to become a buildable concept. |
-| `visualize` | Optional aid when structure/flow is ambiguous. |
 
 ## Do / Don't
 
@@ -192,7 +175,7 @@ rather than vibes. Do not pretend Q&A replaces benchmarks.
 
 **Don't:** Let k8s / sharding / 'for scale' ride along because they sound responsible.
 
-**Do:** "Shared concept locked in the decision log. Say `lock it` if you want a plan/issues; otherwise I can take this into `8020`."
+**Do:** "Shared concept locked in the decision log. Say `lock it` if you want a plan/issues; otherwise I can take this into the smallest useful implementation."
 
 **Don't:** Jump into a multi-section PRD the moment questions slow down.
 

@@ -1,13 +1,6 @@
 ---
 name: prune
-description: >-
-  Audit and strip AI residue, dead code, zombie workflows, and YAGNI bloat
-  after heavy iteration. Uses an inverted burden of proof (every added symbol
-  is assumed unneeded until proven necessary). Prompts for diff scope,
-  presents evidentiary findings, and requires explicit user approval via
-  ask_question before pruning. Use when saying "prune", "clean up the diff",
-  "strip dead code", "de-bloat", "remove ai slop", or after multi-turn coding
-  sessions where code has accreted unneeded residue.
+description: Audit and remove dead code, AI residue, and unnecessary complexity after iteration.
 disable-model-invocation: true
 ---
 
@@ -43,7 +36,7 @@ To survive pruning, every symbol in the audited diff must satisfy these four tes
 | **3. Non-Duplication Proof** | "Did this logic already exist in the codebase?" | Verify whether an existing helper, utility, or standard library method already handles this. | **Accidental Reinvention** → Collapse. |
 | **4. Breakage Proof** | "If we delete this right now, what test or behavior breaks?" | Simulate removal or check test coverage. If nothing fails and no behavior shifts, why does it exist? | **Phantom Scaffolding** → Remove. |
 
-If a symbol looks like a hand-rolled version of a known library or tool rather than of local code, that is an adoption question and not a deletion — note it and point the user at `scout`.
+If a symbol looks like a hand-rolled version of a known library or tool rather than of local code, that is an adoption question and not a deletion — note it and flag it for the user.
 
 ---
 
@@ -136,7 +129,7 @@ Once approved:
 
 1. **Delete Dead Code**: Remove the approved functions, types, branches, and parameters.
 2. **Clean Up Dangling References**: Remove unused imports and unneeded variables left behind by deletions.
-3. **Respect Comments**: Apply `smart-comments` principles — preserve load-bearing landmine/WHY comments, and remove comments only if the code they explain was deleted.
+3. **Respect Comments**: Preserve load-bearing landmine/WHY comments, and remove comments only if the code they explain was deleted.
 4. **Run Verification**:
    * Run the test suite (`npm test`, `pytest`, `cargo test`, `go test`, etc.).
    * Run type checking (`tsc`, `mypy`, `cargo check`, etc.) or build commands.
@@ -145,20 +138,6 @@ Once approved:
    * Lines of code removed
    * Files cleaned
    * Final verification/test status (e.g. `All 42 tests passing green`)
-
----
-
-## Relationship to Sibling Skills
-
-| Skill | When to Use |
-|---|---|
-| `8020` | **Before coding**: Pick the smallest useful path to avoid building bloat in the first place. |
-| `pre-plan` | **Before coding**: Align on the design concept before generating code. |
-| `distill-need` | **Before coding**: Determine if the task even needs to be built. |
-| `scout` | **Any time**: Verified search for a library, tool, or service that already provides a capability. |
-| `smart-comments` | **During coding / pruning**: Preserve load-bearing WHY comments; avoid noisy WHAT comments. |
-| `prune` | **After coding / iterations**: Audit and strip the residue, dead code, and speculative bloat accumulated across AI prompts. |
-| `reviewer-clone` | **At PR review**: Review the final clean PR through your personal review lens. |
 
 ---
 

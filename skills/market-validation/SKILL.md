@@ -1,18 +1,6 @@
 ---
 name: market-validation
-description: >-
-  Shape an open product or business opportunity into a testable market
-  hypothesis and, when useful, validate it end to end. Clarify the aim,
-  relationship to any current product, target customer, painful situation,
-  buyer, alternatives, and proposed value; gather first-party and public
-  evidence; design and synthesize customer discovery; run the smallest
-  behavioral or commercial test; and return an evidence-backed Advance /
-  Reshape / Hold / Stop decision when a verdict is requested. Use whenever
-  someone wants to explore or validate a startup, business idea, new market,
-  ICP, buyer, paid product opportunity, demand, willingness to pay, or whether
-  an opportunity is worth pursuing—even when the premise is still vague. For a
-  concrete feature or implementation request, use distill-need first. Do not use
-  for implementation planning after the market decision is already made.
+description: Test whether a product or market opportunity has real demand and willingness to pay.
 ---
 
 # Market Validation
@@ -49,10 +37,10 @@ Choose this skill based on the state of the user's thinking:
 
 | User has | Use |
 |---|---|
-| A concrete requested solution that may not serve the real need | `distill-need` |
+| A concrete requested solution that may not serve the real need | Distill the real need first — not this skill |
 | An open product or business opportunity and wants to discover a testable market premise | Shape it here, then validate when useful |
 | A specific customer/problem/value hypothesis and wants to know whether reality supports it | Start at the validation contract |
-| A market-backed direction and needs a shared build concept | `pre-plan` |
+| A market-backed direction and needs a shared build concept | Move on to shaping a buildable concept — not this skill |
 
 Do not force an open idea into a validation contract before its important
 pieces are legible. Conversely, do not keep ideating after one hypothesis has

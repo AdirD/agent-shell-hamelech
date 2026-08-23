@@ -1,14 +1,6 @@
 ---
 name: distill-need
-description: >-
-  Distill the real need behind a user request before obeying it. Treat the
-  literal ask as a proposed solution, uncover the outcome that must be true,
-  check context and existing alternatives, and surface better solution
-  categories — including non-build options. Use for concrete feature, tool,
-  architecture, or implementation requests when the user wants help deciding
-  what should actually be built, especially when they ask to "distill-need",
-  "distill this", "what do I actually need", "faster horse", or say not to just
-  implement what they asked.
+description: Uncover the real need behind a requested solution before building it.
 disable-model-invocation: true
 ---
 
@@ -79,7 +71,7 @@ Before inventing:
 - is there already a wheel in the codebase, product, or process
 - are they reinventing it
 - worse: reinventing it as a rectangle
-- if a known library, tool, or service may already do it, point the user at `scout`
+- if a known library, tool, or service may already do it, flag it for the user
 
 Prefer integrate / reuse / configure over greenfield when it hits the need.
 
@@ -97,8 +89,8 @@ Recommend one. User picks.
 ### 6. Hand off
 
 - If the need dies or "walk" wins → stop. No plan, no code.
-- If still build-shaped → hand to `pre-plan` and/or `8020`.
-- If they already had a direction and only needed holes poked → `challenge`.
+- If still build-shaped → move on to aligning the concept and picking the smallest useful path.
+- If they already had a direction and only needed holes poked → pressure-test that direction instead.
 
 ## Question Filter
 
@@ -111,17 +103,7 @@ Ask only what would change:
 
 Do not ask implementation trivia. Do not invent requirements theater.
 
-## Relationship To Sibling Skills
-
-| Skill | Relationship |
-|---|---|
-| `pre-plan` | After distillation, if the work is still build-shaped: align the shared concept. |
-| `8020` | After the need is clear: pick the smallest useful path to that outcome. |
-| `market-validation` | Use when distillation exposes a broader product or business opportunity and customer or commercial evidence should shape and test it. |
-| `challenge` | Pressure-tests an existing direction. Does not primarily re-category the ask. |
-| `scout` | Verified search for existing libraries, tools, services, or products that already deliver the outcome. |
-
-`distill-need` is the intercept. It can end with **don't build**.
+This is the intercept. It can end with **don't build**.
 
 ## Do / Don't
 

@@ -1,12 +1,6 @@
 ---
 name: consult
-description: >-
-  Double-check, proof, and stress-test an AI-proposed implementation,
-  architecture, plan, or product idea before committing. Isolates the proposal,
-  briefs fresh subagents or an expert council without grading its own homework,
-  and synthesizes consensus vs flaws into concrete adjustments. Use when the
-  user asks to "double check", "proof this", "consult", "second opinion", "ask
-  another model", "are you sure", or "convene an expert council" on a proposal.
+description: Get independent model opinions on an AI-proposed plan, fix, architecture, or idea.
 disable-model-invocation: true
 ---
 

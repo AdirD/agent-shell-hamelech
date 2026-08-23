@@ -1,12 +1,6 @@
 ---
 name: idea-to-canvas
-description: >-
-  Turn any starting point — a rough idea, meeting notes, product brief, RFC,
-  design doc, bullet list, or Slack dump — into a standalone Cursor Canvas that
-  helps the team quickly understand and align on how we are going to build this.
-  Use when the user asks for "idea-to-canvas", "design-to-canvas", "idea to
-  canvas", "design to canvas", or to turn any idea, note, or doc into a Canvas
-  for knowledge transfer.
+description: Turn rough ideas or docs into a standalone Cursor Canvas for team understanding.
 disable-model-invocation: true
 ---
 

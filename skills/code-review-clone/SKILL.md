@@ -1,13 +1,6 @@
 ---
 name: code-review-clone
-description: >-
-  Create and resync a private user-global Clone skill that reviews GitHub pull
-  requests like the authenticated user. It trains on the repository you run it
-  from: it correlates the user's real review comments to the actual code they
-  point to (local files plus read-only git history and blame) to learn where they
-  focus, when they intervene, and how they investigate. Use when the user asks to
-  clone or learn their code-review style, build a personal CR/PR reviewer,
-  retrain, or resync an existing reviewer Clone.
+description: Build or resync a private reviewer that learns your GitHub code-review style.
 ---
 
 # Reviewer Clone

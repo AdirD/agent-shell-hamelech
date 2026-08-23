@@ -1,6 +1,6 @@
 ---
 name: debug-mode
-description: "Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Two reproduction modes: manual (user holds the wheel, then replies proceed) and autopilot (agent drives the user's already-open Chrome via Chrome DevTools MCP --autoConnect). Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, autopilot, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow."
+description: Diagnose reproducible bugs using temporary runtime probes and captured evidence.
 ---
 
 # Debug Mode

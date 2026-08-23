@@ -1,12 +1,6 @@
 ---
 name: "8020"
-description: >-
-  Help the user decide on the smallest useful way to reach a product goal
-  before writing code. Explore technical, UX, product, and strategy trade-offs,
-  favor existing integration points over new code, and surface 80/20
-  alternatives the user may not have considered. Use when the user asks for
-  this skill by name, or says things like "least intrusive", "least diff",
-  "80/20", or "minimal change" for a task.
+description: Find the smallest useful path to a product or engineering outcome.
 disable-model-invocation: true
 ---
 

@@ -1,16 +1,6 @@
 ---
 name: scout
-description: >-
-  Find out whether the thing about to be built (or just built) already exists as
-  a library, open-source project, dev tool, managed service, cloud primitive, or
-  dependency already in the stack — before paying to reinvent it. Runs parallel
-  research lanes with live web search, verifies every candidate against a real
-  URL, and returns a ranked shortlist with an honest roll-your-own case. Also
-  works as open-ended discovery for a capability or space. Use when the user
-  says "scout", "does this already exist", "is there a tool for this", "prior
-  art", "what's out there", "don't reinvent the wheel", "any library for X",
-  "build vs buy", "what are people using for X", or "find me new AI tools for
-  X".
+description: Find and compare existing tools before building a capability from scratch.
 disable-model-invocation: true
 ---
 
@@ -184,13 +174,13 @@ recommends. The user rules.
 
 ### 6. Hand off
 
-- **Adopt** → `8020` for the smallest integration path, or `pre-plan` if the
-  swap reshapes the design.
-- **Keep building** → proceed, and leave one `smart-comments`-style WHY comment
-  recording what was evaluated and rejected, so the next agent does not re-run
-  this debate.
-- **The need itself now looks shaky** → back to `distill-need`.
-- **A shortlisted option needs stress-testing before commitment** → `consult`.
+- **Adopt** → integrate it via the smallest path, or realign the design if the
+  swap reshapes it.
+- **Keep building** → proceed, and leave one WHY comment recording what was
+  evaluated and rejected, so the next agent does not re-run this debate.
+- **The need itself now looks shaky** → revisit whether the need is real.
+- **A shortlisted option needs stress-testing before commitment** → proof the
+  pick before writing code.
 
 ---
 
@@ -247,17 +237,3 @@ is not research, it is a reflex.
 **Do:** Present the shortlist and let the user choose.
 
 **Don't:** Start swapping out working code because a more popular option exists.
-
----
-
-## Relationship To Sibling Skills
-
-| Skill | Relationship |
-|---|---|
-| `distill-need` | Interrogates whether the *need* is real. `scout` assumes the capability is wanted and asks who already built it. |
-| `prune` | Audits the repo for internal duplication and dead code. `scout` covers everything outside the repo. |
-| `8020` | After a candidate is chosen: the smallest path to integrate it. |
-| `pre-plan` | If adopting reshapes the design rather than swapping an implementation. |
-| `consult` | Stress-tests a chosen option. `scout` finds the options; `consult` proofs the pick. |
-| `market-validation` | Maps competitors and alternatives as evidence for a *market premise*. `scout` is landscape for a *capability you are about to build*. |
-| `challenge` | Pokes holes in a direction. Does not go find alternatives. |

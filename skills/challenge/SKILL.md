@@ -1,11 +1,6 @@
 ---
 name: challenge
-description: >-
-  Pressure-test an existing idea, direction, or partial plan before
-  implementation. Ask one high-value question at a time, revise assumptions
-  after each answer, and surface risks, weak trade-offs, and over-engineering.
-  Use when the user asks to "challenge", "pressure-test", "poke holes in",
-  "stress test", or "sanity check" a direction they already have.
+description: Pressure-test an existing direction before implementation.
 disable-model-invocation: true
 ---
 
@@ -52,7 +47,7 @@ Flag places where the current direction may be broader, more abstract, or more m
 For non-critical details, make reasonable working assumptions and move on.
 Only surface those assumptions if they become risky.
 
-When structural or flow ambiguity would be easier to reason about visually, use a compact ASCII sketch or trigger the `visualize` skill — it helps communicate ideas with the human developer.
+When structural or flow ambiguity would be easier to reason about visually, use a compact ASCII sketch — it helps communicate ideas with the human developer.
 
 Keep going until we reach a plateau, meaning further questions are no longer meaningfully improving the thinking.
 

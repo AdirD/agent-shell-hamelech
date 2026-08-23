@@ -1,9 +1,6 @@
 ---
 name: babysit
-description: >-
-  Keep a PR merge-ready by looping over comments, merge conflicts, and CI until
-  the PR is green and mergeable, or a real blocker needs the user. Use when the
-  user asks to babysit, watch, drive, or keep-alive a PR.
+description: Keep a PR moving through review, conflicts, and CI until merge-ready.
 disable-model-invocation: true
 ---
 
