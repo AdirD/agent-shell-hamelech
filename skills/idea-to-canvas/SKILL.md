@@ -1,16 +1,20 @@
 ---
-name: design-to-canvas
+name: idea-to-canvas
 description: >-
-  Turn a design doc into a standalone Cursor Canvas that helps the team
-  quickly understand and align on how we are going to build this. Use when
-  the user asks for "design-to-canvas", "design to canvas", or to turn a
-  design doc / RFC / tech design into a Canvas for knowledge transfer.
+  Turn any starting point — a rough idea, meeting notes, product brief, RFC,
+  design doc, bullet list, or Slack dump — into a standalone Cursor Canvas that
+  helps the team quickly understand and align on how we are going to build this.
+  Use when the user asks for "idea-to-canvas", "design-to-canvas", "idea to
+  canvas", "design to canvas", or to turn any idea, note, or doc into a Canvas
+  for knowledge transfer.
 disable-model-invocation: true
 ---
 
-Turn @<design-doc-path> into a standalone Cursor Canvas that helps the team quickly understand and align on how we are going to build this.
+Turn @<input> into a standalone Cursor Canvas that helps the team quickly understand and align on how we are going to build this.
 
-This is primarily a knowledge-transfer artifact—not an approval workflow, debate space, or prettier copy of the document.
+Accept any starting point: a rough idea, a shower thought, a Slack thread dump, meeting notes, a decision log, a product brief, a PRD fragment, a design doc, an RFC, or a tech spec. The less structured the input, the more the skill must do the structuring work.
+
+This is primarily a knowledge-transfer artifact — not an approval workflow, debate space, or prettier copy of the input.
 
 Core objective:
 Make what the author knows as easy as humanly possible for the team to absorb without losing important meaning, decisions, constraints, or implementation direction.
@@ -26,8 +30,10 @@ Before building the canvas, identify:
 - The implementation sequence and what each team or component owns
 - Details needed for alignment versus details that can be progressively disclosed
 
+If the input is rough or unstructured, make reasonable inferences to fill gaps, clearly mark them as inferred or assumed, and surface anything the canvas exposes that the author may not have considered.
+
 Presentation principles:
-- Less is more. Do not reproduce the document section by section.
+- Less is more. Do not reproduce the input section by section.
 - Prefer showing over explaining.
 - Use short, direct text only where visuals cannot carry the meaning.
 - Compartmentalize information into independently understandable views.
@@ -48,7 +54,7 @@ Drawings:
 - Every drawing should answer a specific question and be understandable without narration.
 - Do not force a visual when a sentence or short list is clearer.
 
-Choose only visual forms that genuinely clarify the design, such as:
+Choose only visual forms that genuinely clarify the idea, such as:
 - A system or component map
 - A user-to-system journey
 - A sequence or data-flow diagram
@@ -69,16 +75,16 @@ Suggested narrative:
 9. Compact technical reference for readers who need depth
 
 Accuracy requirements:
-- Preserve the source document’s intent.
-- Do not invent requirements, decisions, or certainty.
+- Preserve the source's intent.
+- Do not invent requirements, decisions, or certainty beyond what can be reasonably inferred.
 - Clearly distinguish decided, assumed, proposed, and unresolved items.
 - Preserve important terminology from the source.
-- If the document contains contradictions or gaps, surface them quietly and precisely without turning the canvas into a review report.
+- If the input contains contradictions or gaps, surface them quietly and precisely without turning the canvas into a review report.
 
 Canvas requirements:
 - Create an actual `.canvas.tsx` artifact using the Cursor Canvas skill.
-- Make it useful as a standalone artifact without requiring the source document beside it.
-- Use strong visual hierarchy and varied composition—not a wall of identical cards.
+- Make it useful as a standalone artifact without requiring the source input beside it.
+- Use strong visual hierarchy and varied composition — not a wall of identical cards.
 - Use progressive disclosure for secondary details.
 - Keep every view purposeful and scannable.
 - Include no placeholders or empty sections.
