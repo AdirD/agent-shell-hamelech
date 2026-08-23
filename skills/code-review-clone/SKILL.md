@@ -1,5 +1,5 @@
 ---
-name: reviewer-clone
+name: code-review-clone
 description: >-
   Create and resync a private user-global Clone skill that reviews GitHub pull
   requests like the authenticated user. It trains on the repository you run it
