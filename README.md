@@ -49,6 +49,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`pre-plan`](#pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
+| [`consult`](#consult) | What do fresh eyes, peer reviewers, or an expert council think? | You want an unbiased second opinion, peer review, sanity check, or multi-expert council on a decision or diff. |
 | [`idea-to-canvas`](#idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
 | [`8020`](#8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`challenge`](#challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
@@ -83,6 +84,8 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
+| "Get a second opinion on this architecture, bug hypothesis, or diff." | [`consult`](#consult) | Unbiased second opinion from an isolated subagent or deeper model tier. |
+| "Consult another model / convene an expert council on this dilemma." | [`consult`](#consult) | Multi-perspective triangulation across distinct roles or deeper model tiers. |
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`idea-to-canvas`](#idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
@@ -110,7 +113,7 @@ Use when you are unsure what should exist. The flow may stop at
 ### Better engineering
 
 ```text
-distill-need → pre-plan → 8020 → challenge (optional)
+distill-need → pre-plan → consult (optional sanity check/council) → 8020 → challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -240,6 +243,22 @@ Use it when:
 - plan mode keeps inventing the wrong thing too early
 - you need grilling without a 40-question tax on every bugfix
 - you want scale/status architecture stripped before it hardens
+
+---
+
+### `consult`
+
+Gets an unbiased second opinion, peer review, sanity check, or multi-expert council on an architectural choice, difficult bug, code diff, plan, or naming dilemma. Isolates context, briefs fresh subagents without leading the witness, and synthesizes consensus vs. divergence into actionable trade-offs.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
+```
+
+Use it when:
+- you want an unbiased second opinion from a fresh subagent or heavier reasoning model
+- you want a peer review on a plan, diff, or RFC before committing
+- you want an expert council to triangulate a multi-variable trade-off (e.g., simplicity vs. scale vs. security)
+- you want a devil's advocate / red team to stress-test a proposal for hidden landmines
 
 ---
 
@@ -419,6 +438,7 @@ skills/
   8020/
   babysit/
   challenge/
+  consult/
   idea-to-canvas/
   distill-need/
   debug-mode/
