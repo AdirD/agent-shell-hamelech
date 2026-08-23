@@ -43,7 +43,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
-| [`problem-discovery`](#problem-discovery) | Is this problem real, painful, and worth solving now? | Pain validation, demand/WTP checks, customer discovery, JTBD research. |
+| [`market-validation`](#market-validation) | Does this specific market hypothesis survive customer and commercial evidence? | Validate a startup, ICP, buyer, demand, willingness to pay, or paid opportunity end to end. |
 | [`product-ideation`](#product-ideation) | What product, feature, or direction is worth pursuing? | A product/company idea, feature opportunity, market question, or premise is still open. |
 
 ### Shape work before coding
@@ -82,7 +82,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | "What melech skills do I have / should I update?" | [`sync-melech-skills`](#sync-melech-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
 | "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
-| "Is this pain real / will buyers pay?" | [`problem-discovery`](#problem-discovery) | Demand and pain need evidence before solutioning. |
+| "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`market-validation`](#market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
@@ -106,11 +106,15 @@ question is already answered.
 ### Product discovery
 
 ```text
-distill-need → problem-discovery (if demand/pain unclear) → product-ideation → consult (optional idea council) → pre-plan
+distill-need (if the ask is a proposed solution)
+  → product-ideation (if the premise is still movable)
+  → market-validation (if customer/demand evidence carries the decision)
+  → consult (optional idea council)
+  → pre-plan
 ```
 
 Use when you are unsure what should exist. The flow may stop at
-`distill-need` or `problem-discovery` if reuse, refine, hold, or stop wins.
+`distill-need` or `market-validation` if reuse, reshape, hold, or stop wins.
 
 ### Better engineering
 
@@ -310,19 +314,22 @@ Use it when:
 
 ---
 
-### `problem-discovery`
+### `market-validation`
 
-Locks one falsifiable hypothesis ("users of type A doing B struggle when they hit C"), then researches real sources (Reddit, forums, G2, GitHub, job posts) for and against it and delivers a blunt, styled decision page — split verdict, sourced numbers, named rivals, one decisive next test. Proposes the hypothesis instead of interrogating you; researches by default instead of waiting to be told.
+Runs an end-to-end market-validation workflow for one concrete hypothesis. It locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill problem-discovery
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill market-validation
 ```
 
 Use it when:
-- you need to know if the problem is real and painful enough before solutioning
-- you want demand / willingness-to-pay confidence, not feature brainstorming
-- you want the agent to go research the pain, not interview you about it
-- you want a decision-ready validation page, not a hedged report
+- you have a specific startup, market, ICP, customer/problem, buyer, or offer hypothesis
+- you need to establish whether the pain is real, budget exists, and customers will act or pay
+- you want secondary research followed by primary discovery and the smallest decisive market test
+- you already ran interviews, a smoke test, or a pilot and need rigorous synthesis against precommitted thresholds
+- you want a decision-ready validation dossier that keeps counter-evidence and remaining risk visible
+
+Do not use it merely to brainstorm what a product could become; start with `product-ideation` while the premise is still movable.
 
 ---
 
@@ -337,9 +344,10 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill product-ide
 Use it when:
 - you want to ideate or think through an idea before it's a spec
 - you're exploring a feature, workflow, roadmap, or growth direction for a current product and repository
-- you're investigating a market, mapping existing solutions, or sharpening positioning
+- you're mapping a market or existing solutions to help reshape an open premise
 - you're deciding what to build or preparing a pitch
 - you want research, lightweight working notes, or a decision artifact without being forced through a validation pipeline
+- you do **not** yet have one market hypothesis ready for end-to-end validation; once you do, hand it to `market-validation`
 
 ---
 
@@ -445,9 +453,9 @@ skills/
   debug-mode/
   hebrew-rtl-writing/
   sync-melech-skills/
+  market-validation/
   podcast-production/
   pre-plan/
-  problem-discovery/
   product-ideation/
   prune/
   reviewer-clone/

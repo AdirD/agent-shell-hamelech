@@ -63,6 +63,11 @@ Do not turn post counts, likes, upvotes, duplicate reposts, or viral complaints
 into prevalence estimates. Public conversation reveals language, mechanisms,
 and behavioral signals; it rarely establishes market size.
 
+This is premise-shaping research, not completed market validation. When the user
+has one fixed customer/problem/buyer hypothesis and wants to establish demand or
+willingness to pay, carry the active premise into `market-validation`; do not
+expand this lightweight method into a parallel validation workflow.
+
 ## Compare the real landscape
 
 Include only categories relevant to the current decision:

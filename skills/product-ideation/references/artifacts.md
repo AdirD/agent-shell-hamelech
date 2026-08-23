@@ -87,34 +87,17 @@ solution, feasibility, economics, regulation, and founder fit. Prioritize by
 assumptions rather than silently deleting them when they explain a premise
 change.
 
-## Customer discovery plan
+## Market-validation handoff
 
-Use for interviews or observed workflow research.
+When one customer/problem/buyer hypothesis has stabilized and the user needs to
+establish demand, willingness to pay, or commercial commitment, stop expanding
+the ideation artifact. Hand the active premise, evidence, assumptions, and
+decision to `market-validation`.
 
-1. **Uncertainty to resolve**
-2. **Exact participant profile and exclusion criteria**
-3. **Recruiting route and sample rationale**
-4. **Questions about past behavior** — triggers, sequence, cost, workarounds,
-   purchase decisions; avoid pitching and hypotheticals
-5. **Observation or artifact requests** — current tools, screenshots, documents,
-   timelines when appropriate
-6. **Evidence capture template** — verbatim quote, observed behavior, context,
-   interpretation
-7. **Decision thresholds** — what strengthens, reshapes, or invalidates the
-   premise
-8. **Synthesis method** — patterns plus disconfirming cases
-
-Interest, compliments, and willingness to join a waitlist are weak signals
-unless paired with behavior or commitment.
-
-## Validation experiment plan
-
-| Assumption | Experiment | Audience | Offer/stimulus | Observable behavior | Pass/reshape/stop threshold | Cost/time cap | Follow-up decision |
-|---|---|---|---|---|---|---|---|
-
-Choose the smallest test that reproduces the risky part of reality. A landing
-page does not test retention; an interview does not test payment; a prototype
-does not test distribution. State exactly what the experiment cannot prove.
+That skill owns customer-discovery protocols, behavioral experiments,
+precommitted thresholds, evidence progression, and the final market decision.
+Product ideation may identify validation as the next useful move; it should not
+silently perform a partial validation workflow and call the market proven.
 
 ## Positioning and MVP boundary
 

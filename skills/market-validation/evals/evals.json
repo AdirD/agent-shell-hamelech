@@ -1,0 +1,29 @@
+{
+  "skill_name": "market-validation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm considering a startup for independent dental practices: an AI agent that follows up on unscheduled treatment plans. My hypothesis is that office managers lose meaningful revenue because follow-up is manual, and practice owners will pay $500/month to recover it. Validate this market before I spend two months building.",
+      "expected_output": "Proposes a falsifiable validation contract; separates customer, problem, demand, buyer, offer, and reachability claims; researches public evidence for and against the hypothesis to a declared depth; treats desk findings as provisional; designs a primary and commercial test with precommitted thresholds; and does not call the market validated without target-buyer behavior or commitment.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We sell scheduling software to 70 home-services companies. Twelve customers have asked for automated no-show recovery and our CSM notes plus cancellation data are in this workspace. Help us determine whether this is a real paid expansion opportunity, including who would buy it and the smallest test that settles willingness to pay.",
+      "expected_output": "Mines authorized first-party evidence before broad web research; distinguishes requests and correlation from demand; maps user, champion, buyer, budget, alternatives, and reachable segment; uses external research to fill rather than overwrite first-party context; and produces a run-ready behavioral or commercial test plus an Advance / Reshape / Hold / Stop decision path.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I completed 14 interviews for a compliance workflow product and ran a landing page test. Here are the transcripts, participant profiles, ad targeting, conversion data, and the thresholds we wrote before launch. Synthesize whether the original market hypothesis survived and tell me what to do next.",
+      "expected_output": "Verifies participant fit and experiment provenance; synthesizes mechanisms, disconfirming cases, and observed behavior without treating all evidence equally; compares the landing-page result with the precommitted threshold; states what the test cannot prove; updates each claim's evidence state; and returns an evidence-backed Advance / Reshape / Hold / Stop decision.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I have a vague idea for making team retrospectives less boring, but I don't know whether it's a Slack feature, a facilitation service, or something else. Think through what this could become with me.",
+      "expected_output": "Recognizes that the premise is still movable and routes to product-ideation rather than prematurely locking a market-validation contract or launching a demand audit.",
+      "files": []
+    }
+  ]
+}

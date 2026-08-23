@@ -8,9 +8,14 @@ description: >-
   users, markets, and alternatives when useful; challenge assumptions without
   forcing a verdict; and turn evolving thinking into decision-ready artifacts
   when needed. Use whenever a user wants to ideate, improve or extend a current
-  product, explore a feature or roadmap direction, interpret user pain,
-  investigate a market, map competitors, sharpen positioning, change a premise,
-  decide what to build, or prepare a pitch—even if they do not call it ideation.
+  product, explore a feature or roadmap direction, map a market to reshape an
+  open premise, sharpen positioning, change a premise, decide what to build, or
+  prepare a pitch—even if they do not call it ideation. Do not use for end-to-end
+  validation of one specific customer/problem/buyer hypothesis; use
+  market-validation when demand, willingness to pay, or commercial commitment
+  must be established. When the user gives a concrete requested solution that
+  may be a faster horse, use distill-need before product ideation rather than
+  treating the requested implementation as an open product premise.
 ---
 
 # Product Ideation
@@ -69,6 +74,18 @@ current-product evidence only when the direction depends on it; do not let an
 unrelated codebase constrain a standalone idea. Existing code can show context
 and feasibility, but does not prove user need.
 
+### Market-validation boundary
+
+Keep using product ideation while the premise itself is moving: the user,
+problem, product shape, relationship to a current product, or value mechanism is
+still being explored.
+
+Hand off to `market-validation` when the user has one concrete market hypothesis
+and the next decision depends on evidence that the target customer experiences
+the problem, a buyer and budget exist, or people will act or pay. Product
+ideation may sample market evidence to reshape a premise; it does not run the
+full discovery-and-commercial-test loop or declare a market validated.
+
 ## Explore proportionately
 
 Work on the uncertainty that matters now. Choose among these tactics rather than
@@ -87,7 +104,9 @@ questions; confidence and repetition are not evidence.
 
 When user pain, competitors, or market evidence carries the decision, read
 `references/research.md` and use only the relevant method. Do not launch broad
-pain research merely because an idea was mentioned.
+pain research merely because an idea was mentioned. If the question has become
+whether one fixed market hypothesis survives demand and buyer evidence, hand it
+to `market-validation` rather than stretching ideation into a validation audit.
 
 ### Parallel research
 
