@@ -84,8 +84,8 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
-| "Get a second opinion on this architecture, bug hypothesis, or diff." | [`consult`](#consult) | Unbiased second opinion from an isolated subagent or deeper model tier. |
-| "Consult another model / convene an expert council on this dilemma." | [`consult`](#consult) | Multi-perspective triangulation across distinct roles or deeper model tiers. |
+| "Get a second opinion on an idea, architecture, bug hypothesis, or diff." | [`consult`](#consult) | Unbiased second opinion from an isolated subagent or deeper model tier. |
+| "Consult another model / convene an expert council on an idea or dilemma." | [`consult`](#consult) | Multi-perspective triangulation across distinct roles or deeper model tiers. |
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`idea-to-canvas`](#idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
@@ -104,7 +104,7 @@ question is already answered.
 ### Product discovery
 
 ```text
-distill-need → problem-discovery (if demand/pain unclear) → product-ideation → pre-plan
+distill-need → problem-discovery (if demand/pain unclear) → product-ideation → consult (optional idea council) → pre-plan
 ```
 
 Use when you are unsure what should exist. The flow may stop at
