@@ -4,7 +4,7 @@ A small, opinionated library of **agent skills** — drop-in behaviors you can i
 
 Everything in this repo is a skill. No commands, no rules, no bespoke installer. One repo, one format, one install command.
 
-![A fictional Moroccan sultan in a palace courtyard at sunset](assets/moroccan-sultan-cover.png)
+![A fictional Moroccan sultan on a palace terrace at sunset, overlooking an ancient medina and the Atlas mountains](assets/moroccan-sultan-cover.jpg)
 
 ---
 
