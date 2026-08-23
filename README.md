@@ -49,7 +49,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`pre-plan`](#pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
-| [`consult`](#consult) | What do fresh eyes, peer reviewers, or an expert council think? | You want an unbiased second opinion, peer review, sanity check, or multi-expert council on a decision or diff. |
+| [`consult`](#consult) | Did the AI miss a landmine, edge case, or simpler path? | The AI proposed an implementation, architecture, or idea and you say "double check", "proof this", or "are you sure". |
 | [`idea-to-canvas`](#idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
 | [`8020`](#8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`challenge`](#challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
@@ -84,8 +84,8 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
-| "Get a second opinion on an idea, architecture, bug hypothesis, or diff." | [`consult`](#consult) | Unbiased second opinion from an isolated subagent or deeper model tier. |
-| "Consult another model / convene an expert council on an idea or dilemma." | [`consult`](#consult) | Multi-perspective triangulation across distinct roles or deeper model tiers. |
+| "Double-check / proof this proposal before building." | [`consult`](#consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
+| "Are you sure? Consult another model on this architecture or idea." | [`consult`](#consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`idea-to-canvas`](#idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
@@ -248,17 +248,17 @@ Use it when:
 
 ### `consult`
 
-Gets an unbiased second opinion, peer review, sanity check, or multi-expert council on an architectural choice, difficult bug, code diff, plan, or naming dilemma. Isolates context, briefs fresh subagents without leading the witness, and synthesizes consensus vs. divergence into actionable trade-offs.
+Double-checks, proofs, and stress-tests an AI-proposed implementation, architecture, plan, or product idea before committing. Isolates the proposal, briefs fresh subagents or an expert council without grading its own homework, and synthesizes consensus vs. flaws into concrete adjustments.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
 ```
 
 Use it when:
-- you want an unbiased second opinion from a fresh subagent or heavier reasoning model
-- you want a peer review on a plan, diff, or RFC before committing
+- the AI proposed a plan, architecture, or fix and you say "double check", "proof this", or "are you sure"
+- you want an unbiased second opinion from a fresh subagent or heavier reasoning model without thread bias
 - you want an expert council to triangulate a multi-variable trade-off (e.g., simplicity vs. scale vs. security)
-- you want a devil's advocate / red team to stress-test a proposal for hidden landmines
+- you want a devil's advocate / red team to stress-test a proposal for hidden landmines before writing code
 
 ---
 
