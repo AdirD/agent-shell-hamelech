@@ -1,6 +1,6 @@
 ---
 name: debug-mode
-description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Two reproduction modes: manual (user holds the wheel, then replies proceed) and autopilot (agent drives the user's already-open Chrome via agent-browser --auto-connect). Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, autopilot, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
+description: Run an evidence-first debugging loop with temporary runtime probes and a local Portless-backed JSONL collector. Two reproduction modes: manual (user holds the wheel, then replies proceed) and autopilot (agent drives the user's already-open Chrome via Chrome DevTools MCP --autoConnect). Use when a user can reproduce a UI, API, desktop, or integration bug but static inspection, tests, and existing logs do not reveal the failing runtime path, especially when the user asks for debug mode, autopilot, live browser control, dynamic request logs, instrumentation, or a reproduce-and-proceed workflow.
 ---
 
 # Debug Mode
@@ -11,7 +11,9 @@ evidence before proposing a fix.
 For the intended first-use, reproduction, iteration, verification, and later-use
 experience, read [DEVELOPER_JOURNEY_EXAMPLE.md](references/DEVELOPER_JOURNEY_EXAMPLE.md)
 and use it as the interaction model. For autopilot attach, read
-[LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that mode starts.
+[LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that mode starts. Chrome
+setup is the official M144 auto-connect flow in
+[CHROME_DEVTOOLS_MCP.md](references/CHROME_DEVTOOLS_MCP.md).
 
 ## Guardrails
 
@@ -118,8 +120,10 @@ Same collector and probes either way. Only who drives the repro changes.
 - **Manual** — the user holds the wheel. You instrument, tell them the exact
   clicks, then stop until they reply `proceed`.
 - **Autopilot** — you drive their already-open Chrome end-to-end with
-  `agent-browser` (same tabs, same logins). They only enable remote debugging
-  and click Allow.
+  Chrome DevTools MCP `--autoConnect` (same tabs, same logins). They only
+  enable remote debugging and click Allow. If this host is missing that
+  MCP, you write the official config with `dm mcp-setup` and wait for a
+  reload so the host can start the server.
 
 Choose once, then announce it in the user-facing message:
 
@@ -133,33 +137,38 @@ Choose once, then announce it in the user-facing message:
 4. Not a UI bug, or the tab looks like production you should not touch →
    **manual**.
 
-Never silently attach. Before any `browser-check` or `agent-browser` call,
-tell the user they are in autopilot and what they must do in Chrome.
+Never silently attach. Before any Chrome DevTools MCP call, tell the user
+they are in autopilot and what they must do in Chrome.
 
 ## Autopilot
 
 Keep probes in place. Snapshots are extra evidence, not a substitute for
-`dm logs`. Read [LIVE_BROWSER.md](references/LIVE_BROWSER.md).
+`dm logs`. Read [LIVE_BROWSER.md](references/LIVE_BROWSER.md) and
+[CHROME_DEVTOOLS_MCP.md](references/CHROME_DEVTOOLS_MCP.md).
 
-1. Confirm `agent-browser` is on PATH. If it is missing, stop the attach track
-   and tell the user to install the official Vercel Labs CLI:
+1. Check whether Chrome DevTools MCP tools are already available in this
+   session. Then run the bundled setup (idempotent):
 
    ```bash
-   npm i -g agent-browser && agent-browser install
+   dm mcp-setup
    ```
+
+   That inspects known host MCP configs, writes the official
+   `chrome-devtools-mcp@latest --autoConnect` entry when it is missing, and
+   prefetches the npm package. It does not inject tools into a live host;
+   the host still has to spawn the server.
+
+   - Tools already present and `ready: true` → continue.
+   - `reload_required: true` → tell the user to reload the `chrome-devtools`
+     MCP server (or restart the host), then wait. Do not attach to a
+     profile that is missing `--autoConnect`.
+   - `ready: false` → show the official snippet from the command output and
+     switch to [Manual](#manual) unless they want the `dm browser-check`
+     fallback.
 
    Do not silently switch to Playwright, Puppeteer, a fresh empty Chrome, a
    cloud browser, or a custom extension.
-2. Discover tabs. Use the saved `session_id` so later commands share one pin:
-
-   ```bash
-   dm browser-check --session dm-<session-id>
-   ```
-
-   That is identical to `agent-browser --auto-connect --json tab list` plus
-   setup hints on failure.
-
-   Before this command, tell the user verbatim:
+2. Before the first MCP call, tell the user verbatim:
 
    > Autopilot is on. I will drive the tab you already have open.  
    > One-time: open chrome://inspect/#remote-debugging and enable Allow
@@ -168,21 +177,16 @@ Keep probes in place. Snapshots are extra evidence, not a substitute for
    > software” banner is expected. I will not quit Chrome or close other tabs.
 
    Then wait only if they have not confirmed they can click Allow. If they
-   already said to go, run `browser-check` and keep those steps visible.
-3. If `browser-check` fails, print the inspect-page + Allow steps from its
-   output and switch to [Manual](#manual).
-4. Bind the existing app tab. Do not `open` a new URL unless the repro needs
-   a fresh navigation. Do not close Chrome or other tabs.
-5. Drive the workflow with `agent-browser` directly, always passing the same
-   attach flags:
-
-   ```bash
-   agent-browser --auto-connect --pin-tab --session dm-<session-id> snapshot
-   agent-browser --auto-connect --pin-tab --session dm-<session-id> click @eN
-   agent-browser --auto-connect --pin-tab --session dm-<session-id> type @eN "…"
-   ```
-
-   Load `agent-browser skills get core` if you need command details.
+   already said to go, list pages and keep those steps visible.
+3. Discover pages through Chrome DevTools MCP. Select the existing app tab.
+   Do not open a new URL unless the repro needs a fresh navigation. Do not
+   close Chrome or other tabs. Do not close the last tab.
+4. Snapshot, then drive the workflow with click / fill / type on snapshot
+   uids. If they already selected a node in the Elements panel or a request
+   in the Network panel, start there.
+5. If attach fails, print the inspect-page + Allow steps and switch to
+   [Manual](#manual). Use `dm browser-check` only when this host has no
+   Chrome DevTools MCP at all.
 6. After one reproduction attempt, read `dm logs` the same as on `proceed`.
    Do not claim a reproduction from a snapshot alone.
 
@@ -277,7 +281,7 @@ is idempotent. After reloading the shell:
 - `dm` — open the doctor TUI
 - `dm help` — list every command
 - `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>`,
-  `dm browser-check` — launcher subcommands
+  `dm mcp-setup`, `dm browser-check` — launcher subcommands
 
 `dm.sh` resolves its own location, so it keeps working wherever the skill is
 installed. Users who prefer not to touch their rc can call
@@ -292,8 +296,8 @@ Whether the bug is fixed, the user stops, or the session fails:
    regression tests.
 2. Search the touched files for `DEBUG_MODE:` and inspect the diff to confirm
    no temporary instrumentation remains.
-3. Stop issuing `agent-browser` commands. Do not run `agent-browser close`,
-   quit Chrome, or close the user's other tabs. Remind them they can disable
+3. Stop issuing Chrome DevTools MCP commands. Do not close tabs you did not
+   open, quit Chrome, or close the last tab. Remind them they can disable
    remote debugging at `chrome://inspect/#remote-debugging` if they no longer
    want local processes to attach.
 4. Tear down only this collector and delete its temporary directory:

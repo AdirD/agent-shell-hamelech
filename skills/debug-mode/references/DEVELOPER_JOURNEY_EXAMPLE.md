@@ -46,13 +46,15 @@ When the developer wants the agent to drive an already-open Chrome tab:
 The agent still instruments as above, then tries live attach instead of
 handing over the clicks:
 
-1. Checks for `agent-browser`. If it is missing, asks the developer to
-   install it (`npm i -g agent-browser && agent-browser install`) and
-   continues with the human `proceed` path until it is available.
-2. Runs `dm browser-check --session dm-<session-id>`.
-3. If this is the first attach on the machine, tells the developer to open
-   `chrome://inspect/#remote-debugging` once and enable remote debugging.
-4. Asks them to click **Allow** on the Chrome permission dialog.
+1. Runs `dm mcp-setup`. If Chrome DevTools MCP is missing or has no
+   `--autoConnect`, that writes the official host config. If a reload is
+   required, it waits until the developer reloads MCP. The host, not the
+   skill, then starts the server.
+2. If this is the first attach on the machine, tells the developer to open
+   `chrome://inspect/#remote-debugging` once and enable remote debugging
+   (official Chrome M144 auto-connect; see
+   [CHROME_DEVTOOLS_MCP.md](CHROME_DEVTOOLS_MCP.md)).
+3. Lists pages through Chrome DevTools MCP and asks them to click **Allow**.
 
 The developer then sees something like:
 

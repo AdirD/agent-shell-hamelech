@@ -37,6 +37,20 @@ BROWSER_SETUP_HINT = {
         "proceed reproduction path."
     ),
 }
+CHROME_DEVTOOLS_SERVER_KEYS = ("chrome-devtools", "chrome-devtools-mcp")
+AUTO_CONNECT_FLAGS = ("--autoConnect", "--auto-connect")
+OFFICIAL_MCP_SERVER = {
+    "command": "npx",
+    "args": ["-y", "chrome-devtools-mcp@latest", "--autoConnect"],
+}
+OFFICIAL_MCP_SNIPPET = {
+    "mcpServers": {
+        "chrome-devtools": {
+            "command": "npx",
+            "args": ["chrome-devtools-mcp@latest", "--autoConnect"],
+        }
+    }
+}
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -456,6 +470,269 @@ def _extract_tabs(parsed: Any) -> list[dict[str, Any]] | None:
     return [record] if record else None
 
 
+def _mcp_servers(payload: dict[str, Any]) -> dict[str, Any]:
+    servers = payload.get("mcpServers")
+    if isinstance(servers, dict):
+        return servers
+    nested = payload.get("mcp")
+    if isinstance(nested, dict) and isinstance(nested.get("mcpServers"), dict):
+        return nested["mcpServers"]
+    return {}
+
+
+def _ensure_mcp_servers_container(payload: dict[str, Any]) -> dict[str, Any]:
+    servers = payload.get("mcpServers")
+    if isinstance(servers, dict):
+        return servers
+    nested = payload.get("mcp")
+    if isinstance(nested, dict):
+        servers = nested.get("mcpServers")
+        if isinstance(servers, dict):
+            return servers
+        servers = {}
+        nested["mcpServers"] = servers
+        return servers
+    servers = {}
+    payload["mcpServers"] = servers
+    return servers
+
+
+def _find_chrome_devtools_entry(
+    servers: dict[str, Any],
+) -> tuple[str, dict[str, Any]] | None:
+    for key in CHROME_DEVTOOLS_SERVER_KEYS:
+        entry = servers.get(key)
+        if isinstance(entry, dict):
+            return key, entry
+    return None
+
+
+def _args_have_auto_connect(args: Any) -> bool:
+    if not isinstance(args, list):
+        return False
+    return any(str(item) in AUTO_CONNECT_FLAGS for item in args)
+
+
+def _entry_is_command_server(entry: dict[str, Any]) -> bool:
+    return isinstance(entry.get("command"), str) and "url" not in entry
+
+
+def _add_auto_connect(entry: dict[str, Any]) -> bool:
+    args = entry.get("args")
+    if not isinstance(args, list):
+        args = []
+        entry["args"] = args
+    if _args_have_auto_connect(args):
+        return False
+    args.append("--autoConnect")
+    return True
+
+
+def discover_mcp_config_paths() -> list[Path]:
+    home = Path.home()
+    existing: list[Path] = []
+    candidates = [
+        home / ".cursor" / "mcp.json",
+        home / ".claude.json",
+        home
+        / "Library"
+        / "Application Support"
+        / "Claude"
+        / "claude_desktop_config.json",
+        home / ".gemini" / "settings.json",
+        home / ".codex" / "mcp.json",
+    ]
+    for path in candidates:
+        if path.is_file():
+            existing.append(path)
+    return existing
+
+
+def default_mcp_create_path() -> Path | None:
+    cursor_dir = Path.home() / ".cursor"
+    if cursor_dir.is_dir():
+        return cursor_dir / "mcp.json"
+    claude_dir = (
+        Path.home() / "Library" / "Application Support" / "Claude"
+    )
+    if claude_dir.is_dir():
+        return claude_dir / "claude_desktop_config.json"
+    return None
+
+
+def inspect_chrome_devtools_config(path: Path) -> dict[str, Any]:
+    try:
+        payload = read_json(path)
+    except (OSError, json.JSONDecodeError) as error:
+        return {"path": str(path), "ok": False, "error": str(error)}
+    if not isinstance(payload, dict):
+        return {"path": str(path), "ok": False, "error": "config is not an object"}
+    found = _find_chrome_devtools_entry(_mcp_servers(payload))
+    if found is None:
+        return {
+            "path": str(path),
+            "ok": True,
+            "present": False,
+            "autoConnect": False,
+        }
+    key, entry = found
+    if not _entry_is_command_server(entry):
+        return {
+            "path": str(path),
+            "ok": True,
+            "present": True,
+            "autoConnect": False,
+            "server": key,
+            "skipped": "remote-url server; not rewritten",
+        }
+    return {
+        "path": str(path),
+        "ok": True,
+        "present": True,
+        "autoConnect": _args_have_auto_connect(entry.get("args")),
+        "server": key,
+    }
+
+
+def apply_chrome_devtools_config(path: Path) -> dict[str, Any]:
+    if path.is_file():
+        try:
+            payload = read_json(path)
+        except (OSError, json.JSONDecodeError) as error:
+            return {"path": str(path), "ok": False, "error": str(error)}
+        if not isinstance(payload, dict):
+            return {"path": str(path), "ok": False, "error": "config is not an object"}
+    else:
+        payload = {}
+
+    servers = _ensure_mcp_servers_container(payload)
+    found = _find_chrome_devtools_entry(servers)
+    if found is None:
+        servers["chrome-devtools"] = {
+            "command": OFFICIAL_MCP_SERVER["command"],
+            "args": list(OFFICIAL_MCP_SERVER["args"]),
+        }
+        action = "added"
+    else:
+        key, entry = found
+        if not _entry_is_command_server(entry):
+            return {
+                "path": str(path),
+                "ok": True,
+                "action": "skipped",
+                "present": True,
+                "autoConnect": False,
+                "server": key,
+                "reason": "remote-url server; not rewritten",
+            }
+        action = "updated" if _add_auto_connect(entry) else "already_ok"
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    write_json(path, payload)
+    after = inspect_chrome_devtools_config(path)
+    after["action"] = action
+    return after
+
+
+def prefetch_chrome_devtools_mcp(timeout: float) -> dict[str, Any]:
+    npx = shutil.which("npx")
+    if npx is None:
+        return {
+            "ok": False,
+            "error": "npx not found on PATH; install Node.js to run chrome-devtools-mcp",
+        }
+    command = [npx, "-y", "chrome-devtools-mcp@latest", "--help"]
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": f"npx timed out after {timeout}s prefetching the MCP"}
+    if result.returncode != 0:
+        error = (result.stderr or result.stdout or "").strip() or f"npx exited {result.returncode}"
+        return {"ok": False, "error": error}
+    return {"ok": True, "command": "npx -y chrome-devtools-mcp@latest"}
+
+
+def mcp_setup_session(args: argparse.Namespace) -> int:
+    paths = discover_mcp_config_paths()
+    create_path = default_mcp_create_path()
+    check_only = bool(args.check)
+
+    inspections = [inspect_chrome_devtools_config(path) for path in paths]
+    results: list[dict[str, Any]]
+    if check_only:
+        results = inspections
+        action = "check"
+    else:
+        results = []
+        written_paths: set[str] = set()
+        for path in paths:
+            current = inspect_chrome_devtools_config(path)
+            if (
+                current.get("ok")
+                and current.get("present")
+                and current.get("autoConnect")
+            ):
+                current["action"] = "already_ok"
+                results.append(current)
+                continue
+            if current.get("skipped"):
+                results.append(current)
+                continue
+            applied = apply_chrome_devtools_config(path)
+            results.append(applied)
+            written_paths.add(str(path))
+        if not paths and create_path is not None:
+            applied = apply_chrome_devtools_config(create_path)
+            results.append(applied)
+            written_paths.add(str(create_path))
+        action = "setup"
+
+    ready = any(item.get("ok") and item.get("present") and item.get("autoConnect") for item in results)
+    reload_required = (not check_only) and any(
+        item.get("action") in {"added", "updated"} for item in results
+    )
+    prefetch = None
+    if not check_only and ready:
+        prefetch = prefetch_chrome_devtools_mcp(args.timeout)
+
+    payload = {
+        "ok": ready and (prefetch is None or prefetch.get("ok", True)),
+        "action": action,
+        "ready": ready,
+        "reload_required": reload_required,
+        "npx": shutil.which("npx") is not None,
+        "configs": results,
+        "official": OFFICIAL_MCP_SNIPPET,
+        "source": (
+            "https://developer.chrome.com/blog/"
+            "chrome-devtools-mcp-debug-your-browser-session"
+        ),
+        "next": (
+            "Reload the chrome-devtools MCP server in this host, then list pages."
+            if reload_required
+            else (
+                "Chrome DevTools MCP --autoConnect is configured."
+                if ready
+                else "No host MCP config found. Add the official snippet and reload."
+            )
+        ),
+    }
+    if prefetch is not None:
+        payload["prefetch"] = prefetch
+        if not prefetch.get("ok"):
+            payload["ok"] = ready
+    print(json.dumps(payload, indent=2))
+    if check_only:
+        return 0 if ready else 2
+    return 0 if ready else 1
+
+
 def browser_check_session(args: argparse.Namespace) -> int:
     binary = shutil.which("agent-browser")
     if binary is None:
@@ -788,12 +1065,14 @@ def build_parser() -> argparse.ArgumentParser:
             "  debug_session.py status <dir>      status of one session\n"
             "  debug_session.py logs <dir> --run run-1\n"
             "  debug_session.py stop <dir>        stop and remove one session\n"
+            "  debug_session.py mcp-setup         write official chrome-devtools --autoConnect\n"
             "  debug_session.py browser-check     attach via agent-browser --auto-connect\n"
             "\n"
             "With the `dm` shell command installed (scripts/install-dm.sh):\n"
             "  dm            open the doctor TUI\n"
             "  dm help       show this help\n"
             "  dm start / dm stop <dir> / ...     same subcommands\n"
+            "  dm mcp-setup [--check]             ensure Chrome DevTools MCP --autoConnect\n"
             "  dm browser-check [--session name]  list open Chrome tabs or print setup hints\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -831,6 +1110,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="print a one-shot JSON snapshot instead of launching the TUI",
     )
     doctor.set_defaults(func=doctor_session)
+
+    mcp_setup = subparsers.add_parser(
+        "mcp-setup",
+        help="check or write official chrome-devtools MCP --autoConnect config",
+    )
+    mcp_setup.add_argument(
+        "--check",
+        action="store_true",
+        help="inspect existing configs only; do not write",
+    )
+    mcp_setup.add_argument(
+        "--timeout",
+        type=float,
+        default=BROWSER_CHECK_TIMEOUT_SECONDS,
+        help="seconds to wait when prefetching chrome-devtools-mcp",
+    )
+    mcp_setup.set_defaults(func=mcp_setup_session)
 
     browser_check = subparsers.add_parser(
         "browser-check",
