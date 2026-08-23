@@ -142,22 +142,21 @@ Use when the work is decided and the remaining job is cleaning iteration residue
 
 ### `sync-melech-skills`
 
-Keeps this library current on the machine: every skill on GitHub is present under `~/.agents/skills` and linked into every coding agent. `sync-melech-skills` / `melech sync` applies missing installs and updates with non-interactive `npx skills` (`-g -y -a '*'`). Never writes a project/repo lock. `sync-melech-skills list` is the dry remote↔local catalog (folder SHAs, not semver). `sync-local` is the authoring-repo copy after you push this checkout. Renamed from `melech`; remove the old global skill with `npx skills remove melech -g -y`.
+Keeps this library current on the machine: every skill on GitHub is present under `~/.agents/skills` and reachable from every coding agent. Ships no scripts — it teaches the agent to drive the Skills CLI correctly, which is one command: `cd ~ && npx skills add AdirD/agent-shell-hamelech --all -g`. Naming the repo is what keeps the sync melech-only, so unrelated global skills are never upgraded behind your back. Also documents the two outputs that look like failures and are not (Eve and PromptScript cannot do global installs; Cursor and Codex read `~/.agents/skills` directly instead of getting a symlink). Renamed from `melech`; remove the old global skill with `npx skills remove melech -g -y`.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill sync-melech-skills -g -y -a '*'
 ```
 
 Invoke it with:
-- `sync-melech-skills` or `melech sync` — install missing + update stale (global, all agents)
-- `sync-melech-skills list` / `melech list` — dry catalog
-- `sync-melech-skills sync-local` — after pushing this repo, copy into sibling local installs
+- `sync-melech-skills` or `melech sync` — install new + refresh existing (global, all agents)
+- `sync-melech-skills list` / `melech list` — dry catalog: remote skills plus what is installed globally
 
 Use it when:
 - you want every melech skill installed and current in `~/.agents/skills`
 - the same set should show up in Cursor, Claude, Codex, Gemini, and the rest
-- you want a dry remote → local comparison before applying (`sync-melech-skills list`)
-- a skill's lock still points at the typo slug `AdirD/agent-shel-hamelech`
+- you want to see what is on remote before applying (`sync-melech-skills list`)
+- a newly pushed skill is not showing up and you need to know whether it is a scope problem or just a stale session
 
 ---
 

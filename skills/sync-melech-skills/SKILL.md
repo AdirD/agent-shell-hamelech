@@ -20,7 +20,8 @@ AdirD/agent-shell-hamelech
 ```
 
 Managed with Vercel's Skills CLI
-([`vercel-labs/skills`](https://github.com/vercel-labs/skills)).
+([`vercel-labs/skills`](https://github.com/vercel-labs/skills)). This skill
+ships no scripts — the CLI does the work, you just run it correctly.
 
 The old skill name was `melech`. This skill is `sync-melech-skills`. If the
 global lock still has `melech`, remove it after this one is installed:
@@ -30,80 +31,83 @@ global lock still has `melech`, remove it after this one is installed:
 
 | They say | You do |
 |---|---|
-| `sync-melech-skills`, `sync melech skills`, `melech sync`, keep skills up to date | **Apply.** Install missing skills and update stale ones. |
+| `sync-melech-skills`, `sync melech skills`, `melech sync`, keep skills up to date | **Apply.** Run the sync command below. |
 | `sync-melech-skills list`, `melech list`, `melech status` | **Dry catalog** only. Do not install. |
 
+## Apply
 
-## Hard rules
-
-1. **Global only.** Every `npx skills` / `npm exec` call uses `-g`. Never
-   install into a repo, `./.agents`, `./.cursor`, or any project lock.
-2. **Every agent.** Adds use `-a '*'`. Do not target Cursor-only or
-   Claude-only unless the user names one agent.
-3. **Non-interactive.** Always `-y`. Never run a promptable skills command.
-4. **Never run `npx skills check`.** It aliases `update` and can mutate
-   non-melech skills. Status = bundled `status.py`. Apply = bundled `sync.py`.
-5. **Melech skills only.** Do not `skills update -g` with no names — that
-   upgrades unrelated global skills.
-6. Run CLI calls with `cwd` = the user's home (the script already does this)
-   so a random git repo cannot flip scope to project.
-
-## Apply (`sync-melech-skills` / `melech sync`)
-
-Resolve this skill directory, then:
+One command. Run it from the user's home so the CLI cannot flip to project
+scope:
 
 ```bash
-python3 <skill-dir>/scripts/sync.py
+cd ~ && npx skills add AdirD/agent-shell-hamelech --all -g
 ```
 
-That script:
+`--all` expands to `--skill '*' --agent '*' -y`, scoped to the named repo. It
+installs new skills, refreshes existing ones, and needs no confirmation. It
+does not touch global skills from other sources.
 
-1. Reads the remote catalog via `status.py --json`.
-2. Plans work for remote skills that are `new`, `outdated`, `untracked`,
-   `broken-source`, or missing `~/.agents/skills/<name>/SKILL.md`.
-3. For each: `skills update <name> -g -y` when outdated, then
-   `skills add AdirD/agent-shell-hamelech --skill <name> -g -y -a '*'`.
-4. Leaves `remote-gone` skills installed. Does not uninstall.
+Takes roughly 30 seconds — it refreshes every skill, not just stale ones.
+There is no cheaper "only what changed" mode worth maintaining.
 
 If `npm` is missing, stop and tell the user to install Node.js.
 
-After apply, print the sync summary (planned / applied / failed). If anything
-failed, show that skill and the CLI error. Do not pretend the library is
-current.
+### Reading the output
 
-Re-run `python3 <skill-dir>/scripts/status.py` only if they also want the
-full catalog cards.
+Two things look like failures and are not:
+
+- `✗ <skill> → Eve` and `✗ <skill> → PromptScript` on every skill. Those two
+  agents do not support global installs at all. The command still exits 0 and
+  prints `Done!`. Never report these as a failed sync.
+- No `~/.cursor/skills` or `~/.codex/skills` entries appear. Cursor, Codex,
+  Amp, Zed, Warp, OpenCode, and friends are *universal* agents in the CLI
+  registry: they read `~/.agents/skills` directly, so a global install writes
+  the canonical dir and skips the per-agent symlink. Agents with their own
+  dir (Claude Code, Droid, Continue, Goose, Roo, ~40 more) get real symlinks.
+
+A newly installed skill will not show up in an already-open Cursor session —
+the skill list is snapshotted at session start. Tell the user to open a new
+session, do not re-run the sync.
+
+Nothing is ever uninstalled. A skill deleted from remote stays installed and
+keeps its lock entry until it is removed by name:
+`npx skills remove <name> -g -y`.
 
 ## Dry catalog (`sync-melech-skills list`)
 
-```bash
-python3 <skill-dir>/scripts/status.py
-python3 <skill-dir>/scripts/status.py --json
-```
-
-Repo checkout:
+What is on remote, with descriptions:
 
 ```bash
-python3 skills/sync-melech-skills/scripts/status.py
+cd ~ && npx skills add AdirD/agent-shell-hamelech -l
 ```
 
-Needs `gh` auth (preferred) or `GITHUB_TOKEN` / `GH_TOKEN`.
+What is installed globally (`--json` for machine-readable):
 
-Remote-first. Every skill on GitHub is a row. Versions are skill-folder tree
-SHAs in `~/.agents/.skill-lock.json`, not semver.
+```bash
+cd ~ && npx skills list -g
+```
 
-| Status | Meaning | Apply does |
-|---|---|---|
-| `new` | on remote, not in the global lock | `add -g -y -a '*'` |
-| `outdated` | lock SHA differs from remote | `update -g -y`, then `add -g -y -a '*'` |
-| `current` | lock matches remote and `~/.agents/skills/<name>` exists | skip |
-| `broken-source` | lock uses typo `AdirD/agent-shel-hamelech` | re-`add` with the canonical slug |
-| `untracked` | installed, no local hash | re-`add` |
-| `remote-gone` | local only, deleted upstream | skip (do not remove) |
+Diff the two by name to answer "what am I missing". There is no
+remote-versus-lock version comparison — the lock stores skill-folder git tree
+SHAs, not semver, and re-running apply is cheaper than computing the diff.
+
+## Hard rules
+
+1. **Global only.** Every call passes `-g`. Without it the CLI auto-detects
+   and picks project scope whenever the cwd is a project, writing a repo lock.
+2. **Home cwd.** Run from `~`, never from a repo checkout.
+3. **Name the repo.** Never run bare `npx skills update -g` or
+   `npx skills check` — both mutate unrelated global skills from other
+   sources. Naming the repo in `add --all` is what keeps this melech-only.
+4. **Never `npx skills list` without `-g` from inside a repo.** One registry
+   agent (OpenClaw) declares a bare `skills` directory, so a project-scope
+   list reports this repo's own authoring folders as installs. It looks like
+   the sync went into the repo. It did not.
+5. **Every agent.** `--all` covers this. Do not narrow to one agent unless
+   the user names one.
 
 ## Voice
 
-
-Sharp and short. Verdict first (N installed, M updated, K failed), then
-names. Do not dump the full catalog after a clean sync unless they asked
-for `list`.
+Sharp and short. Verdict first (installed / refreshed / genuinely failed),
+then names. Do not dump the catalog after a clean sync unless they asked for
+`list`. Do not recite the Eve and PromptScript noise.
