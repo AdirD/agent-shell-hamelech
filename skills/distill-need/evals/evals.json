@@ -1,0 +1,21 @@
+{
+  "skill_name": "distill-need",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Use the attached Queuewise product fixture. We're considering automatic support-ticket triage inside this existing product. Help me understand whether we should build that feature, what the real need is, and which solution category best fits. Do not implement it.",
+      "expected_output": "Treats automatic triage as a proposed solution; identifies the likely outcome around ownership, queue delay, or reassignment without silently choosing among them; uses the fixture's workflow, aggregate signals, implementation, and caveats; distinguishes routing capability, feature requests, and reassignment analytics from proof that automation is needed; compares reuse or process change, a smaller extension, and the named automation with trade-offs; recommends one path while leaving the choice to the user; and does not launch market validation or edit code.",
+      "files": [
+        "evals/fixtures/support-product/README.md",
+        "evals/fixtures/support-product/product-signals.md",
+        "evals/fixtures/support-product/routing.ts"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We should build a custom notification service so customers notice failed payments. Distill this before we commit to the feature.",
+      "expected_output": "Separates the custom service from the outcome that customers notice and recover from failed payments; asks only questions that could change the outcome, solution category, or build decision; checks for existing notification and recovery mechanisms; offers meaningfully different no-build, smallest-change, and custom-service paths with trade-offs; recommends one; and stops for the user's choice before planning or implementation.",
+      "files": []
+    }
+  ]
+}

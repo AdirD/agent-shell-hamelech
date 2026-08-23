@@ -1,27 +1,36 @@
 ---
 name: market-validation
 description: >-
-  Run end-to-end market validation for one concrete market hypothesis: lock the
-  target customer, painful situation, buyer, current alternatives, and proposed
-  value; gather first-party and public evidence; design and synthesize customer
-  discovery; run the smallest behavioral or commercial test; and return an
-  evidence-backed Advance / Reshape / Hold / Stop decision. Use whenever someone
-  wants to validate a startup, business idea, new market, ICP, buyer, demand,
-  willingness to pay, or whether a specific opportunity is worth pursuing—even
-  if they ask for market research, customer discovery, demand validation, or
-  "will people pay for this?" Trigger only once the customer/problem/value
-  hypothesis is concrete enough to test. Use product-ideation when those pieces
-  are still movable, and do not use for implementation planning after the market
-  decision is already made.
+  Shape an open product or business opportunity into a testable market
+  hypothesis and, when useful, validate it end to end. Clarify the aim,
+  relationship to any current product, target customer, painful situation,
+  buyer, alternatives, and proposed value; gather first-party and public
+  evidence; design and synthesize customer discovery; run the smallest
+  behavioral or commercial test; and return an evidence-backed Advance /
+  Reshape / Hold / Stop decision when a verdict is requested. Use whenever
+  someone wants to explore or validate a startup, business idea, new market,
+  ICP, buyer, paid product opportunity, demand, willingness to pay, or whether
+  an opportunity is worth pursuing—even when the premise is still vague. For a
+  concrete feature or implementation request, use distill-need first. Do not use
+  for implementation planning after the market decision is already made.
 ---
 
 # Market Validation
 
-Validate one specific market hypothesis all the way from plausibility to the
-strongest real-world evidence the user can obtain. Do not mistake research,
-enthusiasm, interviews, or one pilot for a validated market.
+Start with the opportunity as the user actually has it. If the premise is open,
+help shape it without manufacturing certainty. Once it is testable, validate it
+from plausibility to the strongest real-world evidence the user can obtain. Do
+not mistake research, enthusiasm, interviews, or one pilot for a validated
+market.
 
-The skill is complete only when it has:
+The skill has two connected modes:
+
+- **Shape** — clarify and reframe an open opportunity until the next useful
+  product or market hypothesis is visible. A verdict is optional.
+- **Validate** — test one provisional hypothesis against customer, behavioral,
+  and commercial evidence until an explicit market decision is possible.
+
+When the user asks for full validation, the work is complete only when it has:
 
 1. made the hypothesis falsifiable
 2. mapped evidence for and against every decision-carrying claim
@@ -40,13 +49,14 @@ Choose this skill based on the state of the user's thinking:
 
 | User has | Use |
 |---|---|
-| A movable product premise and wants help shaping what it could become | `product-ideation` |
 | A concrete requested solution that may not serve the real need | `distill-need` |
-| A specific customer/problem/value hypothesis and wants to know whether reality supports it | `market-validation` |
+| An open product or business opportunity and wants to discover a testable market premise | Shape it here, then validate when useful |
+| A specific customer/problem/value hypothesis and wants to know whether reality supports it | Start at the validation contract |
 | A market-backed direction and needs a shared build concept | `pre-plan` |
 
-Do not force an open idea into validation. Help the user form a testable
-hypothesis first, or hand back to `product-ideation`.
+Do not force an open idea into a validation contract before its important
+pieces are legible. Conversely, do not keep ideating after one hypothesis has
+stabilized when customer or commercial evidence now carries the decision.
 
 ## Validation model
 
@@ -77,6 +87,53 @@ Not every claim needs commitment-level evidence before proceeding. The riskiest
 claim that would reverse the decision does.
 
 ## End-to-end workflow
+
+### 0. Shape an open premise
+
+Use this step when the user has an opportunity, aspiration, market question, or
+vague product idea rather than a testable hypothesis. Treat the first idea as a
+movable premise, not a contract.
+
+Maintain a compact working map:
+
+- **Aim** — the outcome the user wants
+- **Relationship** — current-product opportunity, standalone product, adjacent
+  product, or deliberately undecided
+- **Premise** — current customer, situation, problem, product shape, and value
+  mechanism, including blanks
+- **Evidence and tensions** — observed facts, user claims, inference,
+  contradictions, and consequential unknowns
+- **Next decision** — the choice that most changes what should happen next
+
+Work on only the uncertainty carrying that decision. Depending on the context:
+
+- ask one to three questions only the user can answer
+- inspect relevant product, repository, or first-party evidence
+- research users, alternatives, competitors, market conditions, or feasibility
+  proportionately
+- compare one to three materially different premise shapes
+
+Existing code proves capability, not need. Public complaints and feature
+requests can reveal mechanisms and language, but not prevalence or willingness
+to pay.
+
+Give value in every turn: a synthesis, reframe, meaningful option, or next
+decision—not an intake questionnaire. When the premise changes:
+
+1. state the new shape in one sentence
+2. preserve what remains valid
+3. name what became invalid or uncertain
+4. continue from the updated map without restarting
+
+If the user only wants orientation, stop with the strongest current shape,
+supporting evidence, remaining tension, and next useful move. Do not manufacture
+a validation verdict. If customer, costly situation, current alternative,
+buyer, and proposed value are legible enough to test, move into the validation
+contract.
+
+When the user requests a durable opportunity map, positioning, MVP boundary,
+pitch narrative, or decision memo, read the relevant section of
+`references/artifacts.md` and preserve the active evidence state.
 
 ### 1. Lock the validation contract
 

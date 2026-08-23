@@ -1,7 +1,74 @@
 # Market Validation Artifacts
 
-Use one living brief while validation is active and one final dossier when a
-decision is ready. Do not create a document per phase.
+Keep premise shaping lightweight. Once validation is active, use one living
+brief and one final dossier when a decision is ready. Do not create a document
+per phase.
+
+## 0. Premise-shaping note
+
+Keep the working map in conversation by default. Consolidate it only when the
+user requests a durable artifact or when a long exploration, handoff, or major
+premise change makes persistence useful:
+
+```markdown
+# Opportunity: <working title>
+
+Aim:
+Relationship: current product / standalone / adjacent / undecided
+Active premise:
+Evidence:
+Assumptions and tensions:
+Next decision:
+```
+
+When divergent options help, add:
+
+| Route | Customer and situation | Value mechanism | Why promising | Main risk | Evidence needed |
+|---|---|---|---|---|---|
+
+Include only materially different routes, such as a narrower customer, adjacent
+job, service-first model, business-model change, enabling layer, or
+non-product intervention. Do not generate cosmetic feature variations.
+
+Update this note in place as the premise changes. Once a validation contract is
+formed, migrate what still matters into the living validation brief rather than
+maintaining parallel artifacts.
+
+### Specialized decision outputs
+
+When the user requests positioning, an MVP boundary, pitch narrative, or
+decision memo, derive it from the active premise and evidence state. Do not make
+the opportunity look more validated than it is.
+
+**Positioning and MVP boundary**
+
+- best-fit customer, triggering situation, current alternative, proposed value,
+  reasons to believe, and who it is not for
+- one user, one trigger, and one end-to-end job
+- riskiest behavior the MVP must expose
+- included and excluded scope with rationale
+- manual work allowed behind the scenes
+- measurement and stop condition
+
+Define the MVP as the smallest credible system for learning the decisive
+behavior, not a reduced feature backlog. Hand implementation alignment to
+`pre-plan`.
+
+**Pitch narrative**
+
+Build only the argument the evidence supports: person and costly situation,
+current alternatives, proposed experience, earned insight, honestly labeled
+proof, reachable entry market, business model, competition, why now, team, and
+ask. Use claim headlines, visual suggestions, speaker notes, and linked sources.
+Label interviews, prototypes, research, and experiments precisely; never invent
+traction or use a giant top-down market as proof.
+
+**Decision memo**
+
+State the decision and deadline, aim and constraints, active premise and
+alternatives, evidence for and against, reversible and irreversible risks,
+recommendation with uncertainty, and the next action, observable signal,
+threshold, and review point.
 
 ## 1. Living validation brief
 

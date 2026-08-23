@@ -4,9 +4,11 @@ description: >-
   Distill the real need behind a user request before obeying it. Treat the
   literal ask as a proposed solution, uncover the outcome that must be true,
   check context and existing alternatives, and surface better solution
-  categories — including non-build options. Use when the user asks to
-  "distill-need", "distill this", "what do I actually need", "faster horse",
-  or says not to just implement what they asked.
+  categories — including non-build options. Use for concrete feature, tool,
+  architecture, or implementation requests when the user wants help deciding
+  what should actually be built, especially when they ask to "distill-need",
+  "distill this", "what do I actually need", "faster horse", or say not to just
+  implement what they asked.
 disable-model-invocation: true
 ---
 
@@ -115,7 +117,7 @@ Do not ask implementation trivia. Do not invent requirements theater.
 |---|---|
 | `pre-plan` | After distillation, if the work is still build-shaped: align the shared concept. |
 | `8020` | After the need is clear: pick the smallest useful path to that outcome. |
-| `product-ideation` | Broader / earlier product premise work. Use when the idea itself is still open, not when a concrete ask needs interception. |
+| `market-validation` | Use when distillation exposes a broader product or business opportunity and customer or commercial evidence should shape and test it. |
 | `challenge` | Pressure-tests an existing direction. Does not primarily re-category the ask. |
 | `scout` | Verified search for existing libraries, tools, services, or products that already deliver the outcome. |
 

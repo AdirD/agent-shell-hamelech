@@ -22,7 +22,13 @@
     {
       "id": 4,
       "prompt": "I have a vague idea for making team retrospectives less boring, but I don't know whether it's a Slack feature, a facilitation service, or something else. Think through what this could become with me.",
-      "expected_output": "Recognizes that the premise is still movable and routes to product-ideation rather than prematurely locking a market-validation contract or launching a demand audit.",
+      "expected_output": "Starts in premise-shaping mode rather than prematurely locking a validation contract or launching a demand audit; clarifies the desired outcome and relationship to any current product; maintains a compact map of evidence, assumptions, tensions, and the next decision; compares materially different shapes such as a Slack workflow and facilitation service; and stops with a useful orientation or transitions to validation only once a provisional customer/problem/value hypothesis is testable.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Our current premise is a neighborhood marketplace where diners order weekly meals from home chefs. Six cooks already sell informally through messaging apps, and four struggle with scheduling and repeat orders. New thought: maybe this should be software for apartment buildings to coordinate resident-run dinners. Update the premise without restarting, show what evidence still applies or became uncertain, and identify the next decision that would most change the direction.",
+      "expected_output": "Uses premise-shaping mode to state the new shape clearly; preserves evidence about informal selling, scheduling, and repeat coordination only where it still applies; marks cook income, diner trust, marketplace liquidity, and building-level participation as invalidated or newly uncertain rather than silently carrying them forward; and recommends one focused next exploration or a provisional validation contract without launching an indiscriminate full audit.",
       "files": []
     }
   ]

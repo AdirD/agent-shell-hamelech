@@ -44,8 +44,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
 | [`scout`](#scout) | Has someone already built this? | "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
-| [`market-validation`](#market-validation) | Does this specific market hypothesis survive customer and commercial evidence? | Validate a startup, ICP, buyer, demand, willingness to pay, or paid opportunity end to end. |
-| [`product-ideation`](#product-ideation) | What product, feature, or direction is worth pursuing? | A product/company idea, feature opportunity, market question, or premise is still open. |
+| [`market-validation`](#market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
 
 ### Shape work before coding
 
@@ -75,9 +74,9 @@ Start from the outcome you need. Skills are individual capabilities; the
 | If you are saying… | Start with | Why |
 |---|---|---|
 | "What melech skills do I have / should I update?" | [`sync-melech-skills`](#sync-melech-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
-| "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
+| "I have a startup/product idea." | [`market-validation`](#market-validation) | It can shape an open premise into a testable hypothesis before gathering market evidence. |
 | "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`market-validation`](#market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
-| "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
+| "Should our existing product add this feature?" | [`distill-need`](#distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
 | "Is there already a library/tool/service that does this?" | [`scout`](#scout) | Parallel verified search of libraries, OSS, dev tools, managed services, and deps already installed. |
 | "The AI just hand-rolled a queue/retry/scheduler — check that." | [`scout`](#scout) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
@@ -92,7 +91,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "I've been iterating with AI and need to strip dead code and bloat." | [`prune`](#prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`reviewer-clone`](#reviewer-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
-| "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
+| "Research competitors to help choose our product or market direction." | [`market-validation`](#market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
 
 ## Workflow bundles
@@ -104,8 +103,7 @@ question is already answered.
 
 ```text
 distill-need (if the ask is a proposed solution)
-  → product-ideation (if the premise is still movable)
-  → market-validation (if customer/demand evidence carries the decision)
+  → market-validation (shape an open premise, then test it)
   → consult (optional idea council)
   → pre-plan
 ```
@@ -298,38 +296,21 @@ Use it when:
 
 ### [`market-validation`](skills/market-validation)
 
-Runs an end-to-end market-validation workflow for one concrete hypothesis. It locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
+Shapes an open product or business opportunity into a testable market hypothesis, then runs validation end to end. It can clarify the aim, relationship to a current product, customer, problem, product shape, and value mechanism without forcing an early verdict. Once the premise is testable, it locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes full validation with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill market-validation
 ```
 
 Use it when:
+- you have a vague startup, product, or market opportunity and need to discover what hypothesis is worth testing
 - you have a specific startup, market, ICP, customer/problem, buyer, or offer hypothesis
 - you need to establish whether the pain is real, budget exists, and customers will act or pay
 - you want secondary research followed by primary discovery and the smallest decisive market test
 - you already ran interviews, a smoke test, or a pilot and need rigorous synthesis against precommitted thresholds
 - you want a decision-ready validation dossier that keeps counter-evidence and remaining risk visible
 
-Do not use it merely to brainstorm what a product could become; start with `product-ideation` while the premise is still movable.
-
----
-
-### [`product-ideation`](skills/product-ideation)
-
-An adaptive, circular thinking partner for new ideas and existing products. It clarifies the idea's relationship to any current product, explores only the uncertainty that matters now, researches or parallelizes proportionately, reframes as evidence changes, and keeps one evolving brief or produces a specialized artifact only when useful.
-
-```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill product-ideation
-```
-
-Use it when:
-- you want to ideate or think through an idea before it's a spec
-- you're exploring a feature, workflow, roadmap, or growth direction for a current product and repository
-- you're mapping a market or existing solutions to help reshape an open premise
-- you're deciding what to build or preparing a pitch
-- you want research, lightweight working notes, or a decision artifact without being forced through a validation pipeline
-- you do **not** yet have one market hypothesis ready for end-to-end validation; once you do, hand it to `market-validation`
+For a concrete feature or implementation request, use `distill-need` first. For implementation planning after the direction is chosen, use `pre-plan`.
 
 ---
 
@@ -438,7 +419,6 @@ skills/
   sync-melech-skills/
   market-validation/
   pre-plan/
-  product-ideation/
   prune/
   reviewer-clone/
   scout/

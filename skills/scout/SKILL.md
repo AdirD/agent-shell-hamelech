@@ -259,5 +259,5 @@ is not research, it is a reflex.
 | `8020` | After a candidate is chosen: the smallest path to integrate it. |
 | `pre-plan` | If adopting reshapes the design rather than swapping an implementation. |
 | `consult` | Stress-tests a chosen option. `scout` finds the options; `consult` proofs the pick. |
-| `product-ideation` | Competitor and market landscape for a *product premise*. `scout` is landscape for a *capability you are about to build*. |
+| `market-validation` | Maps competitors and alternatives as evidence for a *market premise*. `scout` is landscape for a *capability you are about to build*. |
 | `challenge` | Pokes holes in a direction. Does not go find alternatives. |

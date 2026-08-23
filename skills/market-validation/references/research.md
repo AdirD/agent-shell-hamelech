@@ -4,6 +4,32 @@ Use secondary research to establish plausibility, map the market, and decide wha
 must be tested with customers. It can disprove a hypothesis. By itself, it rarely
 validates one.
 
+## Research while the premise is open
+
+Before a validation contract exists, research should change the premise or next
+decision—not create volume. Choose the assumption whose answer would most alter
+the customer, problem, product shape, or value mechanism.
+
+Useful conversions include:
+
+- "Nobody solves this" → map direct, adjacent, bundled, service, manual, and
+  internal alternatives.
+- "People hate the current tools" → look for repeated consequences,
+  workarounds, switching, spend, and what users still tolerate or value.
+- "This should be a feature" → compare the current-product workflow with
+  standalone, adjacent, service-first, and non-product interventions when those
+  are genuinely plausible.
+- "This became possible now" → verify the technical, regulatory, cost, or
+  behavioral shift.
+
+Public communities, reviews, support boards, and practitioner discussions can
+reveal language, mechanisms, frequency across independent accounts, intensity,
+observed behavior, segment specificity, recency, and counter-signals. They do
+not establish representative prevalence or willingness to pay.
+
+Stop when the next premise or decision is clear. Once a provisional contract is
+formed, use the full evidence discipline and desk-audit depth bar below.
+
 ## Match evidence to the claim
 
 | Claim | Useful evidence | Common false proof |

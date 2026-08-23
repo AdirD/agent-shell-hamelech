@@ -179,7 +179,7 @@ rather than vibes. Do not pretend Q&A replaces benchmarks.
 | `challenge` | Standalone poke at an **existing** plan/direction. `pre-plan` may run a late challenge pass; use standalone `challenge` when ceremony is unnecessary. |
 | `distill-need` | Run first when the ask may be a proposed solution / faster horse. `pre-plan` assumes the work is already build-shaped. |
 | `8020` | After alignment: pick the smallest useful implementation shape. |
-| `product-ideation` | Earlier / broader product premise work. Hand off to `pre-plan` when the user is ready to align a buildable concept. |
+| `market-validation` | Earlier product and market premise work when customer evidence carries the decision. Hand off to `pre-plan` once the direction is ready to become a buildable concept. |
 | `visualize` | Optional aid when structure/flow is ambiguous. |
 
 ## Do / Don't
