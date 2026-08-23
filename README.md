@@ -144,7 +144,7 @@ Use when the work is decided and the remaining job is cleaning iteration residue
 
 ---
 
-### `sync-melech-skills`
+### [`sync-melech-skills`](skills/sync-melech-skills)
 
 Keeps this library current on the machine: every skill on GitHub is present under `~/.agents/skills` and reachable from every coding agent. Ships no scripts — it teaches the agent to drive the Skills CLI correctly, which is one command: `cd ~ && npx skills add AdirD/agent-shell-hamelech --all -g`. Naming the repo is what keeps the sync melech-only, so unrelated global skills are never upgraded behind your back. Also documents the two outputs that look like failures and are not (Eve and PromptScript cannot do global installs; Cursor and Codex read `~/.agents/skills` directly instead of getting a symlink). Renamed from `melech`; remove the old global skill with `npx skills remove melech -g -y`.
 
@@ -164,7 +164,7 @@ Use it when:
 
 ---
 
-### `8020`
+### [`8020`](skills/8020)
 
 Helps decide on the smallest useful way to reach a product goal before writing code. Explores technical, UX, product, and strategy trade-offs, favors existing integration points over new code, and surfaces 80/20 alternatives.
 
@@ -179,7 +179,7 @@ Use it when:
 
 ---
 
-### `babysit`
+### [`babysit`](skills/babysit)
 
 Keeps a PR merge-ready by looping over comments, merge conflicts, and CI on a recurring cadence (default 5 min) until the PR is green and mergeable — or a real blocker needs you. Delegates the loop to a `/loop` primitive if available, otherwise arms a background heartbeat.
 
@@ -194,7 +194,7 @@ Use it when:
 
 ---
 
-### `debug-mode`
+### [`debug-mode`](skills/debug-mode)
 
 Runs an evidence-first debugging loop for bugs that require a real user workflow. It starts a lean, isolated JSONL collector through Portless on a newly assigned backend port and adds minimal temporary POST probes. Reproduction is one of two modes: **manual** (you hold the wheel, then reply `proceed`) or **autopilot** (the agent drives your already-open Chrome via Chrome DevTools MCP `--autoConnect` — same tabs and logins; Chrome 144+ one-time toggle at `chrome://inspect/#remote-debugging`, then Allow). If the host has no `chrome-devtools` MCP, `dm mcp-setup` writes the official `--autoConnect` config and asks for a reload so the host can start the server. If you do not pick, the agent names both modes and waits. It inspects evidence, iterates or fixes, removes every probe, detaches without quitting Chrome, and tears down only that session. A bundled developer-journey example defines the intended first-use and repeat-use experience. A built-in `doctor` TUI (`debug_session.py doctor`) shows every live session with per-session health (running/degraded/dead from process state plus the collector `/health` endpoint), a real-time event tail, surfaced collector errors, and a hotkey to kill a session. `dm browser-check` is a CLI fallback only.
 
@@ -220,7 +220,7 @@ sh <skill-dir>/scripts/install-dm.sh
 
 ---
 
-### `challenge`
+### [`challenge`](skills/challenge)
 
 Pressure-tests an existing direction before implementation. Asks one high-value question at a time, revises assumptions as you answer, and flags over-engineering risk. Does not restart from zero; does not turn into a PRD.
 
@@ -235,7 +235,7 @@ Use it when:
 
 ---
 
-### `pre-plan`
+### [`pre-plan`](skills/pre-plan)
 
 Reaches a shared buildable design concept before plan mode or code. Auto-calibrates question density (`light` / `standard` / `deep`), keeps domain nouns aligned, kills premature scale/architecture, and optionally pressure-tests the concept. Stops at a short decision log unless you explicitly lock a plan.
 
@@ -251,7 +251,7 @@ Use it when:
 
 ---
 
-### `consult`
+### [`consult`](skills/consult)
 
 Double-checks, proofs, and stress-tests an AI-proposed implementation, architecture, plan, or product idea before committing. Isolates the proposal, briefs fresh subagents or an expert council without grading its own homework, and synthesizes consensus vs. flaws into concrete adjustments.
 
@@ -267,7 +267,7 @@ Use it when:
 
 ---
 
-### `idea-to-canvas`
+### [`idea-to-canvas`](skills/idea-to-canvas)
 
 Turns any starting point — a rough idea, meeting notes, product brief, RFC, design doc, or bullet list — into a standalone Cursor Canvas for team knowledge transfer. Not an approval workflow or a prettier copy of the input. Shapes the idea if unstructured, then surfaces mental model, system shape, decisions, constraints, and rollout with strong hierarchy and progressive disclosure.
 
@@ -283,7 +283,7 @@ Use it when:
 
 ---
 
-### `distill-need`
+### [`distill-need`](skills/distill-need)
 
 Treats the literal ask as a proposed solution, not scripture. Distills the outcome that must be true, checks context and existing alternatives, and surfaces better solution categories — including reuse or don't-build. Hands off to `pre-plan` / `8020` only when the work is still build-shaped.
 
@@ -299,7 +299,7 @@ Use it when:
 
 ---
 
-### `hebrew-rtl-writing`
+### [`hebrew-rtl-writing`](skills/hebrew-rtl-writing)
 
 Fixes mixed RTL/LTR rendering for any textual artifact that is primarily Hebrew but includes embedded English terms. Wraps English spans with Unicode bidi isolates without touching code blocks, links, or frontmatter.
 
@@ -314,7 +314,7 @@ Use it when:
 
 ---
 
-### `market-validation`
+### [`market-validation`](skills/market-validation)
 
 Runs an end-to-end market-validation workflow for one concrete hypothesis. It locks the customer, costly situation, buyer, current alternative, proposed value, market boundary, and decision thresholds; mines first-party evidence; audits public evidence for and against the claims; closes mechanism gaps with customer discovery; and closes demand gaps with a behavioral or commercial test. It preserves one living validation brief across human gates and finishes with an evidence-backed **Advance / Reshape / Hold / Stop** dossier. Desk research is labeled plausible or research-supported—not “validated.”
 
@@ -333,7 +333,7 @@ Do not use it merely to brainstorm what a product could become; start with `prod
 
 ---
 
-### `product-ideation`
+### [`product-ideation`](skills/product-ideation)
 
 An adaptive, circular thinking partner for new ideas and existing products. It clarifies the idea's relationship to any current product, explores only the uncertainty that matters now, researches or parallelizes proportionately, reframes as evidence changes, and keeps one evolving brief or produces a specialized artifact only when useful.
 
@@ -351,7 +351,7 @@ Use it when:
 
 ---
 
-### `podcast-production`
+### [`podcast-production`](skills/podcast-production)
 
 Turns long interviews, meetings, webinars, panels, or recorded conversations into a short, user-approved podcast story and finished video. Two independently invokable intents: collaborative storyline development from raw media/transcripts, and source-faithful FFmpeg production from an approved script.
 
@@ -367,7 +367,7 @@ Use it when:
 
 ---
 
-### `reviewer-clone`
+### [`reviewer-clone`](skills/reviewer-clone)
 
 Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. Every reviewer has their own themes and biases—this mimics them, it doesn't correct them. It trains on the repository you run it from—no menu—and learns a compact model across six lenses: **IF** they weigh in at all, **WHAT** they flag, **WHERE** they focus and own, **WHEN** they escalate (ask / suggest / block), **WHO** they push on, and **WHY** they care—plus **HOW** they say it (their voice). Instead of deep-reading whole PRs (which overfits), it **correlates over the whole comment corpus**: the bundled collector sweeps every review comment with its file+line anchor and splits them into ordered chunk-files, and the main agent reads the chunks one by one—building a running model and grounding real patterns against the actual local code and read-only git (`log`, `blame`, `shortlog`)—until new chunks stop teaching it anything. The lenses are how the *trainer* learns; what it publishes is the *Clone's* brain, filed the way a review actually happens: an attention map (where to look), reflexes (trigger → reaction → how hard → why), negative space (what to wave through), and default posture. Once a real pattern exists, a compact `Calibrate Clone` question set—each question naming a real package/file/area—settles the few choices that would change behavior. Built-in todos replace narration. Reviews stay draft-first; approvals, change requests, and comments post through the authenticated `gh` CLI. The human always chooses whether to publish, continue, or pause. Its comments read in the person's own voice (no bot prefix) and carry only a hidden HTML trace, so later human corrections to them teach it what to learn or unlearn.
 
@@ -392,7 +392,7 @@ Use it when:
 
 ---
 
-### `smart-comments`
+### [`smart-comments`](skills/smart-comments)
 
 Makes the agent write selective, intent-preserving inline comments and respect existing ones as load-bearing memory. Kills "what" comments, preserves "why" comments, and refuses to silently delete comments during refactors.
 
@@ -407,7 +407,7 @@ Use it when:
 
 ---
 
-### `prune`
+### [`prune`](skills/prune)
 
 Audits and strips AI residue, dead code, zombie workflows, and YAGNI bloat after heavy multi-turn iteration. Operates on an **inverted burden of proof**: every added or modified symbol is assumed unneeded until proven necessary with concrete evidence (reachability, explicit requirement, non-duplication, and breakage tests). Prompts for diff scope via `ask_question`, presents a clear evidence table, and requires explicit user approval before safely pruning and verifying the test suite.
 
@@ -423,7 +423,7 @@ Use it when:
 
 ---
 
-### `visualize`
+### [`visualize`](skills/visualize)
 
 Renders the current idea as a compact ASCII diagram — architecture, flows, screens, sequences, boundaries, comparisons, or current mental models. Marks assumptions, separates confirmed from inferred, and calls out anything the drawing exposes.
 
