@@ -34,7 +34,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`melech`](#melech) | What melech skills exist remote vs local, and should I update? | Say `melech list` / `melech list skills`, or ask about catalog sync / updates. |
+| [`sync-melech-skills`](#sync-melech-skills) | Are all melech skills installed globally and current? | Say `sync-melech-skills` / `melech sync` to apply, or `sync-melech-skills list` for a dry catalog. |
 
 ### Understand what you need
 
@@ -76,7 +76,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | If you are saying… | Start with | Why |
 |---|---|---|
-| "What melech skills do I have / should I update?" | [`melech`](#melech) | Dry remote↔local sync status for this library. |
+| "What melech skills do I have / should I update?" | [`sync-melech-skills`](#sync-melech-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
 | "I have a startup/product idea." | [`product-ideation`](#product-ideation) | The product premise is still open. |
 | "Is this pain real / will buyers pay?" | [`problem-discovery`](#problem-discovery) | Demand and pain need evidence before solutioning. |
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
@@ -135,23 +135,23 @@ structure or flow is unclear.
 
 ---
 
-### `melech`
+### `sync-melech-skills`
 
-Remote-first catalog for this library. For every skill on GitHub it shows name, description, installed y/n, where (global/project/workspace → which agents), local/remote version (folder SHA), update available y/n, and the exact install/update command. Also lists the [workflow bundles](#workflow-bundles) (journey recipes) with which steps you already have. Leverages [`vercel-labs/skills`](https://github.com/vercel-labs/skills); dry-run only (`npx skills check` aliases `update` and applies changes).
+Keeps this library current on the machine: every skill on GitHub is present under `~/.agents/skills` and linked into every coding agent. `sync-melech-skills` / `melech sync` applies missing installs and updates with non-interactive `npx skills` (`-g -y -a '*'`). Never writes a project/repo lock. `sync-melech-skills list` is the dry remote↔local catalog (folder SHAs, not semver). `sync-local` is the authoring-repo copy after you push this checkout. Renamed from `melech`; remove the old global skill with `npx skills remove melech -g -y`.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill sync-melech-skills -g -y -a '*'
 ```
 
 Invoke it with:
-- `melech list` or `melech list skills` (easiest to remember)
-- `melech`, `melech status`, or "should I update my melech skills?"
-- `melech sync-local` or `python3 scripts/sync-local-skills.py` (local zero-deviation sync)
+- `sync-melech-skills` or `melech sync` — install missing + update stale (global, all agents)
+- `sync-melech-skills list` / `melech list` — dry catalog
+- `sync-melech-skills sync-local` — after pushing this repo, copy into sibling local installs
 
 Use it when:
-- you want remote → local comparison per skill (including brand-new remote skills)
-- you ask "should I update?" before running `npx skills update`
-- you pushed skill changes and want all usages across sibling repos & global agent dirs synced
+- you want every melech skill installed and current in `~/.agents/skills`
+- the same set should show up in Cursor, Claude, Codex, Gemini, and the rest
+- you want a dry remote → local comparison before applying (`sync-melech-skills list`)
 - a skill's lock still points at the typo slug `AdirD/agent-shel-hamelech`
 
 ---
@@ -408,7 +408,7 @@ skills/
   distill-need/
   debug-mode/
   hebrew-rtl-writing/
-  melech/
+  sync-melech-skills/
   podcast-production/
   pre-plan/
   problem-discovery/

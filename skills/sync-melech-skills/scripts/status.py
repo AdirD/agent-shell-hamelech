@@ -561,7 +561,7 @@ def classify(
             "remote_version": rem["folder_sha"],
             "source": None,
             "skill_path": rem["skill_path"],
-            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y",
+            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y -a '*'",
             "note": "on remote, not installed locally",
         }
 
@@ -604,7 +604,7 @@ def classify(
             **base,
             "update_available": not content_matches,
             "status": "broken-source",
-            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y",
+            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y -a '*'",
             "note": (
                 f"lock source is typo {TYPO_SOURCE!r}; reinstall with "
                 f"{CANONICAL_SOURCE!r}"
@@ -617,7 +617,7 @@ def classify(
             **base,
             "update_available": True,
             "status": "untracked",
-            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y",
+            "action": f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y -a '*'",
             "note": "no local version hash — reinstall to track updates",
         }
 
@@ -656,7 +656,7 @@ def command_for(row: dict[str, Any]) -> str:
     name = row["name"]
     if row.get("on_remote"):
         # current — still give a reinstall path if the user asks to reinstall
-        return f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y"
+        return f"npx skills add {CANONICAL_SOURCE} --skill {name} -g -y -a '*'"
     return f"npx skills remove {name} -g -y"
 
 
@@ -716,7 +716,7 @@ def print_human(
     installed_count = sum(1 for r in remote_rows if r["installed"])
     broken = sum(1 for r in remote_rows if r["status"] == "broken-source")
 
-    print(f"melech catalog — remote {source}@{ref}  →  local lock")
+    print(f"sync-melech-skills catalog — remote {source}@{ref}  →  local lock")
     print(
         f"remote skills: {len(remote_rows)}  |  installed: {installed_count}  |  "
         f"new on remote: {new_count}  |  updates available: {outdated_count}"
@@ -795,8 +795,8 @@ def print_human(
         " agent dirs; `workspace` = bare skills/ checkout discovery (not an install)"
     )
     print(
-        "  - each card's `command` is what to run when the user asks to"
-        " install/update that skill; do not run until asked"
+        "  - installs are always global (`-g`) for every agent (`-a '*'`)."
+        " `sync-melech-skills` applies them; `sync-melech-skills list` is dry"
     )
     print(
         "  - workflow bundles come from the remote README; they chain skills,"
@@ -882,7 +882,7 @@ def main() -> int:
     readme = fetch_repo_file(args.source, args.ref, "README.md") or ""
     # Prefer local README when running inside this checkout (unpushed edits)
     local_readme = cwd / "README.md"
-    if local_readme.is_file() and (cwd / "skills" / "melech").is_dir():
+    if local_readme.is_file() and (cwd / "skills" / "sync-melech-skills").is_dir():
         try:
             readme = local_readme.read_text()
         except OSError:
