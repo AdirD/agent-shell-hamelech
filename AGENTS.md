@@ -17,15 +17,9 @@ Do not leave the repo in a state where the catalog in `README.md` is stale.
 
 After committing and pushing modifications, additions, or deletions under `skills/`:
 
-1. All local installations across global agent directories (`~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`, `~/.codex/skills`, etc.) and sibling repositories under `~/Dev` must remain 100% in sync with zero deviation.
-2. Run the sync script after pushing to update all usages (do not sync inline on unstaged changes):
-   ```bash
-   python3 scripts/sync-local-skills.py --apply
-   ```
-3. You can audit deviations at any time:
-   ```bash
-   python3 scripts/sync-local-skills.py --check
-   ```
+1. All installations across global agent directories (`~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`, `~/.codex/skills`, etc.) must remain 100% in sync with zero deviation.
+2. Run the `sync-melech-skills` skill (or `melech sync`) to fan out updates to all agent environments.
+
 
 ## Git Identity (this repo)
 
@@ -79,11 +73,10 @@ ln -sf ../../scripts/pre-push-audit.sh .git/hooks/pre-push
 
 ## After You Push
 
-After pushing changes under `skills/`, sync all local installations across global directories and sibling repos:
+After pushing changes under `skills/`, sync all installations across global agent directories:
 
-```bash
-python3 scripts/sync-local-skills.py --apply
-```
+- Run the `sync-melech-skills` skill (or `melech sync`).
+
 
 ## Before Making the Repo Public
 

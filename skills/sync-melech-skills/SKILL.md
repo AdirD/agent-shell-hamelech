@@ -32,7 +32,7 @@ global lock still has `melech`, remove it after this one is installed:
 |---|---|
 | `sync-melech-skills`, `sync melech skills`, `melech sync`, keep skills up to date | **Apply.** Install missing skills and update stale ones. |
 | `sync-melech-skills list`, `melech list`, `melech status` | **Dry catalog** only. Do not install. |
-| `sync-melech-skills sync-local` | Authoring-repo zero-deviation copy (this checkout → local installs). |
+
 
 ## Hard rules
 
@@ -101,19 +101,8 @@ SHAs in `~/.agents/.skill-lock.json`, not semver.
 | `untracked` | installed, no local hash | re-`add` |
 | `remote-gone` | local only, deleted upstream | skip (do not remove) |
 
-## Authoring checkout only (`sync-melech-skills sync-local`)
-
-After this repo's `skills/` were edited and pushed, copy them across sibling
-`~/Dev` checkouts and global agent dirs:
-
-```bash
-python3 scripts/sync-local-skills.py --apply
-```
-
-That is not a substitute for `sync-melech-skills`. `sync.py` pulls GitHub →
-global lock. `sync-local-skills.py` copies this checkout → other local trees.
-
 ## Voice
+
 
 Sharp and short. Verdict first (N installed, M updated, K failed), then
 names. Do not dump the full catalog after a clean sync unless they asked
