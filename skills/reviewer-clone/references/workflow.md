@@ -228,5 +228,6 @@ The Clone is a transparent, correctable stand-in—never claim it's the person.
 Don't start over. Only look at comments and Clone-feedback newer than the last run
 (match by GitHub/trace IDs, not timestamps), read those new chunks, and fold them into
 the saved model. The strongest signal is the human editing or rejecting one of the
-Clone's own `🤖 Clone:` comments—compare it against the original the Clone recorded.
+Clone's own comments (matched by the hidden `clone-trace` marker)—compare it against
+the original the Clone recorded.
 Anything the human typed directly into `VOICE.md`/`MODEL.md` wins.

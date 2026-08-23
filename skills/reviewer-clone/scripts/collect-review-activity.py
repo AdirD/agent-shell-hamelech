@@ -258,7 +258,7 @@ def compact_comment(
         "body": body,
         "body_chars": len(body),
         "links": LINK_RE.findall(body),
-        "clone_marked": body.startswith("🤖 Clone:"),
+        "clone_marked": "<!-- clone-trace:" in body,
     }
 
 

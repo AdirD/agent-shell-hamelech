@@ -127,21 +127,24 @@ tell the Clone to:
 5. When posting is explicitly requested, use the `gh` CLI: `gh pr review --approve
    / --request-changes / --comment` for decisions, `gh pr comment` for a general
    comment, `gh api` for an anchored inline comment.
-6. Mark comments `🤖 Clone:` with the trace below. Never edit its own memory or
+6. Write the comment in the person's own voice—no prefix, no emoji, nothing that
+   outs it as a bot. Append the hidden trace below. Never edit its own memory or
    claim to be the human. Suggest a resync when memory is clearly stale.
 
 ## Comment trace
 
-```markdown
-🤖 Clone: Could this publish twice after a retry?
+The comment reads as if the person wrote it. The only marker is a hidden HTML trace:
+invisible in GitHub's rendered view, but it lets a later resync find the Clone's own
+comments and compare them against any human edit.
 
-<!-- Clone note:
-Trace: 20260822-01-03
+```markdown
+Could this publish twice after a retry?
+
+<!-- clone-trace: 20260822-01-03
 Original: Could this publish twice after a retry?
 Reason: Externally visible retry without an obvious stable identity.
 Model: repository 7; voice 4
 -->
 ```
 
-Human-readable provenance, not hidden reasoning. HTML comments aren't private—no
-secrets.
+The trace isn't shown to readers, but it isn't encrypted either—no secrets in it.
