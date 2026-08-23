@@ -1,204 +1,232 @@
 # Reviewer Clone workflow
 
-This is the flow. It's a guide, not a script—use judgment. The goal is to learn
-how this person reviews (WHERE they focus, WHEN they speak, HOW they work), check
-it with them, and save it as a Clone that reviews like them.
+Learn how one person reviews PRs, then save that as a Clone that reviews new PRs the
+same way. Two principles:
 
-## Who does what
+- **Mimic, don't fix.** Clone their real themes and biases—what they obsess over,
+  wave through, and push back on. Never impose your own "best practices."
+- **Correlate, don't narrate.** Learn from many small comments, each checked against
+  the actual code it was written on—never from re-reading whole PRs (that overfits).
 
-You (the main agent) run the whole thing: pick the repo with the human, run the
-collectors, choose and deeply read PRs, talk to the human, decide what's learned,
-and publish. Deep reads and learning are always yours.
+## What you're learning: the lenses
 
-Hand off only bounded, independent work to subagents:
+You're building one thing—a model of how this person reviews—looked at through these
+lenses. Use what fits; don't force a rigid matrix. This is the only place they're
+defined. For every lens, the *negative space* is signal too: what they wave through
+tells you as much as what they flag, so capture both sides.
 
-- map the chosen repository → `repository-system.md`
-- study how the person writes and investigates → `voice.md`
-- go fetch one missing fact or find candidate contrasting PRs
+- **IF** — do they weigh in at all, or wave it through
+- **WHAT** — the concerns they keep flagging vs the ones they never raise
+- **WHERE** — the parts of the system they dig into and own vs the parts they skim
+- **WHEN** — how far they take it: a question, a suggestion, a hard block—or silence
+- **WHO** — whose PRs they push on vs whose they wave through, if it recurs
+- **WHY** — the reason under the comment (risk, data loss, maintainability, cost…)
+- **HOW** — tone, and whether they research / link / cite. This is their voice.
 
-Give a subagent a complete prompt, one output, and let it run fresh. It doesn't
-touch active memory, interview the human, or decide anything. If it fails, run it
-again. Use a cheap fast model for mechanical mapping/search, a stronger one when
-wording and interpretation matter.
+Absence is a real part of the picture, but it's ambiguous—"didn't comment" can mean
+"trusts it" or "those PRs just didn't need me." So paint both sides, then treat the
+gaps as questions to confirm, not proof they don't care.
 
-## Progress
+There's just one model file, `MODEL.md` (plus `VOICE.md` for the cross-repo voice).
+You build it up as you read—draft in the run's `scratch/`—and publish it only when the
+human says so. Each claim carries its own grounding inline (the comments + code + git
+that back it), so there's no separate "evidence" file. `RUN.md` is the run's journal
+(what each chunk added, decisions); `state.json` tracks what's been processed so a
+resync resumes where you left off.
 
-Track progress with todos, not narration:
+## How the run goes
 
 ```text
-Offer recent repositories and let the user choose
-Create or resume the training run
-Collect activity and start repository/voice analysis
-Explore PRs and learn iteratively
-Choose whether to continue or publish
-Publish the reviewer Clone
-Report the result
+1. WHERE AM I   Find the repo + GitHub user from the current folder (no menu).
+       │
+2. SET UP       Open this person's training folder (start fresh or continue an old one).
+       │
+3. GATHER       Download every review comment they left here (split into chunk-files),
+       │        and in parallel read the code + git to see what they wrote and own.
+       │
+4. LEARN  ┌───► Read the comments one chunk at a time, filling in the model above.
+       │  │     When a pattern looks real, open the code they commented on to confirm.
+       │  │     When a real fork appears, ask them a sharp question right there.
+       │  └──── Repeat until new chunks stop teaching you anything.
+       │
+5. DECIDE       They pick: save it / keep going / pause.
+       │
+6. SAVE         Write the model to files the Clone can reuse, then report.
 ```
 
-Keep one in progress; on the exploration step, append the deep-read count and what
-you're checking next. Between routine tool calls, say nothing—let the todos talk.
+You (main agent) do all the thinking, and run the quick read-only git/code lookups
+yourself. Offload to a fresh subagent (cheap fast model, full prompt, one job) only
+for genuinely heavy read-only work; it never decides anything or touches saved memory.
+If one fails, dispatch it again.
 
-## 1 — Pick the repo
+Surface these six as todos, one in progress at a time; while reading chunks show
+which (e.g. "chunk 6 of 11"). Between routine tool calls, say nothing.
 
-Usually already done from `SKILL.md`'s quick-start—if so, skip to step 2 and don't
-re-run the queries. If not: resolve the login, run the two `jq`-aggregated queries
-in `github.md`, offer the top few, let the human choose. Keep it cheap—just the
-menu, no code inspection or history crawl.
+## 1 — Find the repo and user
 
-## 2 — Create or resume the run
+The repo is wherever the skill runs. Don't ask.
 
-Find `~/.agents/skills/cr-clone-<login>`. Decide from its state whether this is a
-fresh init, a new repo, a resync, or a no-op. Make a run directory with a real UTC
-timestamp (see `output-contract.md`). Don't rebuild existing memory just because
-someone said "init"—that needs explicit confirmation.
+```bash
+gh api user --jq .login
+git -C . remote get-url origin      # → canonical owner/repo (base, not a fork head)
+```
 
-## 3 — Collect and start parallel analysis
+Only if there's no remote, ask the user for `owner/repo`.
 
-Kick these off together:
+## 2 — Open the training folder
 
-- run `collect-review-activity.py` yourself, save output to the run's `scratch/`
-- dispatch **Map repository system** → `repository-system.md`
-- once the activity index exists, dispatch **Analyze review method and voice** →
-  `voice.md` (studies both wording and how they back up claims—links, research,
-  in-repo precedent, tests, examples)
-- on resync, also dispatch **Collect Clone feedback** to gather traced comments,
-  human edits/replies, and missed concerns
+In `~/.agents/skills/cr-clone-<login>`, decide from what's already there whether
+this is a first-time run, an update of an existing one, or nothing-to-do. Make a run
+dir with a real UTC timestamp (`output-contract.md`). Don't wipe existing memory
+just because someone said "init"—that needs explicit confirmation.
 
-Don't wait on those. Build a menu of ~8–12 promising PRs from the activity: real
-inline comments, change requests, follow-ups, praise, comments backed by research
-or links, and repeated activity in one area. Spread across areas, authors, and
-time. It's a menu, not a commitment.
+## 3 — Gather comments, scan ownership (parallel)
 
-## 4 — Explore PRs and learn
+Run the collector yourself (don't reinvent it in shell):
 
-Loop, one PR (or a matched pair) at a time:
+```bash
+python3 "$REVIEWER_CLONE_SKILL_DIR/scripts/collect-review-activity.py" \
+  --repo "$OWNER/$REPO" --login "$LOGIN" \
+  --output "$RUN/scratch/review-activity.json"
+```
 
-1. Pick something that can establish, contrast, or challenge a pattern.
-2. Run `collect-pr-evidence.py` for it.
-3. Read it yourself—diff, live code, what the human actually did, the thread,
-   later changes, outcome.
-4. Jot a short source-backed note in `EVIDENCE.md` (see shape below).
-5. Update your picture of WHERE / WHEN / HOW and what's still unclear.
-6. Ask the human when their answer would actually change the model or your next move.
-7. Decide: contrast it, explore further, pick another, or propose stopping.
+It grabs every code-review comment the person left (each tagged with the file and
+line it was written on), splits them into small chunk-files
+(`scratch/comments/batch-*.json`), and counts how many landed in each area
+(`area_counts`). Read `review-activity.summary.json` first—the per-area counts
+already give you **WHERE** by volume, over every comment, not a sample. If it fails,
+fix args/auth and retry once; don't improvise a big script.
 
-Evidence note shape:
+While the collector runs, scan ownership yourself in one pass so you know which areas
+this person actually *wrote*, not just commented on:
+
+```bash
+git -C . shortlog -sne --all | head            # who authors the most, overall
+git -C . log --author="<login>" --oneline | wc -l   # their footprint
+```
+
+That's the ownership half of **WHERE**; `area_counts` is the attention half. You don't
+need a full architecture write-up—just enough to overlay ownership on attention.
+
+## 4 — Build the model, chunk by chunk
+
+Read one chunk-file at a time, filling in the lenses in the draft `MODEL.md`
+(`scratch/`). Never load every comment at once, and never conclude from a single
+comment. For each chunk, in order:
+
+1. Read it (~40 comments, each with its file/line).
+2. Add what's new to your notes; note what just repeats what you knew.
+3. When a pattern looks real, open the actual file they commented on and check git:
+
+   ```bash
+   git -C . log --author="<login>" --oneline -- <path>   # do they write here?
+   git -C . blame -L <line>,+1 -- <path>                  # who owns this line
+   git -C . log --oneline -n 5 -- <path>                  # how often it changes
+   ```
+
+4. Jot the delta in `RUN.md` ("chunk 5: +1 recurring concern, nothing else").
+
+**Stop early when it stops paying off:** if 2–3 chunks in a row add nothing new,
+you've seen enough—move to the questions even if chunks remain (a later run resumes
+from where you left off). Reading all chunks is fine too.
+
+What to trust: the same concern across unrelated PRs, suggested fixes, links/precedent
+they cite, specific praise, human corrections of a Clone comment, and areas they both
+wrote and commented on. Weak—never a conclusion on its own: a bare approval, "LGTM",
+or silence—an area they didn't comment on is a question to ask, not proof they don't
+care. Only save something as learned when the human confirms it, the behavior repeats
+independently, or a correction to a Clone comment makes it explicit.
+
+While reading, draft freely by lens—that's how you think—each claim carrying its
+grounding inline (this *is* the receipts):
 
 ```markdown
-## PR #...
-- Observed: exact action/comment + GitHub ID.
-- Context: only what's needed to understand it.
-- Outcome: reply, edit, code movement, final state.
-- Read: what it suggests (as inference) and what it can't prove.
+## WHAT — recurring themes
+- "await / use a queue" — 31 comments / 22 PRs; grounded `packages/ai-sdk/tools/run.ts:44`
+  (they author it) → strong WHEN gate?
+
+## WHERE — focus + ownership
+- packages/ai-sdk: 120 comments, ~70% authored → high
+- apps/studio (studio.json): 3 comments, heavy churn → unknown (silence fork)
 ```
 
-Repository and voice jobs keep running in the background—don't block on them.
+These are your working notes, filed by lens. At publish (step 6) you reshape them into
+the brain the Clone actually reads—attention map, reflexes, negative space, default
+posture—per `output-contract.md`. Lenses are how *you* learn; reflexes are how *it* acts.
 
-## Calibrate with the human
+### Ask when a real fork appears
 
-Calibration is an interview with a senior engineer about how they review. Use
-`AskQuestion` with title `Calibrate Clone`, one to three questions, only when a
-real fork exists. Every good question follows the same shape:
+This is where the skill earns its trust. A great question makes the human go **"whoa,
+it gets me—I *do* review like that."** You're holding up a mirror: naming a reflex of
+theirs, in their own repo, that they act on but maybe never spelled out. The best ones
+name a pattern they hadn't consciously noticed—then instantly recognize as themselves.
+Get this right and everything else is forgivable; get it generic and the Clone feels
+like a bot.
 
-**[a concrete thing you actually saw them do, named] → [your read of it] → lock it
-in / correct me.**
-
-The "aha" comes from naming the real thing—the actual package, file, framework, or
-area from the collector data (`ai-sdk`, `studio.json`, migrations, the retry code),
-not a generic reviewer trait. "You push back on abstractions" is a horoscope that
-fits everyone; "you're all over the `ai-sdk` tool-calling code" is personal.
-
-Rules for a golden question:
-
-- **Name a real artifact** from their activity. No generic archetype questions.
-- **It's a pattern across PRs**, never "on #163." Named area ≠ single incident.
-- **One-line premise, then the fork.** Don't write a setup that already answers it.
-- **2–4 clean, non-overlapping options**—each a different reviewer, recognizable
-  instantly. Not a `block / suggestion / ask / don't encode` config ladder.
-- **Only ask a genuine fork.** If you already know the answer, it's a reflection
-  for the summary, not a question. Don't recommend an option on a real fork.
-
-The golden set (fill the names from real data):
+Calibration isn't a phase after learning—it happens inside the loop. When a chunk
+raises a genuine fork you can't settle from evidence, stop and ask right there, then
+keep reading. `AskQuestion` titled `Calibrate Clone`, 1–3 questions, **only when a real
+fork exists**. Learn the shape from the contrast (fill names from real data):
 
 ```text
-WHERE — home turf (high, well-evidenced → confirm the bar):
-You're all over anything touching the ai-sdk tool-calling code — deep comments,
-follow-ups, you defend your takes. Reading that as your home turf. Want Clone to
-go hard there and lower its bar to speak up?
-- Yeah, lock it in — that's my area
-- I know it well but don't over-scrutinize it
-- Nah, that was just these PRs
+❌ "You push back on abstractions. Want Clone to flag over-engineering?"
+   horoscope — abstract, unnamed, true of everyone. no aha.
+✅ "You author most of the ai-sdk tool-calling code and comment on it heavily —
+   reading that as your home turf. Want Clone to go hard there and lower its bar?"
+   - Yeah, lock it in — that's my area
+   - I know it well, don't over-scrutinize it
+   - Nah, that was just these PRs
 ```
 
 ```text
-WHERE — silence fork (an area they DON'T comment on is ambiguous → ask):
-Changes to studio.json / generated config mostly sail past you with no comment.
-Is that "I trust it, skim it" or just "those PRs didn't need me"?
-- Trust it — Clone can go light there
-- Didn't come up — don't downgrade it
-- Actually I'd want regressions there caught
+❌ "On #163 you flagged the un-awaited sandbox call — was that a big deal?"
+   a memory quiz about one incident. they won't even remember it.
+✅ "Across PRs you keep catching un-awaited queue writes (e.g. run.ts:44). A hard
+   gate for you, or something you raise and trust the author on?"
+   - Hard gate — I don't approve without it
+   - I push hard but won't block
+   - Case by case
 ```
 
 ```text
-WHEN — grounded in a real area:
-On DB migrations you always dig into rollback + backfill order. Is that a hard
-gate for you, or you raise it and trust the author?
-- Hard gate — I don't approve migrations without it
-- I push hard but won't block on it
-- Case by case
+❌ "How should Clone treat studio.json? block / request-changes / suggest / ask / ignore"
+   a config ladder in robot-speak; pre-answers nothing real.
+✅ "Changes to studio.json mostly sail past you with no comment. Is that 'I trust it,
+   skim it' or just 'those PRs didn't need me'?"
+   - Trust it — Clone can go light there
+   - Didn't come up — don't downgrade it
+   - Actually I'd want regressions there caught
 ```
 
-```text
-HOW — grounded in a real habit:
-When you flag retry/idempotency stuff you link the queue docs or a past incident.
-Want Clone to dig up that kind of proof before commenting, or just raise it?
-- Dig it up — don't make that claim bare
-- Only for the non-obvious ones
-- Just raise it, I'll get the proof myself
-```
+Zero forks in a session is fine. Ask again only when new evidence raises a real
+uncertainty.
 
-Some sessions produce zero real forks—that's fine. Ask again later only when new
-evidence raises a genuine uncertainty. Always show the current model before
-publishing and ask anything still open that could change it.
+## 5 — They decide
 
-## 5 — Keep the model compact
+Show them the model you built and what's still open, with honest counts (comments
+downloaded / chunks read of total / codebase mapped). Suggest stopping when more
+chunks keep confirming the same picture and no open question would change how reviews
+go—your judgment, not a formula. They pick: publish, keep going, look harder at a
+named area, or pause. Stopping is not the same as permission to publish.
 
-After each deep read: separate what you saw from what you infer (`evidence.md`),
-prefer matched contrasts over topic counts, overlay demonstrated interest/expertise
-onto the repo architecture, and update WHERE / WHEN / HOW / uncertainty. Explicit
-human answers and direct edits win. Record only material changes in `RUN.md`. The
-repo and voice artifacts are inputs—you decide what enters active memory.
+## 6 — Save and report
 
-## 6 — Let the human choose depth
+Only an explicit "save/publish" choice changes what the Clone actually uses. Record
+the accepted learning + source IDs in `RUN.md`, then reshape your lens-notes into the
+finished `VOICE.md` and `MODEL.md` (the brain format in `output-contract.md`, written
+for the Clone) in `scratch/`, re-read the live files so any hand-edits survive, back
+up the old copies, swap in the new, update `state.json`. If it fails partway, restore
+the backup and report. A paused/failed run resumes from `RUN.md` + the draft
+`MODEL.md`.
 
-Before proposing to publish, show the current model and the important unknowns:
+Then report: status, honest coverage, why you stopped and what the human chose, what
+was learned (the model + their voice) and anything dropped, and the Clone + run paths.
+The Clone is a transparent, correctable stand-in—never claim it's the person.
 
-```text
-WHERE — where they focus: ...
-WHEN — when they intervene: ...
-HOW — how they investigate and write: ...
-Narrowed / unlearned: ...
-Still uncertain: ...
-```
+## Resync (updating an existing Clone)
 
-Propose stopping when recent diverse reads keep reinforcing the same picture and no
-open contradiction seems likely to change reviews. That's judgment, not a formula.
-Show honest counts (indexed / comments swept / evidence fetched / deep-read) and
-let the human publish, keep exploring, deep-dive a named area, or pause. Stopping
-is not permission to publish.
-
-## 7 — Publish
-
-Only an explicit publish choice changes active memory. Then: record the accepted
-learning and source IDs in `RUN.md`, stage complete `VOICE.md` and `MEMORY.md` in
-`scratch/`, re-read the live active files so human edits aren't clobbered, check for
-privacy and contradictions, back up the old copies into the run, swap in the new
-files, and update `state.json`. If it fails mid-way, restore the backup and report
-it. A paused or failed run resumes from `RUN.md` and `EVIDENCE.md`.
-
-## Wrap up
-
-Report: status (initialized / resynced / no-op / paused / failed), honest coverage
-counts, why you stopped and what the human chose, the accepted WHERE/WHEN/HOW and
-anything unlearned, and the Clone + run paths. The Clone is a transparent,
-correctable stand-in—never claim it's the person.
+Don't start over. Only look at comments and Clone-feedback newer than the last run
+(match by GitHub/trace IDs, not timestamps), read those new chunks, and fold them into
+the saved model. The strongest signal is the human editing or rejecting one of the
+Clone's own `🤖 Clone:` comments—compare it against the original the Clone recorded.
+Anything the human typed directly into `VOICE.md`/`MODEL.md` wins.

@@ -58,9 +58,10 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
+| [`prune`](#prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
 | [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
-| [`reviewer-clone`](#reviewer-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone through parent-led PR exploration, parallel repository/voice analysis, and calibration. |
+| [`reviewer-clone`](#reviewer-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone by correlating your real review comments to the local code and git history in the repo you run it from. |
 | [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
 ### Specialized production
@@ -86,6 +87,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
 | "Drive the Chrome tab I'm already logged into while we debug." | [`debug-mode`](#debug-mode) | Autopilot: Chrome DevTools MCP `--autoConnect`; one-time `chrome://inspect/#remote-debugging` toggle, then Allow. |
+| "I've been iterating with AI and need to strip dead code and bloat." | [`prune`](#prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`reviewer-clone`](#reviewer-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our direction." | [`product-ideation`](#product-ideation) | Competitor research is serving a product decision. |
@@ -126,12 +128,10 @@ useful implementation.
 ### Shipping
 
 ```text
-smart-comments (during implementation) → babysit
+prune (after AI iteration) → smart-comments (during implementation) → babysit
 ```
 
-Use when the work is decided and the remaining job is preserving code intent
-and driving the PR to merge-ready. `visualize` can assist any bundle when
-structure or flow is unclear.
+Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving the PR to merge-ready. `visualize` can assist any bundle when structure or flow is unclear.
 
 ---
 
@@ -340,7 +340,7 @@ Use it when:
 
 ### `reviewer-clone`
 
-Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. It learns a compact model: **WHERE** the human demonstrates system interest or expertise, **WHEN** they stay silent, ask, suggest, praise, or block, and **HOW** they investigate and communicate—including whether they research, cite links, use repository precedent, or provide proof. The main agent runs a cheap recent-activity query and asks which repository to use before inspecting code or history. After selection it invokes the bundled activity collector while a fresh subagent maps the repository; method and voice analysis starts when comments are available. The main agent alone chooses and deeply reads PRs, talks with the human, decides learning, and publishes. Once useful evidence exists, it summarizes WHERE, WHEN, and HOW and uses a compact `Calibrate Clone` question set for choices that would materially change behavior. Built-in todos replace routine narration. Durable runs retain exact coverage and source IDs. Reviews stay draft-first; explicit approval, change requests, and comments are posted through the authenticated `gh` CLI. The human always chooses whether to publish, continue, deep-dive, or pause. Later corrections to traced `🤖 Clone` comments teach it what to learn or unlearn.
+Creates and resyncs a private user-global `cr-clone-<name>` reviewer from the authenticated user's real GitHub behavior. Every reviewer has their own themes and biases—this mimics them, it doesn't correct them. It trains on the repository you run it from—no menu—and learns a compact model across six lenses: **IF** they weigh in at all, **WHAT** they flag, **WHERE** they focus and own, **WHEN** they escalate (ask / suggest / block), **WHO** they push on, and **WHY** they care—plus **HOW** they say it (their voice). Instead of deep-reading whole PRs (which overfits), it **correlates over the whole comment corpus**: the bundled collector sweeps every review comment with its file+line anchor and splits them into ordered chunk-files, and the main agent reads the chunks one by one—building a running model and grounding real patterns against the actual local code and read-only git (`log`, `blame`, `shortlog`)—until new chunks stop teaching it anything. The lenses are how the *trainer* learns; what it publishes is the *Clone's* brain, filed the way a review actually happens: an attention map (where to look), reflexes (trigger → reaction → how hard → why), negative space (what to wave through), and default posture. Once a real pattern exists, a compact `Calibrate Clone` question set—each question naming a real package/file/area—settles the few choices that would change behavior. Built-in todos replace narration. Reviews stay draft-first; approvals, change requests, and comments post through the authenticated `gh` CLI. The human always chooses whether to publish, continue, or pause. Later corrections to traced `🤖 Clone` comments teach it what to learn or unlearn.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill reviewer-clone
@@ -348,17 +348,15 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill reviewer-cl
 
 Use it when:
 - you want an agent to review PRs with your attention, judgment threshold, and writing voice
-- you want to initialize another repository inside the same personal Clone
-- you want activity collection and repository mapping to begin together while the main agent iteratively reasons through selected PRs with you
-- you want the parent to own repository choice, collectors, deep reads, questions, learning, and publication
-- you want fresh bounded subagents only for repository mapping, voice, and narrow factual searches
-- you want the Clone to learn WHERE you focus, WHEN you intervene, and HOW you investigate and write
-- you want repeated research, citation, proof, and repository-precedent habits reproduced
+- you want it to mimic your themes and biases, not correct them or impose "best practices"
+- you want it to just use the repo you run it from, with no repo-picker step
+- you want it to learn across IF/WHAT/WHERE/WHEN/WHO/WHY plus your voice, then act from reflexes, an attention map, and negative space
+- you want learning grounded by correlating your real comments to the actual local code and git history, not deep-read PR narratives
+- you want a compact `Calibrate Clone` question set where every question names a real package/file/area
+- you want a clean split between the trainer that learns and the generated Clone that acts
+- you want fresh bounded subagents only for genuinely heavy read-only lookups (ownership is scanned inline)
 - you want approvals, change requests, and comments performed through the GitHub CLI
-- you want a compact evidence-backed calibration instead of a long interview
-- you want code areas ranked by relative review importance without treating missing evidence as low importance
-- you want the human—not the trainer—to choose whether to publish, continue broadly, or deep dive
-- you want each run's evidence, decisions, and learning delta retained without separate log systems
+- you want the human—not the trainer—to choose whether to publish, continue, or pause
 - a week of new human and Clone review activity is ready to resync
 - you want direct edits, rejected comments, missed concerns, and replies to teach the Clone what to learn or unlearn
 - you need personalized review memory to stay private and out of project git
@@ -377,6 +375,22 @@ Use it when:
 - you want agents to leave landmines, WHYs, and workarounds behind — not narrate WHAT the code does
 - you've been burned by an agent "cleaning up" a comment that was the only trace of a past incident
 - you want one consistent comment policy across Cursor, Claude Code, Codex, and anything else reading `.agents/skills/`
+
+---
+
+### `prune`
+
+Audits and strips AI residue, dead code, zombie workflows, and YAGNI bloat after heavy multi-turn iteration. Operates on an **inverted burden of proof**: every added or modified symbol is assumed unneeded until proven necessary with concrete evidence (reachability, explicit requirement, non-duplication, and breakage tests). Prompts for diff scope via `ask_question`, presents a clear evidence table, and requires explicit user approval before safely pruning and verifying the test suite.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill prune
+```
+
+Use it when:
+- you've been iterating with an AI for multiple turns and lost track of what is actually used
+- you suspect orphaned helper functions, dead types, and abandoned workflows are polluting the diff
+- you want speculative generality (YAGNI) and ad-hoc duplicate helpers collapsed before opening a PR
+- you want an evidentiary audit where you approve the deletions with full visibility
 
 ---
 
@@ -413,6 +427,7 @@ skills/
   pre-plan/
   problem-discovery/
   product-ideation/
+  prune/
   reviewer-clone/
   smart-comments/
   visualize/

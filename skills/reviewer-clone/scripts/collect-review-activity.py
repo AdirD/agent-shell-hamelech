@@ -190,6 +190,46 @@ def value_range(values: list[str]) -> dict[str, str] | None:
     return {"earliest": min(values), "latest": max(values)} if values else None
 
 
+def area_of(path: str | None) -> str:
+    """Group a comment's file path into a coarse system area."""
+    if not path:
+        return "(no path)"
+    parts = [part for part in path.split("/") if part]
+    return "/".join(parts[:2]) if len(parts) >= 2 else (parts[0] if parts else "(no path)")
+
+
+def write_comment_batches(
+    comments: list[dict[str, Any]],
+    comments_dir: Path,
+    batch_size: int,
+) -> list[dict[str, Any]]:
+    """Shard human comments into ordered batch files the agent crunches one by one."""
+    ordered = sorted(
+        comments, key=lambda comment: (comment.get("created_at") or "", comment["id"])
+    )
+    batches: list[dict[str, Any]] = []
+    for start in range(0, len(ordered), batch_size):
+        chunk = ordered[start : start + batch_size]
+        index = start // batch_size
+        path = comments_dir / f"batch-{index:03d}.json"
+        atomic_write_json(path, chunk)
+        batches.append(
+            {
+                "index": index,
+                "file": str(path),
+                "count": len(chunk),
+                "pr_numbers": sorted({comment["pr_number"] for comment in chunk}),
+                "areas": counter_rows(
+                    [area_of(comment["path"]) for comment in chunk], "area"
+                ),
+                "created_range": value_range(
+                    [comment["created_at"] for comment in chunk if comment.get("created_at")]
+                ),
+            }
+        )
+    return batches
+
+
 def compact_comment(
     comment: dict[str, Any],
     repo: str,
@@ -257,6 +297,8 @@ def build_summary(result: dict[str, Any], detail_output: Path) -> dict[str, Any]
         "states": result["states"],
         "top_authors": result["authors"][:25],
         "role_combinations": result["role_combinations"],
+        "area_counts": result["area_counts"],
+        "comment_batches": result["comment_batches"],
         "candidate_selection": {
             "method": result["candidate_selection"]["method"],
             "limit": result["candidate_selection"]["limit"],
@@ -357,6 +399,19 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         key=lambda comment: (-comment["body_chars"], comment["id"]),
     )[: args.candidate_limit]
 
+    human_comments = [
+        comment
+        for comment in comments
+        if not comment["clone_marked"] and comment["body"].strip()
+    ]
+    comments_dir = args.comments_dir or args.output.parent / "comments"
+    comment_batches = write_comment_batches(
+        human_comments, comments_dir, args.batch_size
+    )
+    area_counts = counter_rows(
+        [area_of(comment["path"]) for comment in human_comments], "area"
+    )
+
     coverage_complete = all(
         interval["complete"]
         for intervals in query_ranges.values()
@@ -393,19 +448,27 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         ),
         "prs": prs,
         "inline_review_comments": comments,
+        "area_counts": area_counts,
+        "comment_batches": {
+            "dir": str(comments_dir),
+            "batch_size": args.batch_size,
+            "human_comment_count": len(human_comments),
+            "batch_count": len(comment_batches),
+            "batches": comment_batches,
+        },
         "candidate_selection": {
             "method": (
                 "Longest non-Clone, non-empty, path-anchored inline comment per PR; "
-                "the main agent still chooses which PRs to read."
+                "a starting sample the main agent correlates to local code and git."
             ),
             "limit": args.candidate_limit,
             "candidates": candidates,
         },
         "collection_levels": {
             "pr_metadata_indexed": len(prs),
-            "authored_inline_comments_collected": len(comments),
-            "review_material_fetched": 0,
-            "full_pr_deep_reads": 0,
+            "inline_comments_collected": len(comments),
+            "human_comments_batched": len(human_comments),
+            "comment_batches_written": len(comment_batches),
         },
     }
 
@@ -439,6 +502,17 @@ def parse_args() -> argparse.Namespace:
         default=30,
         help="Maximum deterministic candidate comments to include (default: 30)",
     )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=40,
+        help="Human comments per batch file for iterative crunching (default: 40)",
+    )
+    parser.add_argument(
+        "--comments-dir",
+        type=Path,
+        help="Directory for comment batch files (default: <output-dir>/comments)",
+    )
     return parser.parse_args()
 
 
@@ -446,6 +520,9 @@ def main() -> int:
     args = parse_args()
     if args.candidate_limit < 1:
         print("--candidate-limit must be positive.", file=sys.stderr)
+        return 2
+    if args.batch_size < 1:
+        print("--batch-size must be positive.", file=sys.stderr)
         return 2
     try:
         result = collect(args)
@@ -472,6 +549,8 @@ def main() -> int:
                 "unique_prs": counts["unique_prs"],
                 "inline_review_comments": counts["inline_review_comments"],
                 "comments_with_links": counts["comments_with_links"],
+                "comment_batches": result["comment_batches"]["batch_count"],
+                "batch_dir": result["comment_batches"]["dir"],
             },
             indent=2,
         )

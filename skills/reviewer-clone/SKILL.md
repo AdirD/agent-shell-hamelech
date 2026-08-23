@@ -2,59 +2,60 @@
 name: reviewer-clone
 description: >-
   Create and resync a private user-global Clone skill that reviews GitHub pull
-  requests like the authenticated user. Learn their review voice,
-  repository-specific concerns, where they focus, when they intervene, and how
-  they investigate—from their real reviews, authored code, and feedback on prior
-  Clone comments. Use when the user asks to clone or learn their code-review
-  style, build a personal CR/PR reviewer, add a repository, retrain, or resync an
-  existing reviewer Clone.
+  requests like the authenticated user. It trains on the repository you run it
+  from: it correlates the user's real review comments to the actual code they
+  point to (local files plus read-only git history and blame) to learn where they
+  focus, when they intervene, and how they investigate. Use when the user asks to
+  clone or learn their code-review style, build a personal CR/PR reviewer,
+  retrain, or resync an existing reviewer Clone.
 ---
 
 # Reviewer Clone
 
 Build a private reviewer that reviews PRs like this specific person—not a generic
-checklist bot. You train it; the generated `cr-clone-<login>` skill does the
-reviews.
+checklist bot. Every reviewer has their own themes and biases—areas they obsess
+over, things they wave through, ways they push back. We don't fix that or impose
+"best practices." We mimic it.
+
+## Two agents—don't conflate them
+
+- **You (this skill, the trainer).** You *learn*. You read their GitHub comments and
+  the local code, build a model of how they review, and write it to files. You never
+  review a PR yourself.
+- **The Clone (`cr-clone-<login>`, generated).** It *acts*. Later, in a PR, it reads
+  the files you wrote and reviews like the person. It never learns or edits its own
+  memory.
+
+So everything you produce (`MODEL.md`, `VOICE.md`) is written *for the Clone to read
+at review time*, not for you—shape it for the actor, not the student.
 
 Learn a compact model of the person:
 
-- **WHERE** they focus—the parts of the system they know deeply or care about.
-- **WHEN** they speak up—what makes them stay silent, ask, suggest, praise, or block.
-- **HOW** they work—how they investigate, what evidence they cite, how they phrase things.
+- **IF** they weigh in at all—what makes them engage vs wave something through.
+- **WHAT** they flag—the concerns they keep raising.
+- **WHERE** they focus—the parts of the system they author, own, or care about.
+- **WHEN** they escalate—a question, a suggestion, or a hard block.
+- **WHO** they push on—authors they treat differently, if it recurs.
+- **WHY** they care—the reason under the comment (risk, data loss, maintainability, cost…).
+- **HOW** they say it—tone and whether they research/cite. This is their voice.
 
-The whole job is to watch how they actually behave on real PRs, form a picture,
-check that picture with them, and save it. Trust your judgment over rigid rules.
+## The approach: correlate, don't narrate
 
-## Start here — pick the repo first (cheap)
+The repo is already checked out where the skill runs. So instead of deep-reading
+whole PRs and their discussions (which overfits and makes the Clone way too
+opinionated), work from breadth grounded in reality:
 
-Do this before reading any other reference. Picking the repo needs almost nothing,
-so don't front-load the whole workflow just to show a menu.
+- Collect the person's real review comments—each one carries the file + line it
+  landed on.
+- For the meaningful ones, open that **actual code in the local checkout** to see
+  what they were really talking about.
+- Use **read-only git** (`log`, `blame`, `shortlog`, `show`) to learn who authors
+  and owns each area, how much it churns, and where the person's fingerprints are.
 
-1. Resolve the login: `gh api user --jq .login`
-2. If a PR was given, use its base repo. Otherwise run both and merge the results:
+That combination—their words, the real code, and git ownership—makes a truer clone
+than any deep dive. Never run destructive git.
 
-```bash
-gh search prs --reviewed-by LOGIN --sort updated --limit 100 --json repository \
-  --jq 'group_by(.repository.nameWithOwner)|map({repo:.[0].repository.nameWithOwner,recent:length})|sort_by(-.recent)'
-gh search prs --commenter LOGIN --sort updated --limit 100 --json repository \
-  --jq 'group_by(.repository.nameWithOwner)|map({repo:.[0].repository.nameWithOwner,recent:length})|sort_by(-.recent)'
-```
+## References
 
-3. Offer the top few and let the human pick (counts = recent window, not lifetime).
-   No code inspection, history crawl, or per-PR fetches here.
-
-## After they pick — run the workflow
-
-Now read `references/workflow.md`—it's the source of truth for the rest of the
-flow. Pull in the others only when you need them:
-
-- `references/github.md` — the CLI commands and bundled collector scripts
-- `references/evidence.md` — how to read behavior into WHERE/WHEN/HOW, and resync
+- `references/workflow.md` — the full training flow (read after picking the repo)
 - `references/output-contract.md` — the files you generate and how to publish
-
-## Ground rules
-
-- Keep private evidence and memory out of project repos. Never store credentials.
-- Silence and authorship are weak hints, not proof.
-- Only publish when the human says so. Only this trainer edits active memory.
-- Mark Clone comments visibly (`🤖 Clone:`). It's a correctable stand-in, not the person.
