@@ -43,6 +43,8 @@ To survive pruning, every symbol in the audited diff must satisfy these four tes
 | **3. Non-Duplication Proof** | "Did this logic already exist in the codebase?" | Verify whether an existing helper, utility, or standard library method already handles this. | **Accidental Reinvention** → Collapse. |
 | **4. Breakage Proof** | "If we delete this right now, what test or behavior breaks?" | Simulate removal or check test coverage. If nothing fails and no behavior shifts, why does it exist? | **Phantom Scaffolding** → Remove. |
 
+If a symbol looks like a hand-rolled version of a known library or tool rather than of local code, that is an adoption question and not a deletion — note it and point the user at `scout`.
+
 ---
 
 ## Workflow
@@ -153,6 +155,7 @@ Once approved:
 | `8020` | **Before coding**: Pick the smallest useful path to avoid building bloat in the first place. |
 | `pre-plan` | **Before coding**: Align on the design concept before generating code. |
 | `distill-need` | **Before coding**: Determine if the task even needs to be built. |
+| `scout` | **Any time**: Verified search for a library, tool, or service that already provides a capability. |
 | `smart-comments` | **During coding / pruning**: Preserve load-bearing WHY comments; avoid noisy WHAT comments. |
 | `prune` | **After coding / iterations**: Audit and strip the residue, dead code, and speculative bloat accumulated across AI prompts. |
 | `reviewer-clone` | **At PR review**: Review the final clean PR through your personal review lens. |

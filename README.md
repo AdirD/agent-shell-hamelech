@@ -43,6 +43,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
+| [`scout`](#scout) | Has someone already built this? | "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
 | [`market-validation`](#market-validation) | Does this specific market hypothesis survive customer and commercial evidence? | Validate a startup, ICP, buyer, demand, willingness to pay, or paid opportunity end to end. |
 | [`product-ideation`](#product-ideation) | What product, feature, or direction is worth pursuing? | A product/company idea, feature opportunity, market question, or premise is still open. |
 
@@ -78,6 +79,9 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`market-validation`](#market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
 | "Should our existing product add this feature?" | [`product-ideation`](#product-ideation) | Feature ideation is product ideation inside a current product. |
 | "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
+| "Is there already a library/tool/service that does this?" | [`scout`](#scout) | Parallel verified search of libraries, OSS, dev tools, managed services, and deps already installed. |
+| "The AI just hand-rolled a queue/retry/scheduler — check that." | [`scout`](#scout) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
+| "What's out there for X? Any new AI tools for it?" | [`scout`](#scout) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
 | "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
 | "Double-check / proof this proposal before building." | [`consult`](#consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
 | "Are you sure? Consult another model on this architecture or idea." | [`consult`](#consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
@@ -112,7 +116,7 @@ Use when you are unsure what should exist. The flow may stop at
 ### Better engineering
 
 ```text
-distill-need → pre-plan → consult (optional sanity check/council) → 8020 → challenge (optional)
+scout (if it might already exist) → distill-need → pre-plan → consult (optional sanity check/council) → 8020 → challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -246,7 +250,7 @@ Use it when:
 
 ### [`consult`](skills/consult)
 
-Double-checks, proofs, and stress-tests an AI-proposed implementation, architecture, plan, or product idea before committing. Isolates the proposal, briefs fresh subagents or an expert council without grading its own homework, and synthesizes consensus vs. flaws into concrete adjustments.
+Double-checks, proofs, and stress-tests an AI-proposed implementation, architecture, plan, or product idea before committing. Isolates the proposal, briefs fresh subagents or an expert council without grading its own homework, and synthesizes consensus vs. flaws into concrete adjustments. Every consultant runs a different model from a different provider — never the main thread's model, never two on the same one — so agreement means corroboration, not an echo.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
@@ -254,7 +258,7 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
 
 Use it when:
 - the AI proposed a plan, architecture, or fix and you say "double check", "proof this", or "are you sure"
-- you want an unbiased second opinion from a fresh subagent or heavier reasoning model without thread bias
+- you want an unbiased second opinion from a fresh subagent on a different model/provider than the thread that wrote the proposal
 - you want an expert council to triangulate a multi-variable trade-off (e.g., simplicity vs. scale vs. security)
 - you want a devil's advocate / red team to stress-test a proposal for hidden landmines before writing code
 
@@ -354,6 +358,24 @@ Use it when:
 
 ---
 
+### [`scout`](skills/scout)
+
+Finds the prior art before you pay to rebuild it: whether the capability already ships as a library, OSS project, dev tool, managed service, cloud primitive, or a dependency already installed and already billed. Its first move is translating the implementation into the capability's canonical name (a `tasks` table plus a polling worker is a **job queue**), because searching the local vocabulary is why this research usually fails. It then fans out parallel research lanes — canon, ecosystem, commercial, already-in-your-stack, practitioner verdicts, counter-case, and a frontier lane for what shipped in the last 6–12 months — each subagent running several live web searches down its own path. Always searches; memory only generates hypotheses, and no candidate reaches the shortlist without a URL seen in this run and a liveness signal, so it cannot invent a plausible package that does not exist. Dead and unverified entries are killed, rebrands and forks deduplicated, options clustered by approach, and the result is a 3–6 row shortlist with cost, what you give up, what no option covers, and an honest case for when rolling your own still wins. Reports and recommends via `ask_question` — it never rips out working code on its own.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill scout
+```
+
+Use it when:
+- an agent just hand-rolled a queue, retry policy, scheduler, state machine, parser, or auth layer and you suspect a known tool already does it
+- you want build-vs-buy answered with verified sources instead of a model's stale memory
+- you want to know whether the capability is already covered by an installed dependency or a vendor you already pay for
+- you are exploring a space open-endedly — "what's out there for X", "what are people using now", "any new AI tools for this"
+- you want to seed the search with specific tools or sources and have them evaluated on the same contract
+- you want the honest counter-case for when writing it yourself is genuinely the smaller total cost
+
+---
+
 ### [`smart-comments`](skills/smart-comments)
 
 Makes the agent write selective, intent-preserving inline comments and respect existing ones as load-bearing memory. Kills "what" comments, preserves "why" comments, and refuses to silently delete comments during refactors.
@@ -419,6 +441,7 @@ skills/
   product-ideation/
   prune/
   reviewer-clone/
+  scout/
   smart-comments/
   visualize/
 ```

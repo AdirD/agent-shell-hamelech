@@ -77,6 +77,7 @@ Before inventing:
 - is there already a wheel in the codebase, product, or process
 - are they reinventing it
 - worse: reinventing it as a rectangle
+- if a known library, tool, or service may already do it, point the user at `scout`
 
 Prefer integrate / reuse / configure over greenfield when it hits the need.
 
@@ -116,6 +117,7 @@ Do not ask implementation trivia. Do not invent requirements theater.
 | `8020` | After the need is clear: pick the smallest useful path to that outcome. |
 | `product-ideation` | Broader / earlier product premise work. Use when the idea itself is still open, not when a concrete ask needs interception. |
 | `challenge` | Pressure-tests an existing direction. Does not primarily re-category the ask. |
+| `scout` | Verified search for existing libraries, tools, services, or products that already deliver the outcome. |
 
 `distill-need` is the intercept. It can end with **don't build**.
 

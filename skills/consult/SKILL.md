@@ -17,7 +17,7 @@ When an AI proposes an architecture, implementation plan, or idea, asking the *s
 - It suffers from **thread fatigue** (trapped in the same assumptions and blind spots).
 - It agrees too easily with whatever direction was already discussed.
 
-`consult` is the **proof-and-verify circuit**. It takes the proposal on the table, packages it into an objective brief, hands it to fresh isolated subagents (or an expert council / deeper model tier) to stress-test and proof, and reports back the independent findings without defending the original idea.
+`consult` is the **proof-and-verify circuit**. It takes the proposal on the table, packages it into an objective brief, hands it to fresh isolated subagents running *different models from different providers* (an expert council / deeper model tier) to stress-test and proof, and reports back the independent findings without defending the original idea.
 
 ---
 
@@ -70,10 +70,10 @@ You are no longer defending your idea. Extract the current proposal into a clean
 ### 3. Dispatch the Consultation
 
 - **When subagent tools are available (`invoke_subagent`, background agents)**:
-  - Launch subagents with distinct `Role` and appropriate `Model` (e.g. deeper reasoning tier like `pro` for architectural sanity checks).
+  - Give every consultant a distinct `Role` **and a deliberately distinct `Model`** — never `inherit`, never the model that authored the proposal, never the same model twice. Same model means shared blind spots, so agreement is an echo rather than corroboration. Prefer spreading across providers, and shrink the council rather than reuse a model.
   - For an **Expert Council**, dispatch all 2–3 consultant lenses concurrently in a single call.
 - **When running without subagent tools**:
-  - Explicitly construct the adversarial/distinct role perspectives with strict isolation, clearly labeling the independent audit.
+  - Explicitly construct the adversarial/distinct role perspectives with strict isolation, clearly labeling the independent audit as single-model.
 
 ---
 
@@ -114,10 +114,10 @@ Task: Find where this breaks, evaluate cache invalidation complexity, and recomm
 **Context**: AI pitched building a custom automated visual diffing engine for PRs.
 **User**: "Convene a council to proof this idea."
 
-**Council Dispatched**:
-1. *Pragmatist / 80-20 Lead* (Focus: build vs. buy, maintenance burden)
-2. *Developer Experience Reviewer* (Focus: workflow friction, false-positive noise)
-3. *Technical Architect* (Focus: headless browser rendering cost, CI latency)
+**Council Dispatched** (3 roles, 3 distinct models, 3 different providers; the main thread's model excluded):
+1. *Pragmatist / 80-20 Lead* — provider A, deep-reasoning tier (Focus: build vs. buy, maintenance burden)
+2. *Developer Experience Reviewer* — provider B (Focus: workflow friction, false-positive noise)
+3. *Technical Architect* — provider C (Focus: headless browser rendering cost, CI latency)
 
 **Synthesized Verdict**:
 - **Consensus**: All 3 agree that building a custom diff engine from scratch has high maintenance overhead and false-positive flake.
@@ -133,10 +133,12 @@ Task: Find where this breaks, evaluate cache invalidation complexity, and recomm
 - Use `consult` whenever the user says "double check", "are you sure", or asks for a second opinion on a proposal.
 - Welcome flaws and pushback from the consultants — proving the idea wrong early saves hours of wasted coding.
 - Keep the briefing neutral and adversarial so the consultant actively tries to break the proposal.
+- Give every consultant a different model from a different provider, and disclose the `role → model` roster in the verdict.
 - End with a concrete, adjusted proposal ready for the user to greenlight.
 
 **Don't:**
 - Defend your original proposal when a consultant points out a valid flaw.
 - Ask the consultant to "confirm" or "validate" your idea.
+- Leave a consultant's model on default/`inherit`, reuse the main thread's model, or run two consultants on the same model — duplicate models manufacture fake consensus.
 - Dump raw subagent logs or transcripts into the chat.
 - Propose changes without explaining *why* the consultation altered the plan.
