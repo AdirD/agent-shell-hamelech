@@ -2,70 +2,59 @@
 name: reviewer-clone
 description: >-
   Create and resync a private user-global Clone skill that reviews GitHub pull
-  requests like the authenticated user. Learn the user's review voice,
-  repository-specific concerns, ranked code-area attention, intervention
-  threshold, and corrections from their reviews of other people's PRs, authored
-  code, and feedback on prior Clone comments. Use when the user asks to clone or
-  learn their code-review style, build a personal CR/PR reviewer, initialize
-  another repository, retrain the reviewer, or resync/update an existing
-  reviewer Clone.
+  requests like the authenticated user. Learn their review voice,
+  repository-specific concerns, where they focus, when they intervene, and how
+  they investigate—from their real reviews, authored code, and feedback on prior
+  Clone comments. Use when the user asks to clone or learn their code-review
+  style, build a personal CR/PR reviewer, add a repository, retrain, or resync an
+  existing reviewer Clone.
 ---
 
 # Reviewer Clone
 
-Build and maintain a private personal reviewer, not a generic checklist bot.
+Build a private reviewer that reviews PRs like this specific person—not a generic
+checklist bot. You train it; the generated `cr-clone-<login>` skill does the
+reviews.
 
-## Run one workflow
+Learn a compact model of the person:
 
-Read `references/workflow.md` first and follow it as the single source of truth.
-Do not reconstruct phase order or human-question behavior elsewhere.
+- **WHERE** they focus—the parts of the system they know deeply or care about.
+- **WHEN** they speak up—what makes them stay silent, ask, suggest, praise, or block.
+- **HOW** they work—how they investigate, what evidence they cite, how they phrase things.
 
-Open the other references only when the workflow needs their subject:
+The whole job is to watch how they actually behave on real PRs, form a picture,
+check that picture with them, and save it. Trust your judgment over rigid rules.
 
-- `references/github.md` — collection and honest coverage labels
-- `references/evidence.md` — what activity can and cannot establish
-- `references/attention-map.md` — relative code-area attention
-- `references/resync.md` — new human and Clone-feedback events
-- `references/output-contract.md` — generated files and publication
+## Start here — pick the repo first (cheap)
 
-Use the bundled GitHub collectors whenever `workflow.md` assigns those jobs:
+Do this before reading any other reference. Picking the repo needs almost nothing,
+so don't front-load the whole workflow just to show a menu.
 
-- `scripts/collect-review-activity.py`: index reviewed, commented, and authored
-  PRs plus inline review comments
-- `scripts/collect-pr-evidence.py`: fetch the repeatable metadata, discussion,
-  diff, commit, and thread data for selected PRs
+1. Resolve the login: `gh api user --jq .login`
+2. If a PR was given, use its base repo. Otherwise run both and merge the results:
 
-The main agent runs both collectors directly. Do not delegate them, inspect
-their source before the first run, or recreate them as improvised Python or
-shell. The main agent personally interprets selected-PR output; never delegate
-those deep reads.
+```bash
+gh search prs --reviewed-by LOGIN --sort updated --limit 100 --json repository \
+  --jq 'group_by(.repository.nameWithOwner)|map({repo:.[0].repository.nameWithOwner,recent:length})|sort_by(-.recent)'
+gh search prs --commenter LOGIN --sort updated --limit 100 --json repository \
+  --jq 'group_by(.repository.nameWithOwner)|map({repo:.[0].repository.nameWithOwner,recent:length})|sort_by(-.recent)'
+```
 
-## Keep the learned model compact
+3. Offer the top few and let the human pick (counts = recent window, not lifetime).
+   No code inspection, history crawl, or per-PR fetches here.
 
-This skill trains and updates; the generated Clone reviews PRs.
+## After they pick — run the workflow
 
-- **WHERE:** which parts of the system draw the human's interest or expertise.
-- **WHEN:** what makes them stay silent, ask, suggest, praise, or block.
-- **HOW:** how they investigate, use research or links, and phrase feedback.
+Now read `references/workflow.md`—it's the source of truth for the rest of the
+flow. Pull in the others only when you need them:
 
-`VOICE.md` holds transferable HOW. Each repository has one `MEMORY.md` for
-WHERE, WHEN, and repository-specific HOW.
+- `references/github.md` — the CLI commands and bundled collector scripts
+- `references/evidence.md` — how to read behavior into WHERE/WHEN/HOW, and resync
+- `references/output-contract.md` — the files you generate and how to publish
 
-- Completed runs explain the evidence but are not active policy.
-- Current code and explicit human corrections outrank learned files.
+## Ground rules
 
-Repository context is the stack as a working system—runtime, frameworks, data
-stores, infrastructure, deployment, architecture, and conventions—not merely
-languages. Learn a plain-language picture of what the human notices, tolerates,
-blocks, praises, and how they say it. Do not build a rigid personality rule
-engine.
-
-## Essential boundaries
-
-- Keep private evidence and memory out of project repositories; never store
-  credentials.
-- Treat silence and authorship as weak evidence, not proof of preference.
-- Publish only after the human chooses it, and preserve completed runs.
-- Only this trainer edits active memory.
-- Mark Clone authorship visibly; it is a correctable approximation, not the
-  human.
+- Keep private evidence and memory out of project repos. Never store credentials.
+- Silence and authorship are weak hints, not proof.
+- Only publish when the human says so. Only this trainer edits active memory.
+- Mark Clone comments visibly (`🤖 Clone:`). It's a correctable stand-in, not the person.

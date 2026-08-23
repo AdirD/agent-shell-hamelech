@@ -1,61 +1,33 @@
 # Reviewer Clone workflow
 
-This file owns the whole training workflow, including human questions. Other
-references define GitHub mechanics, evidence, attention, resync facts, and
-output files; they do not add workflow.
+This is the flow. It's a guide, not a script—use judgment. The goal is to learn
+how this person reviews (WHERE they focus, WHEN they speak, HOW they work), check
+it with them, and save it as a Clone that reviews like them.
 
 ## Who does what
 
-The main agent is the continuous trainer. Only it:
+You (the main agent) run the whole thing: pick the repo with the human, run the
+collectors, choose and deeply read PRs, talk to the human, decide what's learned,
+and publish. Deep reads and learning are always yours.
 
-- resolves identity, offers repositories, and lets the human choose
-- creates or resumes the run and invokes bundled collectors directly
-- chooses every PR it will deeply read
-- personally interprets selected PRs and compares behavior across them
-- interacts with the human
-- decides what the Clone learns, unlearns, or leaves uncertain
-- decides whether another exploration is useful
-- proposes stopping and publishes only after explicit approval
+Hand off only bounded, independent work to subagents:
 
-Use subagents only for independent bounded work:
+- map the chosen repository → `repository-system.md`
+- study how the person writes and investigates → `voice.md`
+- go fetch one missing fact or find candidate contrasting PRs
 
-- map the chosen repository and write `repository-system.md`
-- analyze review method and wording and write `voice.md`
-- collect a narrow missing fact or find candidate contrasting PRs
-
-Subagents are disposable, not long-lived collaborators. Give each a complete
-self-contained prompt, start it fresh, and assign at most one output. It must
-rewrite that output completely rather than append, never rely on prior agent
-memory, and never edit active Clone memory, interview the human, choose the next
-PR, decide learning, or publish. If it fails, dispatch the same complete job
-again. The main agent records useful facts once using stable GitHub IDs.
-
-Use a fast inexpensive model for factual repository mapping and narrow searches.
-Use a stronger model when wording or contextual interpretation matters. The
-main agent always keeps selected-PR interpretation and final learning.
-
-## Invocation routing
-
-Treat every invocation as:
-
-> Ensure this reviewer's Clone is initialized and current for this repository.
-
-- Clone missing: initialize transferable voice and repository memory.
-- Clone exists but this repository is missing: initialize repository memory and
-  update voice only if new evidence materially changes it.
-- Clone and repository memory exist: resync from new events.
-- Resync finds no relevant new evidence: report a no-op.
-
-Never rebuild existing memory merely because the user said `init`. A destructive
-rebuild requires explicit confirmation.
+Give a subagent a complete prompt, one output, and let it run fresh. It doesn't
+touch active memory, interview the human, or decide anything. If it fails, run it
+again. Use a cheap fast model for mechanical mapping/search, a stronger one when
+wording and interpretation matter.
 
 ## Progress
 
-Create these todos when the todo tool is available:
+Track progress with todos, not narration:
 
 ```text
 Offer recent repositories and let the user choose
-Create or resume the private training run
+Create or resume the training run
 Collect activity and start repository/voice analysis
 Explore PRs and learn iteratively
 Choose whether to continue or publish
@@ -63,250 +35,170 @@ Publish the reviewer Clone
 Report the result
 ```
 
-Keep one todo in progress. During PR exploration, update that todo with the
-number of completed deep reads and the purpose of the next choice, for example:
+Keep one in progress; on the exploration step, append the deep-read count and what
+you're checking next. Between routine tool calls, say nothing—let the todos talk.
 
-```text
-Explore PRs and learn iteratively — 4 deep reads; checking a threshold contrast
-```
+## 1 — Pick the repo
 
-Do not create one todo per PR or duplicate the todo UI with progress bars,
-dashboards, ASCII status panels, or routine narration. Between routine tool
-calls, say nothing: do not announce plans, restate completed mechanics, or
-explain the next tool. Let todos carry that information.
+Usually already done from `SKILL.md`'s quick-start—if so, skip to step 2 and don't
+re-run the queries. If not: resolve the login, run the two `jq`-aggregated queries
+in `github.md`, offer the top few, let the human choose. Keep it cheap—just the
+menu, no code inspection or history crawl.
 
-## Phase 1 — identify reviewer and choose repository
+## 2 — Create or resume the run
 
-The main agent performs this entire phase directly.
+Find `~/.agents/skills/cr-clone-<login>`. Decide from its state whether this is a
+fresh init, a new repo, a resync, or a no-op. Make a run directory with a real UTC
+timestamp (see `output-contract.md`). Don't rebuild existing memory just because
+someone said "init"—that needs explicit confirmation.
 
-1. Resolve the authenticated GitHub login using `github.md`.
-2. If a PR was supplied, use its canonical base repository.
-3. Otherwise run only the two bounded recent reviewed/commented PR queries in
-   `github.md`.
-4. Group results by repository and offer three to five useful choices.
-5. Let the human choose through a structured question with `Other`.
-6. Resolve and show canonical `host/owner/repo`.
+## 3 — Collect and start parallel analysis
 
-Describe menu counts as matches in the bounded recent window, not total
-historical PR counts.
+Kick these off together:
 
-Before the choice, do not inspect candidate repository code, enumerate full PR
-history, inspect Clone state, or launch a repository subagent. This first step
-is a quick menu.
+- run `collect-review-activity.py` yourself, save output to the run's `scratch/`
+- dispatch **Map repository system** → `repository-system.md`
+- once the activity index exists, dispatch **Analyze review method and voice** →
+  `voice.md` (studies both wording and how they back up claims—links, research,
+  in-repo precedent, tests, examples)
+- on resync, also dispatch **Collect Clone feedback** to gather traced comments,
+  human edits/replies, and missed concerns
 
-## Phase 2 — create or resume the run
+Don't wait on those. Build a menu of ~8–12 promising PRs from the activity: real
+inline comments, change requests, follow-ups, praise, comments backed by research
+or links, and repeated activity in one area. Spread across areas, authors, and
+time. It's a menu, not a commitment.
 
-Locate `~/.agents/skills/cr-clone-<github-login-lowercase>`, then determine init,
-repository init, resync, or no-op from its active files and `state.json`.
+## 4 — Explore PRs and learn
 
-Create one new run directory using an actual UTC timestamp from the system
-clock; never hand-type or guess it. Follow `output-contract.md`. `RUN.md` owns
-run status, exact collection coverage, selected/deep-read PR IDs, human answers,
-learning changes, failures, and the final decision. Do not create the generated
-runtime `SKILL.md` until the human publishes the first initialization.
+Loop, one PR (or a matched pair) at a time:
 
-For resync, preserve existing active files. Collect only events newer or changed
-since the saved GitHub cursors and revisit open PRs whose observable state
-changed.
+1. Pick something that can establish, contrast, or challenge a pattern.
+2. Run `collect-pr-evidence.py` for it.
+3. Read it yourself—diff, live code, what the human actually did, the thread,
+   later changes, outcome.
+4. Jot a short source-backed note in `EVIDENCE.md` (see shape below).
+5. Update your picture of WHERE / WHEN / HOW and what's still unclear.
+6. Ask the human when their answer would actually change the model or your next move.
+7. Decide: contrast it, explore further, pick another, or propose stopping.
 
-## Phase 3 — collect activity and start parallel analysis
-
-In the first tool turn after creating the run:
-
-- the main agent starts `scripts/collect-review-activity.py` directly and saves
-  its detailed and compact outputs in run `scratch/`
-- concurrently, dispatch **Map repository system** to inspect current code,
-  configuration, and docs and write `repository-system.md` with a compact
-  architecture graph, important boundaries, source paths, and gaps. This graph
-  is the scaffold for learning WHERE the human shows repeated interest or
-  expertise
-- on resync, also dispatch **Collect Clone feedback** to return only observed
-  traced comments, human edits/replies, missed concerns, changed outcomes, and
-  direct active-file edits
-
-Do not read the collector source before invoking its documented command. As soon
-as the activity index exists, dispatch **Analyze review method and voice** over
-the shared comment material. It studies HOW the human investigates and supports
-feedback—not only wording—including links, external research, repository
-precedents, tests, examples, and demonstrations. It writes `voice.md` with exact
-examples, counterexamples, uncertainty, and a complete candidate `VOICE.md`. If
-later deep reads materially change the evidence, start a fresh job with the full
-current evidence and replace `voice.md`.
-
-The main agent does not wait for repository or voice analysis. It builds an
-initial menu of roughly 8–12 promising PRs from:
-
-- substantive inline comments and change requests
-- follow-up, withdrawal, defense, re-review, or specific praise
-- comments containing research, links, proof, or a request for evidence
-- repeated activity in the same system area
-- varied areas, authors, change types, and time periods
-- authored PRs only as supporting familiarity evidence
-
-This is a menu, not a batch commitment.
-
-## Phase 4 — explore PRs iteratively
-
-For each iteration, the main agent:
-
-1. Chooses one PR or a small matched pair that can establish, contrast, or
-   challenge something material.
-2. Runs `scripts/collect-pr-evidence.py` for those PR numbers.
-3. Personally reads the saved evidence, relevant diff and live code, exact human
-   actions, discussion, later changes, outcome, and limitations.
-4. Adds concise source-backed sections to run `EVIDENCE.md`.
-5. Updates WHERE the human focuses, WHEN they intervene, HOW they investigate
-   and communicate, and what remains uncertain.
-6. Asks the human when an answer would materially improve the model or redirect
-   the next exploration.
-7. Decides whether to inspect a contrast, launch a focused exploration, choose
-   another PR, or propose stopping.
-8. Updates `RUN.md` and the active todo.
-
-Use this evidence shape:
+Evidence note shape:
 
 ```markdown
 ## PR #...
-
-### Observed
-- Exact human action/comment with stable GitHub ID and anchor.
-
-### Context
-- Only what is needed to understand that action.
-
-### Outcome
-- Reply, edit, code movement, re-review, and final state.
-
-### Supports
-- Plausible interpretation, stated as inference.
-
-### Challenges
-- Contradictions, alternatives, and what this PR cannot establish.
+- Observed: exact action/comment + GitHub ID.
+- Context: only what's needed to understand it.
+- Outcome: reply, edit, code movement, final state.
+- Read: what it suggests (as inference) and what it can't prove.
 ```
 
-Focused exploration remains available whenever the main agent sees a real gap:
-find a contrasting review, check one repository behavior, or locate comparable
-decisions. Give the explorer shared sources and one narrow question. It returns
-facts and candidate IDs; the main agent chooses and reads any resulting PR.
-
-Repository and voice jobs continue in parallel. Their completion should not
-block the next PR choice.
+Repository and voice jobs keep running in the background—don't block on them.
 
 ## Calibrate with the human
 
-Once the first useful repository, voice, and PR evidence exists, summarize the
-current **WHERE, WHEN, and HOW**, then use `AskQuestion` with title `Calibrate
-Clone`. Ask one to three high-impact questions together. Useful early questions
-test system-area attention, intervention threshold, block-versus-ask behavior,
-research habits, and voice when the evidence actually raises them.
+Calibration is an interview with a senior engineer about how they review. Use
+`AskQuestion` with title `Calibrate Clone`, one to three questions, only when a
+real fork exists. Every good question follows the same shape:
 
-Each question should:
+**[a concrete thing you actually saw them do, named] → [your read of it] → lock it
+in / correct me.**
 
-- begin from a concrete pattern already observed
-- offer choices that would make Clone behave differently
-- include a recommended choice only when the evidence supports it
+The "aha" comes from naming the real thing—the actual package, file, framework, or
+area from the collector data (`ai-sdk`, `studio.json`, migrations, the retry code),
+not a generic reviewer trait. "You push back on abstractions" is a horoscope that
+fits everyone; "you're all over the `ai-sdk` tool-calling code" is personal.
 
-The tool supplies `Other`; do not add another. Avoid generic engineering-policy
-questions and isolated anecdotes. Repeated behavior or a direct human answer can
-shape active memory; keep weaker observations tentative.
+Rules for a golden question:
 
-Later, ask again only when new evidence reveals an important uncertainty or
-contradiction. Always show the current model before publication and ask any
-remaining question that could materially change it. Background jobs may
-continue while the human answers.
+- **Name a real artifact** from their activity. No generic archetype questions.
+- **It's a pattern across PRs**, never "on #163." Named area ≠ single incident.
+- **One-line premise, then the fork.** Don't write a setup that already answers it.
+- **2–4 clean, non-overlapping options**—each a different reviewer, recognizable
+  instantly. Not a `block / suggestion / ask / don't encode` config ladder.
+- **Only ask a genuine fork.** If you already know the answer, it's a reflection
+  for the summary, not a question. Don't recommend an option on a real fork.
 
-## Phase 5 — maintain the candidate model
-
-After every deep read, the main agent:
-
-- separates observation from interpretation using `evidence.md`
-- looks for matched contrasts rather than topic counts
-- overlays demonstrated interest and expertise onto the repository architecture
-  using `attention-map.md`
-- updates WHERE, WHEN, HOW, and uncertainty
-- applies explicit human answers and direct active-file edits as authoritative
-- records only material changes in `RUN.md`
-
-Repository and voice artifacts are inputs, not independent learned reviewers.
-Only the main agent decides what enters active `VOICE.md` and `MEMORY.md`.
-
-## Phase 6 — let the human choose depth
-
-Before proposing publication, show the current WHERE, WHEN, HOW, and important
-unknowns. Calibrate again only if an answer could materially change them.
-
-Before changing active memory, show the smallest useful delta:
+The golden set (fill the names from real data):
 
 ```text
-WHERE — system attention
-- ...
-
-WHEN — intervention threshold
-- ...
-
-HOW — investigation and communication
-- ...
-
-Unlearned or narrowed
-- ...
-
-Still uncertain
-- ...
+WHERE — home turf (high, well-evidenced → confirm the bar):
+You're all over anything touching the ai-sdk tool-calling code — deep comments,
+follow-ups, you defend your takes. Reading that as your home turf. Want Clone to
+go hard there and lower its bar to speak up?
+- Yeah, lock it in — that's my area
+- I know it well but don't over-scrutinize it
+- Nah, that was just these PRs
 ```
 
-The main agent may propose stopping when recent diverse deep reads mostly
-reinforce the same model and no unresolved contradiction is likely to change
-future reviews materially. This is judgment, not a fixed wave count or
-saturation percentage.
+```text
+WHERE — silence fork (an area they DON'T comment on is ambiguous → ask):
+Changes to studio.json / generated config mostly sail past you with no comment.
+Is that "I trust it, skim it" or just "those PRs didn't need me"?
+- Trust it — Clone can go light there
+- Didn't come up — don't downgrade it
+- Actually I'd want regressions there caught
+```
 
-Show exact indexed, comment-collected, review-material-fetched, and fully
-deep-read counts. Let the human choose:
+```text
+WHEN — grounded in a real area:
+On DB migrations you always dig into rollback + backfill order. Is that a hard
+gate for you, or you raise it and trust the author?
+- Hard gate — I don't approve migrations without it
+- I push hard but won't block on it
+- Case by case
+```
 
-- publish now
-- continue with another diverse exploration
-- deep-dive into a named unknown area
-- pause and resume later
+```text
+HOW — grounded in a real habit:
+When you flag retry/idempotency stuff you link the queue docs or a past incident.
+Want Clone to dig up that kind of proof before commenting, or just raise it?
+- Dig it up — don't make that claim bare
+- Only for the non-obvious ones
+- Just raise it, I'll get the proof myself
+```
 
-Stopping never implies permission to publish.
+Some sessions produce zero real forks—that's fine. Ask again later only when new
+evidence raises a genuine uncertainty. Always show the current model before
+publishing and ask anything still open that could change it.
 
-## Phase 7 — publish simply and safely
+## 5 — Keep the model compact
 
-Only an explicit publish choice authorizes active changes.
+After each deep read: separate what you saw from what you infer (`evidence.md`),
+prefer matched contrasts over topic counts, overlay demonstrated interest/expertise
+onto the repo architecture, and update WHERE / WHEN / HOW / uncertainty. Explicit
+human answers and direct edits win. Record only material changes in `RUN.md`. The
+repo and voice artifacts are inputs—you decide what enters active memory.
 
-1. Record accepted learning, source IDs, human decision, and remaining
-   uncertainty in `RUN.md`.
-2. Build complete candidate `VOICE.md` and repository `MEMORY.md` in `scratch/`.
-3. Re-read existing active files so direct human edits are not overwritten.
-4. Check the candidates for privacy, contradictions, unsupported certainty, and
-   required structure.
-5. If replacing active files, preserve their prior contents in the run.
-6. Replace each active file with one complete candidate, then update
-   `state.json`.
-7. Mark `RUN.md` published and remove only disposable scratch.
+## 6 — Let the human choose depth
 
-If publication fails before replacement, existing memory remains active. If it
-fails midway, restore the prior copy preserved in the run and report the
-failure. A paused or failed run remains resumable from `RUN.md` and
-`EVIDENCE.md`.
+Before proposing to publish, show the current model and the important unknowns:
 
-## Communication and hand-off
+```text
+WHERE — where they focus: ...
+WHEN — when they intervene: ...
+HOW — how they investigate and write: ...
+Narrowed / unlearned: ...
+Still uncertain: ...
+```
 
-Use todos for routine progress. Do not narrate tool selection, phase mechanics,
-or what just completed. Send a conversational update only when:
+Propose stopping when recent diverse reads keep reinforcing the same picture and no
+open contradiction seems likely to change reviews. That's judgment, not a formula.
+Show honest counts (indexed / comments swept / evidence fetched / deep-read) and
+let the human publish, keep exploring, deep-dive a named area, or pause. Stopping
+is not permission to publish.
 
-- access or another blocker requires action
-- a useful calibration question is ready
-- a meaningful result changes the next exploration
-- the human must choose depth or publication
+## 7 — Publish
 
-Finish with:
+Only an explicit publish choice changes active memory. Then: record the accepted
+learning and source IDs in `RUN.md`, stage complete `VOICE.md` and `MEMORY.md` in
+`scratch/`, re-read the live active files so human edits aren't clobbered, check for
+privacy and contradictions, back up the old copies into the run, swap in the new
+files, and update `state.json`. If it fails mid-way, restore the backup and report
+it. A paused or failed run resumes from `RUN.md` and `EVIDENCE.md`.
 
-- initialized, resynced, no-op, paused, or failed status
-- exact indexed/collected/fetched/deep-read coverage
-- why work stopped and what the human chose
-- accepted WHERE, WHEN, HOW, and unlearning
-- system-area strengths and unknowns
-- active Clone path and run path
+## Wrap up
 
-The Clone is a transparent, correctable approximation of the human, never the
-human.
+Report: status (initialized / resynced / no-op / paused / failed), honest coverage
+counts, why you stopped and what the human chose, the accepted WHERE/WHEN/HOW and
+anything unlearned, and the Clone + run paths. The Clone is a transparent,
+correctable stand-in—never claim it's the person.

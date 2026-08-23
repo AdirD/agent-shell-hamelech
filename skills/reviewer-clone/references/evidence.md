@@ -1,159 +1,101 @@
-# Evidence model
+# Reading behavior into a model
 
-Phase order, main-agent PR exploration, and parallel repository/voice work live
-in `workflow.md`. This file defines what counts as evidence and when an
-inference is supportable.
+The point isn't to count review activity—it's to learn what this person notices,
+when they intervene, how strongly, and how they say it. Organize what you learn as
+**WHERE** they focus, **WHEN** they speak, and **HOW** they investigate and phrase.
 
-The goal is not to count review activity. It is to learn what this human notices,
-why they intervene, how strongly, and how they communicate.
+Always keep observation separate from interpretation: an inline comment is
+observed; the concern behind it is inferred; the human accepting it makes it
+confirmed; anything else stays uncertain.
 
-Organize useful learning as:
+## What signals are worth
 
-- **WHERE:** system areas where the human demonstrates interest or expertise
-- **WHEN:** the threshold for silence, questions, suggestions, praise, or blocks
-- **HOW:** how the human investigates, supports, and phrases feedback
+**Strong** — build on these: inline comments on a specific change, change requests
+and what later made them approve, the same concern repeated across unrelated PRs,
+suggested patches, threads where they defend/narrow/withdraw feedback, explicit
+risk reasoning, links/docs/precedent/tests used to back a point, specific praise,
+and any human correction of a Clone comment.
 
-Keep observation separate from interpretation:
+**Supporting** — use with restraint: review summaries, repeated review requests in
+an area, returning after new commits, recent authorship, ownership metadata,
+repeated approvals of similar changes. Authorship shows familiarity, not preference.
 
-- **Observed:** an inline comment, review state, reply, edit, reaction, code
-  change, authorship, or repository fact.
-- **Inferred:** the concern or preference that may explain it.
-- **Confirmed:** the human accepted or supplied the interpretation.
-- **Uncertain:** plausible, but not safe to make active yet.
+**Weak** — don't build beliefs from silence: bare approval, `LGTM`, absence from a
+review, not commenting on an area, a single old comment, or "the repo already does
+it this way." Silence only means they didn't object hard enough to block—it never
+explains why.
 
-## Strong signals
+A comment followed by a code change is useful, but doesn't prove the comment was
+right or that they'd have blocked.
 
-Prioritize:
+## WHERE — where they focus
 
-- inline comments anchored to a specific changed region
-- change requests and the later conditions under which approval appeared
-- repeated comments about the same concern across unrelated PRs
-- concrete replacement suggestions or suggested patches
-- thread follow-ups where the human defends, narrows, or withdraws feedback
-- explicit risk explanations
-- links, research, official documentation, experiments, or repository precedent
-  used to support a comment
-- specific praise for an implementation choice
-- human correction, rewrite, rejection, or addition to a Clone review
+Developers have parts of a system they know deeply or keep caring about. Find
+those so the Clone reviews them harder. Keep a compact ASCII attention tree in the
+repo's `MEMORY.md`, built on the real architecture (from `repository-system.md`)
+and overlaid with actual review behavior:
 
-A comment followed by a code change is useful outcome evidence, but does not
-alone prove the comment was correct or that the reviewer considered it blocking.
+```text
+Attention map — relative within this repository
 
-## Supporting signals
+repository
+├── API and trust boundaries ......... high — repeated deep review + a correction
+├── async jobs and retries ........... medium — some substantive evidence
+├── persistence and migrations ....... medium — early repeated evidence
+├── frontend interaction state ....... unknown
+└── generated formatting churn ....... explicitly low — human-confirmed
+```
 
-Use with restraint:
+Ranks: `high` (repeated/explicit deep attention), `medium` (real evidence but not
+dominant), `unknown` (not enough evidence—never downgrade from silence), and
+`explicitly low` (they said they let it pass, or keep deleting Clone comments
+there). Raise a rank from repeated substantive attention, risk reasoning,
+concentrated re-review, expertise others rely on, or a direct answer. Only lower
+from affirmative evidence. The map decides depth and comment budget—it never
+manufactures a comment or suppresses a real defect.
 
-- review summaries
-- repeated review requests in the same repository area
-- returning after new commits
-- recent substantial authorship or maintenance in affected code
-- repository ownership metadata
-- repeated approval of comparable changes
+## WHEN — when they intervene
 
-Authorship indicates familiarity more reliably than preference. `CODEOWNERS`
-indicates expected attention more reliably than personal concern.
+Learn the threshold: what tips them from silent-approve to a question, a suggestion,
+or a block, and where the real risk boundaries are. Specific beats confident:
+"often questions externally visible retries" is better than "always blocks
+non-idempotent code."
 
-## Weak or ambiguous signals
+## HOW — investigation and voice
 
-Do not build beliefs from:
+Notice whether they research before commenting, follow links, cite docs or in-repo
+precedent, run checks, or give a concrete example—and when they skip all that. If
+the habit repeats, the Clone should gather comparable evidence before making that
+kind of comment. It must never fabricate a source or cite something it didn't read.
 
-- approval without comments
-- `LGTM`
-- absence from a review
-- not commenting on a changed area
-- a single old comment without context
-- repository prevalence alone
+## Learning from Clone feedback
 
-Silent approval establishes only that the human did not object strongly enough
-to block that snapshot. It does not explain disinterest, expertise, perceived
-risk, or why they approved.
+Corrections to traced Clone comments are the richest signal because the attempted
+decision and its reasoning are visible. Roughly strongest to weakest: a human
+edit/replacement of a Clone comment, a direct correction of its rationale, a
+concern the human added that Clone missed, an endorsement, the author changing code
+after it, then silence (teaches nothing). Classify each as repository
+understanding, attention, threshold, voice, or timing. Compare a human edit against
+the trace's `Original`; if the trace is gone or it's ambiguous, keep the human
+version and don't invent the original.
 
-## WHERE — system-area importance
+## When to promote something
 
-Read `references/attention-map.md` before ranking repository areas. Repeated
-substantive attention, detailed risk reasoning, follow-up, and direct human
-answers can raise an area's relative priority. Authorship and ownership are
-supporting familiarity signals only.
+Make an inference active when the human confirms it, when repeated independent
+behavior supports it without real contradiction, or when a traced correction makes
+the intended behavior explicit. Don't drag the human in to rescue a weak inference
+just because the topic sounds important—look for corroboration first, otherwise
+leave it as evidence, not memory. Repeated "don't encode" answers should make you
+more cautious generally, not just on that one point.
 
-Never lower an area because the human left no comments there. Use `unknown` until
-affirmative evidence shows a lighter review preference.
+## Resync — new events
 
-## HOW — research and proof
-
-Notice whether the human checks external sources, links evidence, cites current
-code or prior PRs, runs tests, requests demonstrations, or supplies a concrete
-example. Learn both the habit and its boundary: which kinds of claims make them
-research, and when they comment without it.
-
-If this pattern repeats, Clone should gather comparable evidence before making
-the same kind of comment. It must never fabricate a source or cite something it
-did not inspect.
-
-## Learn from Clone feedback
-
-Clone feedback is especially valuable because the attempted decision and its
-rationale are traceable.
-
-Rank it roughly as:
-
-1. Human edits, rejects, or replaces a proposed Clone comment.
-2. Human directly corrects the hidden rationale or replies in the thread.
-3. Human adds a concern Clone missed on the same PR.
-4. Human endorses a Clone comment or repeats its concern independently.
-5. The author changes code after Clone feedback.
-6. No response.
-
-Classify the correction before updating:
-
-- **Repository understanding:** Clone misunderstood the stack, architecture,
-  behavior, convention, or surrounding code.
-- **Attention:** Clone cared about something the human would ignore, or missed
-  something they would inspect.
-- **Threshold:** the concern was real but should have been silent, a question,
-  a suggestion, or a blocker.
-- **Voice:** the judgment was right but the wording, length, directness, or tone
-  was wrong.
-- **Timing:** the comment was reasonable historically but the human's current
-  preference changed.
-
-If a human edits a Clone comment, compare the visible text with `I wrote:` in the
-hidden note. Preserve the human version as current evidence. If the marker was
-removed or the edit is ambiguous, do not invent the original.
-
-## Repository context
-
-Read the repository as a system:
-
-- runtimes and major frameworks
-- services, packages, and architectural boundaries
-- persistence, queues, caches, and external integrations
-- deployment and operational shape
-- tests, CI, linting, and explicit conventions
-- ownership and high-risk areas
-
-Prefer explicit docs/configuration and current live code. Treat repeated existing
-patterns as descriptive until human review behavior shows they are endorsed.
-
-Do not turn context into repetitive per-observation qualifiers. Summarize the
-repository once in `MEMORY.md`; let the LLM reason from that context.
-
-## Learning threshold
-
-Promote an inference into active memory when at least one is true:
-
-- the human confirms it directly
-- repeated independent review behavior supports it without material
-  contradiction
-- a traced Clone correction makes the intended behavior explicit
-
-Do not ask the human to rescue a weak inference merely because its topic sounds
-important. Search for corroboration and contrast first. If the observation
-remains isolated, preserve it as evidence without turning it into either active
-memory or a calibration question.
-
-Specificity beats false confidence: "often questions externally visible
-retries" is better than "always blocks non-idempotent code."
-
-Human answers also reveal how readily the reviewer wants patterns generalized.
-Repeated narrowing or `do not encode` answers should make later learning more
-cautious across topics, not only update the observation that prompted them.
+Resync reconciles new behavior with the existing model; it's not a fresh
+personality analysis. From the last cursor, collect new human reviews/comments/
+replies, new traced Clone comments, human edits/replies to those, concerns added
+after Clone reviewed, code changes after comments, and direct edits to active
+`VOICE.md`/`MEMORY.md`. Identify events by stable GitHub IDs and Clone trace IDs,
+not timestamps (events get edited). Group related events into one proposed change
+rather than one entry per comment. New explicit preferences outrank older inferred
+behavior; preserve the old evidence in the completed run instead of rewriting it.
+Direct unambiguous human edits are authoritative—apply them without re-asking.
