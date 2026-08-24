@@ -18,7 +18,7 @@ Do not leave the repo in a state where the catalog in `README.md` is stale.
 After committing and pushing modifications, additions, or deletions under `skills/`:
 
 1. All installations across global agent directories (`~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`, `~/.codex/skills`, etc.) must remain 100% in sync with zero deviation.
-2. Run the `sync-melech-skills` skill (or `melech sync`) to fan out updates to all agent environments.
+2. Run the `melech-sync-skills` skill (or `melech sync`) to fan out updates to all agent environments.
 
 
 ## Git Identity (this repo)
@@ -75,7 +75,7 @@ ln -sf ../../scripts/pre-push-audit.sh .git/hooks/pre-push
 
 After pushing changes under `skills/`, sync all installations across global agent directories:
 
-- Run the `sync-melech-skills` skill (or `melech sync`).
+- Run the `melech-sync-skills` skill (or `melech sync`).
 
 
 ## Before Making the Repo Public

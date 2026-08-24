@@ -36,36 +36,36 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`sync-melech-skills`](#sync-melech-skills) | Are all melech skills installed globally and current? | Say `sync-melech-skills` / `melech sync` to apply, or `sync-melech-skills list` for a dry catalog. |
+| [`melech-sync-skills`](#melech-sync-skills) | Are all melech skills installed globally and current? | Say `melech-sync-skills` / `melech sync` to apply, or `melech-sync-skills list` for a dry catalog. |
 
 ### Understand what you need
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`distill-need`](#distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
-| [`scout`](#scout) | Has someone already built this? | "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
-| [`market-validation`](#market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
+| [`melech-distill-need`](#melech-distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
+| [`melech-scout`](#melech-scout) | Has someone already built this? | "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
+| [`melech-market-validation`](#melech-market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
 
 ### Shape work before coding
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`pre-plan`](#pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
-| [`consult`](#consult) | Did the AI miss a landmine, edge case, or simpler path? | The AI proposed an implementation, architecture, or idea and you say "double check", "proof this", or "are you sure". |
-| [`idea-to-canvas`](#idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
-| [`8020`](#8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
-| [`challenge`](#challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
-| [`visualize`](#visualize) | Can this structure, flow, or trade-off be easier to see? | Prose is hiding architecture, sequence, boundaries, layout, or ambiguity. |
+| [`melech-pre-plan`](#melech-pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
+| [`melech-consult`](#melech-consult) | Did the AI miss a landmine, edge case, or simpler path? | The AI proposed an implementation, architecture, or idea and you say "double check", "proof this", or "are you sure". |
+| [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
+| [`melech-8020`](#melech-8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
+| [`melech-challenge`](#melech-challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
+| [`melech-visualize`](#melech-visualize) | Can this structure, flow, or trade-off be easier to see? | Prose is hiding architecture, sequence, boundaries, layout, or ambiguity. |
 
 ### Implement and ship safely
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
-| [`prune`](#prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
-| [`debug-mode`](#debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
-| [`smart-comments`](#smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
-| [`code-review-clone`](#code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone by correlating your real review comments to the local code and git history in the repo you run it from. |
-| [`babysit`](#babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
+| [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
+| [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
+| [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
+| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone by correlating your real review comments to the local code and git history in the repo you run it from. |
+| [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
 ---
 
@@ -73,25 +73,25 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | If you are saying… | Start with | Why |
 |---|---|---|
-| "What melech skills do I have / should I update?" | [`sync-melech-skills`](#sync-melech-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
-| "I have a startup/product idea." | [`market-validation`](#market-validation) | It can shape an open premise into a testable hypothesis before gathering market evidence. |
-| "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`market-validation`](#market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
-| "Should our existing product add this feature?" | [`distill-need`](#distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
-| "Build a custom RBAC engine." | [`distill-need`](#distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
-| "Is there already a library/tool/service that does this?" | [`scout`](#scout) | Parallel verified search of libraries, OSS, dev tools, managed services, and deps already installed. |
-| "The AI just hand-rolled a queue/retry/scheduler — check that." | [`scout`](#scout) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
-| "What's out there for X? Any new AI tools for it?" | [`scout`](#scout) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
-| "We decided to add RBAC; align it before planning." | [`pre-plan`](#pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
-| "Double-check / proof this proposal before building." | [`consult`](#consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
-| "Are you sure? Consult another model on this architecture or idea." | [`consult`](#consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
-| "Turn this idea/doc/notes into a Canvas the team can absorb." | [`idea-to-canvas`](#idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
-| "Find the least invasive way to add role checks." | [`8020`](#8020) | The outcome is understood; now minimize the implementation. |
-| "I can reproduce this bug, but the existing logs do not explain it." | [`debug-mode`](#debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
-| "Drive the Chrome tab I'm already logged into while we debug." | [`debug-mode`](#debug-mode) | Autopilot: Chrome DevTools MCP `--autoConnect`; one-time `chrome://inspect/#remote-debugging` toggle, then Allow. |
-| "I've been iterating with AI and need to strip dead code and bloat." | [`prune`](#prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
-| "Learn how I review PRs and make me a reviewer Clone." | [`code-review-clone`](#code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
-| "Here is the design—poke holes in it." | [`challenge`](#challenge) | A direction exists and needs pressure-testing. |
-| "Research competitors to help choose our product or market direction." | [`market-validation`](#market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
+| "What melech skills do I have / should I update?" | [`melech-sync-skills`](#melech-sync-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
+| "I have a startup/product idea." | [`melech-market-validation`](#melech-market-validation) | It can shape an open premise into a testable hypothesis before gathering market evidence. |
+| "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`melech-market-validation`](#melech-market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
+| "Should our existing product add this feature?" | [`melech-distill-need`](#melech-distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
+| "Build a custom RBAC engine." | [`melech-distill-need`](#melech-distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
+| "Is there already a library/tool/service that does this?" | [`melech-scout`](#melech-scout) | Parallel verified search of libraries, OSS, dev tools, managed services, and deps already installed. |
+| "The AI just hand-rolled a queue/retry/scheduler — check that." | [`melech-scout`](#melech-scout) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
+| "What's out there for X? Any new AI tools for it?" | [`melech-scout`](#melech-scout) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
+| "We decided to add RBAC; align it before planning." | [`melech-pre-plan`](#melech-pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
+| "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
+| "Are you sure? Consult another model on this architecture or idea." | [`melech-consult`](#melech-consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
+| "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
+| "Find the least invasive way to add role checks." | [`melech-8020`](#melech-8020) | The outcome is understood; now minimize the implementation. |
+| "I can reproduce this bug, but the existing logs do not explain it." | [`melech-debug-mode`](#melech-debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
+| "Drive the Chrome tab I'm already logged into while we debug." | [`melech-debug-mode`](#melech-debug-mode) | Autopilot: Chrome DevTools MCP `--autoConnect`; one-time `chrome://inspect/#remote-debugging` toggle, then Allow. |
+| "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
+| "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
+| "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
+| "Research competitors to help choose our product or market direction." | [`melech-market-validation`](#melech-market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
 
 ## Workflow bundles
@@ -102,19 +102,19 @@ question is already answered.
 ### Product discovery
 
 ```text
-distill-need (if the ask is a proposed solution)
-  → market-validation (shape an open premise, then test it)
-  → consult (optional idea council)
-  → pre-plan
+melech-distill-need (if the ask is a proposed solution)
+  → melech-market-validation (shape an open premise, then test it)
+  → melech-consult (optional idea council)
+  → melech-pre-plan
 ```
 
 Use when you are unsure what should exist. The flow may stop at
-`distill-need` or `market-validation` if reuse, reshape, hold, or stop wins.
+`melech-distill-need` or `melech-market-validation` if reuse, reshape, hold, or stop wins.
 
 ### Better engineering
 
 ```text
-scout (if it might already exist) → distill-need → pre-plan → consult (optional sanity check/council) → 8020 → challenge (optional)
+melech-scout (if it might already exist) → melech-distill-need → melech-pre-plan → melech-consult (optional sanity check/council) → melech-8020 → melech-challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -123,7 +123,7 @@ the wrong thing, aligning it poorly, or overbuilding the solution.
 ### Existing-plan review
 
 ```text
-challenge → 8020
+melech-challenge → melech-8020
 ```
 
 Use when the direction already exists: pressure-test it, then find the smallest
@@ -132,39 +132,39 @@ useful implementation.
 ### Shipping
 
 ```text
-prune (after AI iteration) → smart-comments (during implementation) → babysit
+melech-prune (after AI iteration) → melech-smart-comments (during implementation) → melech-babysit
 ```
 
-Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving the PR to merge-ready. `visualize` can assist any bundle when structure or flow is unclear.
+Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving the PR to merge-ready. `melech-visualize` can assist any bundle when structure or flow is unclear.
 
 ---
 
-### [`sync-melech-skills`](skills/sync-melech-skills)
+### [`melech-sync-skills`](skills/melech-sync-skills)
 
 Syncs this skill library globally across supported coding agents.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill sync-melech-skills -g -y -a '*'
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-sync-skills -g -y -a '*'
 ```
 
 Invoke it with:
-- `sync-melech-skills` or `melech sync` — install new + refresh existing (global, all agents)
-- `sync-melech-skills list` / `melech list` — dry catalog: remote skills plus what is installed globally
+- `melech-sync-skills` or `melech sync` — install new + refresh existing (global, all agents)
+- `melech-sync-skills list` / `melech list` — dry catalog: remote skills plus what is installed globally
 
 Use it when:
 - you want every melech skill installed and current in `~/.agents/skills`
 - the same set should show up in Cursor, Claude, Codex, Gemini, and the rest
-- you want to see what is on remote before applying (`sync-melech-skills list`)
+- you want to see what is on remote before applying (`melech-sync-skills list`)
 - a newly pushed skill is not showing up and you need to know whether it is a scope problem or just a stale session
 
 ---
 
-### [`8020`](skills/8020)
+### [`melech-8020`](skills/melech-8020)
 
 Finds the smallest useful path to a product or engineering outcome.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill 8020
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-8020
 ```
 
 Use it when:
@@ -174,12 +174,12 @@ Use it when:
 
 ---
 
-### [`babysit`](skills/babysit)
+### [`melech-babysit`](skills/melech-babysit)
 
 Keeps a PR moving through review, conflicts, and CI until merge-ready.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill babysit
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-babysit
 ```
 
 Use it when:
@@ -189,12 +189,12 @@ Use it when:
 
 ---
 
-### [`debug-mode`](skills/debug-mode)
+### [`melech-debug-mode`](skills/melech-debug-mode)
 
 Diagnoses reproducible bugs using temporary runtime probes and captured evidence.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill debug-mode
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-debug-mode
 ```
 
 Use it when:
@@ -215,12 +215,12 @@ sh <skill-dir>/scripts/install-dm.sh
 
 ---
 
-### [`challenge`](skills/challenge)
+### [`melech-challenge`](skills/melech-challenge)
 
 Pressure-tests an existing direction before implementation.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill challenge
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-challenge
 ```
 
 Use it when:
@@ -230,12 +230,12 @@ Use it when:
 
 ---
 
-### [`pre-plan`](skills/pre-plan)
+### [`melech-pre-plan`](skills/melech-pre-plan)
 
 Aligns on a buildable design concept before planning or coding.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill pre-plan
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-pre-plan
 ```
 
 Use it when:
@@ -246,12 +246,12 @@ Use it when:
 
 ---
 
-### [`consult`](skills/consult)
+### [`melech-consult`](skills/melech-consult)
 
 Gets independent model opinions on an AI-proposed plan, fix, architecture, or idea.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill consult
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-consult
 ```
 
 Use it when:
@@ -262,12 +262,12 @@ Use it when:
 
 ---
 
-### [`idea-to-canvas`](skills/idea-to-canvas)
+### [`melech-idea-to-canvas`](skills/melech-idea-to-canvas)
 
 Turns rough ideas or docs into a standalone Cursor Canvas for team understanding.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill idea-to-canvas
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-idea-to-canvas
 ```
 
 Use it when:
@@ -278,12 +278,12 @@ Use it when:
 
 ---
 
-### [`distill-need`](skills/distill-need)
+### [`melech-distill-need`](skills/melech-distill-need)
 
 Uncovers the real need behind a requested solution before building it.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill distill-need
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-distill-need
 ```
 
 Use it when:
@@ -294,12 +294,12 @@ Use it when:
 
 ---
 
-### [`market-validation`](skills/market-validation)
+### [`melech-market-validation`](skills/melech-market-validation)
 
 Tests whether a product or market opportunity has real demand and willingness to pay.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill market-validation
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-market-validation
 ```
 
 Use it when:
@@ -310,16 +310,16 @@ Use it when:
 - you already ran interviews, a smoke test, or a pilot and need rigorous synthesis against precommitted thresholds
 - you want a decision-ready validation dossier that keeps counter-evidence and remaining risk visible
 
-For a concrete feature or implementation request, use `distill-need` first. For implementation planning after the direction is chosen, use `pre-plan`.
+For a concrete feature or implementation request, use `melech-distill-need` first. For implementation planning after the direction is chosen, use `melech-pre-plan`.
 
 ---
 
-### [`code-review-clone`](skills/code-review-clone)
+### [`melech-code-review-clone`](skills/melech-code-review-clone)
 
 Builds or resyncs a private reviewer that learns your GitHub code-review style.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill code-review-clone
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-code-review-clone
 ```
 
 Use it when:
@@ -339,12 +339,12 @@ Use it when:
 
 ---
 
-### [`scout`](skills/scout)
+### [`melech-scout`](skills/melech-scout)
 
 Finds and compares existing tools before building a capability from scratch.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill scout
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-scout
 ```
 
 Use it when:
@@ -357,12 +357,12 @@ Use it when:
 
 ---
 
-### [`smart-comments`](skills/smart-comments)
+### [`melech-smart-comments`](skills/melech-smart-comments)
 
 Preserves code intent with selective comments and protects meaningful existing comments.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill smart-comments
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-smart-comments
 ```
 
 Use it when:
@@ -372,12 +372,12 @@ Use it when:
 
 ---
 
-### [`prune`](skills/prune)
+### [`melech-prune`](skills/melech-prune)
 
 Audits and removes dead code, AI residue, and unnecessary complexity after iteration.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill prune
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-prune
 ```
 
 Use it when:
@@ -388,12 +388,12 @@ Use it when:
 
 ---
 
-### [`visualize`](skills/visualize)
+### [`melech-visualize`](skills/melech-visualize)
 
 Turns an idea, flow, or structure into a compact ASCII diagram.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill visualize
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-visualize
 ```
 
 Use it for:
@@ -409,21 +409,21 @@ Use it for:
 
 ```text
 skills/
-  8020/
-  babysit/
-  challenge/
-  consult/
-  idea-to-canvas/
-  distill-need/
-  debug-mode/
-  sync-melech-skills/
-  market-validation/
-  pre-plan/
-  prune/
-  code-review-clone/
-  scout/
-  smart-comments/
-  visualize/
+  melech-8020/
+  melech-babysit/
+  melech-challenge/
+  melech-consult/
+  melech-idea-to-canvas/
+  melech-distill-need/
+  melech-debug-mode/
+  melech-sync-skills/
+  melech-market-validation/
+  melech-pre-plan/
+  melech-prune/
+  melech-code-review-clone/
+  melech-scout/
+  melech-smart-comments/
+  melech-visualize/
 ```
 
 Every skill is self-contained: a `SKILL.md` with frontmatter, optional `scripts/`, and optional `references/`.
@@ -434,7 +434,7 @@ Add a new skill by creating `skills/<name>/SKILL.md` with proper frontmatter (`n
 
 Before pushing, run `bash scripts/pre-push-audit.sh` (see `AGENTS.md` for commit/push safety rules and optional git hook setup).
 
-After pushing, sync installations across all global agent dirs by running the `sync-melech-skills` skill (or `melech sync`).
+After pushing, sync installations across all global agent dirs by running the `melech-sync-skills` skill (or `melech sync`).
 
 
 ## License
