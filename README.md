@@ -2,6 +2,8 @@
 
 A king's problem was never obedience — it was a court that only ever agreed with him.
 
+![A fictional Moroccan sultan on a palace terrace at sunset, overlooking an ancient medina and the Atlas mountains](assets/moroccan-sultan-cover.jpg)
+
 Which is why every throne kept a wazir: one advisor close enough to speak plainly and trusted enough to be believed. This library makes your agent that wazir instead of another courtier. It questions the decree before carrying it out, prices the campaign before marching, demands evidence before naming a culprit, and burns what the last campaign left behind. It counsels. You rule.
 
 Plain `SKILL.md` files in the [Agent Skills](https://github.com/anthropics/skills) format — drop into Cursor, Claude Code, Codex, or anything that reads `.agents/skills/`.
@@ -60,8 +62,6 @@ windsurf://cascade/newChat?prompt=You+are+onboarding+me+to+the+agent-shell-hamel
 ```
 
 </details>
-
-![A fictional Moroccan sultan on a palace terrace at sunset, overlooking an ancient medina and the Atlas mountains](assets/moroccan-sultan-cover.jpg)
 
 ---
 
