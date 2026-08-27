@@ -10,32 +10,23 @@ Plain `SKILL.md` files in the [Agent Skills](https://github.com/anthropics/skill
 
 ## Quick start
 
-**On the run?** Click your editor — the prompt is prefilled; review it and press Enter. The agent reads every skill, installs them globally, and gives you a first-day wizard tour: when to reach for each skill, how the workflow bundles connect, and what to try first for *your* task.
+**On the run?** Click your editor — the prompt is prefilled; review it and press Enter. The agent installs the skills and walks you through what each one is for and when to reach for it on your repo.
 
-[![Open in Cursor](https://img.shields.io/badge/Open_in-Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/link/prompt?text=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.)
-[![Open in Claude Code](https://img.shields.io/badge/Open_in-Claude_Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code/new?q=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.&repo=AdirD%2Fagent-shell-hamelech)
-[![Open in Codex](https://img.shields.io/badge/Open_in-Codex-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/codex?prompt=You%20are%20onboarding%20me%20to%20the%20agent-shell-hamelech%20skill%20library%20%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo%20this%20in%20order%3A%0A1.%20Read%20the%20repo%20README%20and%20every%20skill%20under%20skills%2F%2A%2FSKILL.md.%0A2.%20Run%20melech-sync-skills%20%28or%3A%20npx%20skills%20add%20https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%20--skill%20melech-sync-skills%20-g%20-y%20-a%20%22%2A%22%20then%20invoke%20melech%20sync%29%20to%20install%20all%20skills%20globally.%0A3.%20Give%20me%20a%20first-day%20tour%20%E2%80%94%20like%20a%20product%20wizard%20%E2%80%94%20not%20a%20wall%20of%20docs%3A%0A%20%20%20-%20One%20sentence%20on%20what%20this%20library%20is%20for%20%28agent%20as%20wazir%2C%20not%20courtier%29.%0A%20%20%20-%20The%204%20workflow%20bundles%20%28product%20discovery%2C%20better%20engineering%2C%20existing-plan%20review%2C%20shipping%29%20as%20journeys%20with%20when%20to%20start%20each.%0A%20%20%20-%20For%20each%20skill%3A%20name%2C%20one-line%20purpose%2C%20and%20a%20concrete%20trigger%20phrase%20%28%22say%20X%20when...%22%29.%0A%20%20%20-%20A%20%22if%20you%20only%20remember%205%20things%22%20cheat%20sheet%20for%20day-to-day%20use.%0A%20%20%20-%20Ask%20what%20I%20am%20working%20on%20right%20now%20and%20recommend%20the%20first%20skill%20%2B%20bundle%20to%20try.%0A%0AKeep%20it%20scannable.%20Use%20tables%20or%20short%20bullets.%20No%20lore%20dumps.)
-[![Open in Windsurf](https://img.shields.io/badge/Open_in-Windsurf-0084FF?style=for-the-badge&logo=wind&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/windsurf?prompt=You%20are%20onboarding%20me%20to%20the%20agent-shell-hamelech%20skill%20library%20%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo%20this%20in%20order%3A%0A1.%20Read%20the%20repo%20README%20and%20every%20skill%20under%20skills%2F%2A%2FSKILL.md.%0A2.%20Run%20melech-sync-skills%20%28or%3A%20npx%20skills%20add%20https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%20--skill%20melech-sync-skills%20-g%20-y%20-a%20%22%2A%22%20then%20invoke%20melech%20sync%29%20to%20install%20all%20skills%20globally.%0A3.%20Give%20me%20a%20first-day%20tour%20%E2%80%94%20like%20a%20product%20wizard%20%E2%80%94%20not%20a%20wall%20of%20docs%3A%0A%20%20%20-%20One%20sentence%20on%20what%20this%20library%20is%20for%20%28agent%20as%20wazir%2C%20not%20courtier%29.%0A%20%20%20-%20The%204%20workflow%20bundles%20%28product%20discovery%2C%20better%20engineering%2C%20existing-plan%20review%2C%20shipping%29%20as%20journeys%20with%20when%20to%20start%20each.%0A%20%20%20-%20For%20each%20skill%3A%20name%2C%20one-line%20purpose%2C%20and%20a%20concrete%20trigger%20phrase%20%28%22say%20X%20when...%22%29.%0A%20%20%20-%20A%20%22if%20you%20only%20remember%205%20things%22%20cheat%20sheet%20for%20day-to-day%20use.%0A%20%20%20-%20Ask%20what%20I%20am%20working%20on%20right%20now%20and%20recommend%20the%20first%20skill%20%2B%20bundle%20to%20try.%0A%0AKeep%20it%20scannable.%20Use%20tables%20or%20short%20bullets.%20No%20lore%20dumps.)
-[![Open in Bolt](https://img.shields.io/badge/Open_in-Bolt-000000?style=for-the-badge&logo=stackblitz&logoColor=white)](https://bolt.new/?prompt=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.)
+[![Open in Cursor](https://img.shields.io/badge/Open_in-Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/link/prompt?text=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.)
+[![Open in Claude Code](https://img.shields.io/badge/Open_in-Claude_Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code/new?q=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.&repo=AdirD%2Fagent-shell-hamelech)
+[![Open in Codex](https://img.shields.io/badge/Open_in-Codex-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/codex?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.)
+[![Open in Windsurf](https://img.shields.io/badge/Open_in-Windsurf-0084FF?style=for-the-badge&logo=wind&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/windsurf?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.)
+[![Open in Bolt](https://img.shields.io/badge/Open_in-Bolt-000000?style=for-the-badge&logo=stackblitz&logoColor=white)](https://bolt.new/?prompt=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.)
 
 Codex and Windsurf badges route through [open-in-agent](https://github.com/anxkhn/open-in-agent) because GitHub strips custom URL schemes from markdown links. Cursor, Claude Code, and Bolt use each product's official HTTPS deeplink.
 
 Or **copy-paste** into any agent chat:
 
 ```text
-You are onboarding me to the agent-shell-hamelech skill library (https://github.com/AdirD/agent-shell-hamelech).
+Install this, then onboard me to agent-shell-hamelech:
+https://github.com/AdirD/agent-shell-hamelech
 
-Do this in order:
-1. Read the repo README and every skill under skills/*/SKILL.md.
-2. Run melech-sync-skills (or: npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-sync-skills -g -y -a "*" then invoke melech sync) to install all skills globally.
-3. Give me a first-day tour — like a product wizard — not a wall of docs:
-   - One sentence on what this library is for (agent as wazir, not courtier).
-   - The 4 workflow bundles (product discovery, better engineering, existing-plan review, shipping) as journeys with when to start each.
-   - For each skill: name, one-line purpose, and a concrete trigger phrase ("say X when...").
-   - A "if you only remember 5 things" cheat sheet for day-to-day use.
-   - Ask what I am working on right now and recommend the first skill + bundle to try.
-
-Keep it scannable. Use tables or short bullets. No lore dumps.
+Show me around the skills and how I can leverage them on this repo.
 ```
 
 <details>
@@ -46,19 +37,19 @@ GitHub cannot link custom URL schemes directly. Paste one of these in your termi
 **Claude Code CLI**
 
 ```text
-claude-cli://open?repo=AdirD%2Fagent-shell-hamelech&q=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.
+claude-cli://open?repo=AdirD%2Fagent-shell-hamelech&q=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.
 ```
 
 **Codex Desktop** (`originUrl` picks the repo if you have it cloned)
 
 ```text
-codex://new?prompt=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.&originUrl=https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech
+codex://new?prompt=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.&originUrl=https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech
 ```
 
 **Windsurf Cascade**
 
 ```text
-windsurf://cascade/newChat?prompt=You+are+onboarding+me+to+the+agent-shell-hamelech+skill+library+%28https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%29.%0A%0ADo+this+in+order%3A%0A1.+Read+the+repo+README+and+every+skill+under+skills%2F%2A%2FSKILL.md.%0A2.+Run+melech-sync-skills+%28or%3A+npx+skills+add+https%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech+--skill+melech-sync-skills+-g+-y+-a+%22%2A%22+then+invoke+melech+sync%29+to+install+all+skills+globally.%0A3.+Give+me+a+first-day+tour+%E2%80%94+like+a+product+wizard+%E2%80%94+not+a+wall+of+docs%3A%0A+++-+One+sentence+on+what+this+library+is+for+%28agent+as+wazir%2C+not+courtier%29.%0A+++-+The+4+workflow+bundles+%28product+discovery%2C+better+engineering%2C+existing-plan+review%2C+shipping%29+as+journeys+with+when+to+start+each.%0A+++-+For+each+skill%3A+name%2C+one-line+purpose%2C+and+a+concrete+trigger+phrase+%28%22say+X+when...%22%29.%0A+++-+A+%22if+you+only+remember+5+things%22+cheat+sheet+for+day-to-day+use.%0A+++-+Ask+what+I+am+working+on+right+now+and+recommend+the+first+skill+%2B+bundle+to+try.%0A%0AKeep+it+scannable.+Use+tables+or+short+bullets.+No+lore+dumps.
+windsurf://cascade/newChat?prompt=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.
 ```
 
 </details>
@@ -119,6 +110,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
+| [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR interaction points—inline comments, replies on your own PRs, conversation comments, and review verdicts including silent approvals—correlated to local code and git history. |
 | [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
@@ -144,7 +136,8 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`melech-8020`](#melech-8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`melech-debug-mode`](#melech-debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
-| "Drive the Chrome tab I'm already logged into while we debug." | [`melech-debug-mode`](#melech-debug-mode) | Autopilot: Chrome DevTools MCP `--autoConnect`; one-time `chrome://inspect/#remote-debugging` toggle, then Allow. |
+| "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
+| "Drive the Chrome tab I'm already logged into while we debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns evidence and diagnosis; live browser owns safe attach and interaction. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
@@ -266,6 +259,28 @@ Use it when:
 
 ---
 
+### [`melech-live-browser`](skills/melech-live-browser)
+
+Operates the user's already-open, logged-in Chrome tabs through Chrome DevTools
+MCP without turning ordinary browser work into a debugging session.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live-browser
+```
+
+Use it when:
+- you want the agent to continue in a Chrome tab you already have open
+- you want a form filled, a comment or reply drafted or posted, or a signed-in web page updated
+- preserving the current browser profile, tabs, and login matters
+- you want explicit language to control whether the agent drafts or commits an action
+
+Requires Chrome 144+, Node/`npx`, and an agent host that can run Chrome DevTools
+MCP with `--autoConnect`. The bundled setup helper changes only the one host
+config explicitly passed to it; it never scans and rewrites every agent config
+on the machine.
+
+---
+
 ### [`melech-debug-mode`](skills/melech-debug-mode)
 
 Diagnoses reproducible bugs using temporary runtime probes and captured evidence.
@@ -282,9 +297,22 @@ Use it when:
 - temporary probes and the local collector must be removed cleanly afterward
 - you want a live view of running collectors, their health, and streamed logs, with the ability to kill one manually (`doctor`)
 
-Requires Python 3.9+ and the official Vercel Labs `portless` CLI. Live-Chrome attach additionally needs Chrome 144+, Node/`npx`, and a host that can run MCP. The skill writes the official `chrome-devtools-mcp --autoConnect` config when it is missing (see [the Chrome blog](https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session)); the collector still works without it.
+Requires Python 3.9+ and the official Vercel Labs `portless` CLI. Manual
+reproduction is self-contained. Autopilot additionally requires
+`melech-live-browser`, which owns Chrome DevTools MCP setup, attach consent, and
+browser interaction:
 
-Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, `dm start`/`dm stop <dir>`/`dm mcp-setup`/`dm browser-check` forward to the launcher):
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live-browser
+```
+
+If the companion is missing during autopilot, debug mode shows this exact
+command and asks whether to install it or switch to manual reproduction. For
+initial reproduction, revised-probe reruns, and fix verification, live browser
+drives one bounded attempt and then returns immediately to debug mode for
+collector evidence; autopilot never waits for a `proceed` reply.
+
+Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, and `dm start`/`dm status <dir>`/`dm logs <dir>`/`dm stop <dir>` manage collectors):
 
 ```bash
 sh <skill-dir>/scripts/install-dm.sh
@@ -496,6 +524,7 @@ skills/
   melech-idea-to-canvas/
   melech-distill-need/
   melech-debug-mode/
+  melech-live-browser/
   melech-sync-skills/
   melech-market-validation/
   melech-pre-plan/
@@ -506,7 +535,9 @@ skills/
   melech-visualize/
 ```
 
-Every skill is self-contained: a `SKILL.md` with frontmatter, optional `scripts/`, and optional `references/`.
+Every skill has its own `SKILL.md` with frontmatter plus optional `scripts/` and
+`references/`. Skills can explicitly compose: debug mode remains independent
+for manual reproduction and uses `melech-live-browser` only for autopilot.
 
 ## Contributing
 
