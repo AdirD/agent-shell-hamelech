@@ -43,13 +43,19 @@ run checks, or give examples.
 Length, questions vs statements, depth, examples, patches, praise, recurring phrasing.
 
 ## Delivery
-How blockers, ordinary concerns, nits, and approval are communicated.
+How blockers, ordinary concerns, nits, and approval are communicated—including
+whether approval is usually *silent* (no words) or carries a summary line.
+
+## As author vs as reviewer
+How they sound answering feedback on their own PRs (concede / defend / explain /
+cite) vs how they push on others'. Note only if the two clearly differ.
 
 ## Avoid / Uncertain
 What would sound unlike them; what isn't learned confidently yet.
 ```
 
-Keep one voice unless evidence clearly shows they communicate differently in a context.
+Keep one voice unless evidence clearly shows they communicate differently in a context
+(reviewing others' code vs replying on their own is the most common such split).
 
 ## `MODEL.md` — the repo brain the Clone acts from
 
@@ -87,8 +93,11 @@ As load-bearing as the reflexes; stops the Clone from nitpicking. Don't comment 
 - Copy / UI strings, config churn in studio.json, formatting, test scaffolding.
 - Style / naming inside areas I don't own.
 
-## Default posture — when nothing above fires (IF / WHO)
+## Default posture — when nothing above fires (IF / WHO / verdict)
 - Baseline verdict: approve and move on; a few surgical comments, not a sweep.
+- Verdict behavior (from `verdict_summary`): e.g. approves 85% silently, only
+  writes a body when requesting changes; rarely leaves a bare `COMMENT` review.
+  This is how the Clone decides whether to comment at all vs approve quietly.
 - Density: 1–4 comments on a normal PR, mostly questions rather than statements.
 - WHO: pushes harder on juniors' migration PRs; light-touch with the platform team.
 

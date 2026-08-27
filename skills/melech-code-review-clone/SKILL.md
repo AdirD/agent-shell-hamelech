@@ -38,12 +38,21 @@ The repo is already checked out where the skill runs. So instead of deep-reading
 whole PRs and their discussions (which overfits and makes the Clone way too
 opinionated), work from breadth grounded in reality:
 
-- Collect the person's real review comments—each one carries the file + line it
-  landed on.
+- Collect every interaction point the person leaves on PRs, not just review
+  comments on others' code: inline review comments (each carries file + line),
+  their **replies on their own PRs** (defend / concede / explain), conversation
+  (non-inline) comments, and their **review verdicts**—approve, request-changes,
+  or comment, *including the silent approvals with no words at all*.
 - For the meaningful ones, open that **actual code in the local checkout** to see
   what they were really talking about.
 - Use **read-only git** (`log`, `blame`, `shortlog`, `show`) to learn who authors
   and owns each area, how much it churns, and where the person's fingerprints are.
+
+Silence and verdicts are first-class signal. "Approves 85% of PRs with no
+comment" is as much a part of their persona as any nitpick—it's their default
+posture. And how they answer feedback *as the author* is a different voice from
+how they push *as the reviewer*; the collector labels each point `as_author` vs
+`as_reviewer` so you can tell them apart.
 
 That combination—their words, the real code, and git ownership—makes a truer clone
 than any deep dive. Never run destructive git.

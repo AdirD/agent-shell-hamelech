@@ -119,7 +119,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
-| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone by correlating your real review comments to the local code and git history in the repo you run it from. |
+| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR interaction points—inline comments, replies on your own PRs, conversation comments, and review verdicts including silent approvals—correlated to local code and git history. |
 | [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 
 ---
@@ -382,7 +382,7 @@ Use it when:
 - you want it to mimic your themes and biases, not correct them or impose "best practices"
 - you want it to just use the repo you run it from, with no repo-picker step
 - you want it to learn across IF/WHAT/WHERE/WHEN/WHO/WHY plus your voice, then act from reflexes, an attention map, and negative space
-- you want learning grounded by correlating your real comments to the actual local code and git history, not deep-read PR narratives
+- you want learning grounded by correlating your real comments, author-side replies, and review verdicts (including silent approvals) to the actual local code and git history, not deep-read PR narratives
 - you want a compact `Calibrate Clone` question set where every question names a real package/file/area
 - you want a clean split between the trainer that learns and the generated Clone that acts
 - you want fresh bounded subagents only for genuinely heavy read-only lookups (ownership is scanned inline)

@@ -230,10 +230,26 @@ def write_comment_batches(
     return batches
 
 
+def is_self(login: str | None, target: str) -> bool:
+    return bool(login) and login.casefold() == target.casefold()
+
+
+def pr_number_from_url(*urls: str | None) -> int | None:
+    """Pull the PR number out of a pull/issue/html URL, PRs only."""
+    for url in urls:
+        if not url:
+            continue
+        match = re.search(r"/(?:pull|pulls|issues)/(\d+)", url)
+        if match:
+            return int(match.group(1))
+    return None
+
+
 def compact_comment(
     comment: dict[str, Any],
     repo: str,
     prs: dict[int, dict[str, Any]],
+    login: str,
 ) -> dict[str, Any]:
     number = int(comment["pull_request_url"].rsplit("/", 1)[1])
     pr = prs.get(number, {})
@@ -248,11 +264,14 @@ def compact_comment(
         "pr_author": pr.get("author"),
         "pr_state": pr.get("state"),
         "roles": sorted(pr.get("roles", [])),
+        "kind": "inline_reply" if comment.get("in_reply_to_id") else "inline",
+        "as_author": is_self(pr.get("author"), login),
         "path": comment.get("path"),
         "line": comment.get("line"),
         "original_line": comment.get("original_line"),
         "review_id": comment.get("pull_request_review_id"),
         "in_reply_to_id": comment.get("in_reply_to_id"),
+        "review_state": None,
         "created_at": comment.get("created_at"),
         "updated_at": comment.get("updated_at"),
         "body": body,
@@ -260,6 +279,127 @@ def compact_comment(
         "links": LINK_RE.findall(body),
         "clone_marked": "<!-- clone-trace:" in body,
     }
+
+
+def compact_issue_comment(
+    comment: dict[str, Any],
+    repo: str,
+    prs: dict[int, dict[str, Any]],
+    login: str,
+) -> dict[str, Any] | None:
+    number = pr_number_from_url(comment.get("html_url"), comment.get("issue_url"))
+    if number is None:
+        return None
+    pr = prs.get(number, {})
+    body = comment.get("body") or ""
+    return {
+        "id": comment["id"],
+        "node_id": comment.get("node_id"),
+        "html_url": comment.get("html_url"),
+        "pr_number": number,
+        "pr_url": pr.get("url", f"https://github.com/{repo}/pull/{number}"),
+        "pr_title": pr.get("title"),
+        "pr_author": pr.get("author"),
+        "pr_state": pr.get("state"),
+        "roles": sorted(pr.get("roles", [])),
+        "kind": "conversation",
+        "as_author": is_self(pr.get("author"), login),
+        "path": None,
+        "line": None,
+        "original_line": None,
+        "review_id": None,
+        "in_reply_to_id": None,
+        "review_state": None,
+        "created_at": comment.get("created_at"),
+        "updated_at": comment.get("updated_at"),
+        "body": body,
+        "body_chars": len(body),
+        "links": LINK_RE.findall(body),
+        "clone_marked": "<!-- clone-trace:" in body,
+    }
+
+
+def compact_review(
+    review: dict[str, Any],
+    repo: str,
+    number: int,
+    prs: dict[int, dict[str, Any]],
+    login: str,
+) -> dict[str, Any]:
+    """A submitted review: the verdict (state) plus its optional summary body."""
+    pr = prs.get(number, {})
+    body = review.get("body") or ""
+    return {
+        "id": review["id"],
+        "node_id": review.get("node_id"),
+        "html_url": review.get("html_url"),
+        "pr_number": number,
+        "pr_url": pr.get("url", f"https://github.com/{repo}/pull/{number}"),
+        "pr_title": pr.get("title"),
+        "pr_author": pr.get("author"),
+        "pr_state": pr.get("state"),
+        "roles": sorted(pr.get("roles", [])),
+        "kind": "review_summary",
+        "as_author": is_self(pr.get("author"), login),
+        "path": None,
+        "line": None,
+        "original_line": None,
+        "review_id": review.get("id"),
+        "in_reply_to_id": None,
+        "review_state": review.get("state"),
+        "created_at": review.get("submitted_at"),
+        "updated_at": review.get("submitted_at"),
+        "body": body,
+        "body_chars": len(body),
+        "links": LINK_RE.findall(body),
+        "clone_marked": "<!-- clone-trace:" in body,
+    }
+
+
+def fetch_repo_comments(repo: str, endpoint: str) -> list[dict[str, Any]]:
+    pages = parse_paginated_json(
+        run_gh(
+            [
+                "api",
+                "--method",
+                "GET",
+                "--paginate",
+                f"repos/{repo}/{endpoint}",
+                "-f",
+                "per_page=100",
+            ]
+        )
+    )
+    return [
+        item
+        for page in pages
+        if isinstance(page, list)
+        for item in page
+        if isinstance(item, dict)
+    ]
+
+
+def fetch_pr_reviews(repo: str, number: int) -> list[dict[str, Any]]:
+    pages = parse_paginated_json(
+        run_gh(
+            [
+                "api",
+                "--method",
+                "GET",
+                "--paginate",
+                f"repos/{repo}/pulls/{number}/reviews",
+                "-f",
+                "per_page=100",
+            ]
+        )
+    )
+    return [
+        item
+        for page in pages
+        if isinstance(page, list)
+        for item in page
+        if isinstance(item, dict)
+    ]
 
 
 def atomic_write_json(path: Path, value: Any) -> None:
@@ -298,6 +438,9 @@ def build_summary(result: dict[str, Any], detail_output: Path) -> dict[str, Any]
         "top_authors": result["authors"][:25],
         "role_combinations": result["role_combinations"],
         "area_counts": result["area_counts"],
+        "kind_counts": result["kind_counts"],
+        "author_side_counts": result["author_side_counts"],
+        "verdict_summary": result["verdict_summary"],
         "comment_batches": result["comment_batches"],
         "candidate_selection": {
             "method": result["candidate_selection"]["method"],
@@ -352,36 +495,68 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
     )
     normalized_prs = {entry["number"]: entry for entry in prs}
 
-    raw_pages = parse_paginated_json(
-        run_gh(
-            [
-                "api",
-                "--method",
-                "GET",
-                "--paginate",
-                f"repos/{args.repo}/pulls/comments",
-                "-f",
-                "per_page=100",
-            ]
-        )
-    )
-    raw_comments = [
-        item
-        for page in raw_pages
-        if isinstance(page, list)
-        for item in page
-        if isinstance(item, dict)
-    ]
-    attributed = [
-        item
-        for item in raw_comments
-        if isinstance(item.get("user"), dict)
-        and item["user"].get("login", "").casefold() == args.login.casefold()
-    ]
+    def attributed_to_login(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [
+            item
+            for item in items
+            if isinstance(item.get("user"), dict)
+            and is_self(item["user"].get("login"), args.login)
+        ]
+
+    inline_raw = attributed_to_login(fetch_repo_comments(args.repo, "pulls/comments"))
     comments = [
-        compact_comment(item, args.repo, normalized_prs)
-        for item in {item["id"]: item for item in attributed}.values()
+        compact_comment(item, args.repo, normalized_prs, args.login)
+        for item in {item["id"]: item for item in inline_raw}.values()
     ]
+
+    conversation_raw = attributed_to_login(
+        fetch_repo_comments(args.repo, "issues/comments")
+    )
+    conversation_comments = [
+        compact
+        for item in {item["id"]: item for item in conversation_raw}.values()
+        if (compact := compact_issue_comment(item, args.repo, normalized_prs, args.login))
+    ]
+
+    # Reviews are per-PR only (no repo-wide endpoint), so sample the most recent
+    # reviewed PRs to bound the call count while still capturing verdict behaviour.
+    reviewed_numbers = sorted(
+        (int(pr["number"]) for pr in indexed["reviewed"]), reverse=True
+    )
+    cap = args.reviews_cap if args.reviews_cap and args.reviews_cap > 0 else None
+    sampled_numbers = reviewed_numbers[:cap] if cap else reviewed_numbers
+    reviews: list[dict[str, Any]] = []
+    for number in sampled_numbers:
+        for review in fetch_pr_reviews(args.repo, number):
+            if not is_self(
+                (review.get("user") or {}).get("login"), args.login
+            ):
+                continue
+            if review.get("state") == "PENDING":
+                continue
+            reviews.append(
+                compact_review(review, args.repo, number, normalized_prs, args.login)
+            )
+
+    approvals = sum(1 for r in reviews if r["review_state"] == "APPROVED")
+    silent_approvals = sum(
+        1
+        for r in reviews
+        if r["review_state"] == "APPROVED" and not r["body"].strip()
+    )
+    verdict_summary = {
+        "reviewed_prs_total": len(reviewed_numbers),
+        "reviewed_prs_sampled": len(sampled_numbers),
+        "cap_applied": bool(cap and len(reviewed_numbers) > cap),
+        "reviews_collected": len(reviews),
+        "states": counter_rows([r["review_state"] for r in reviews], "state"),
+        "approvals": approvals,
+        "silent_approvals": silent_approvals,
+        "silent_approval_ratio": (
+            round(silent_approvals / approvals, 3) if approvals else None
+        ),
+        "reviews_with_body": sum(1 for r in reviews if r["body"].strip()),
+    }
 
     strongest_by_pr: dict[int, dict[str, Any]] = {}
     for comment in comments:
@@ -399,9 +574,13 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         key=lambda comment: (-comment["body_chars"], comment["id"]),
     )[: args.candidate_limit]
 
+    # Everything with words the person actually wrote feeds the learn loop:
+    # inline review comments, their replies on their own PRs, conversation
+    # comments, and review summary bodies. Silent reviews carry no text, so they
+    # shape verdict_summary only.
     human_comments = [
         comment
-        for comment in comments
+        for comment in (comments + conversation_comments + reviews)
         if not comment["clone_marked"] and comment["body"].strip()
     ]
     comments_dir = args.comments_dir or args.output.parent / "comments"
@@ -409,7 +588,18 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         human_comments, comments_dir, args.batch_size
     )
     area_counts = counter_rows(
-        [area_of(comment["path"]) for comment in human_comments], "area"
+        [area_of(comment["path"]) for comment in human_comments if comment["path"]],
+        "area",
+    )
+    kind_counts = counter_rows(
+        [comment["kind"] for comment in human_comments], "kind"
+    )
+    author_side_counts = counter_rows(
+        [
+            "as_author" if comment["as_author"] else "as_reviewer"
+            for comment in human_comments
+        ],
+        "side",
     )
 
     coverage_complete = all(
@@ -431,11 +621,19 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
             "authored": len(indexed["authored"]),
             "unique_prs": len(prs),
             "inline_review_comments": len(comments),
+            "conversation_comments": len(conversation_comments),
+            "reviews_collected": len(reviews),
+            "replies_on_own_prs": sum(
+                1
+                for comment in (comments + conversation_comments)
+                if comment["as_author"] and comment["body"].strip()
+            ),
             "prs_with_inline_review_comments": len(
                 {comment["pr_number"] for comment in comments}
             ),
             "clone_marked_comments": sum(
-                comment["clone_marked"] for comment in comments
+                comment["clone_marked"]
+                for comment in (comments + conversation_comments + reviews)
             ),
             "comments_with_links": sum(bool(comment["links"]) for comment in comments),
         },
@@ -448,7 +646,12 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         ),
         "prs": prs,
         "inline_review_comments": comments,
+        "conversation_comments": conversation_comments,
+        "reviews": reviews,
+        "verdict_summary": verdict_summary,
         "area_counts": area_counts,
+        "kind_counts": kind_counts,
+        "author_side_counts": author_side_counts,
         "comment_batches": {
             "dir": str(comments_dir),
             "batch_size": args.batch_size,
@@ -467,6 +670,8 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
         "collection_levels": {
             "pr_metadata_indexed": len(prs),
             "inline_comments_collected": len(comments),
+            "conversation_comments_collected": len(conversation_comments),
+            "reviews_collected": len(reviews),
             "human_comments_batched": len(human_comments),
             "comment_batches_written": len(comment_batches),
         },
@@ -476,8 +681,10 @@ def collect(args: argparse.Namespace) -> dict[str, Any]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Index reviewed, commented, and authored PRs plus the reviewer's inline "
-            "comments. Handles GitHub Search's 1,000-result cap automatically."
+            "Index reviewed, commented, and authored PRs plus the person's inline "
+            "comments, conversation replies (incl. on their own PRs), and review "
+            "verdicts (approve / request-changes / comment, including silent ones). "
+            "Handles GitHub Search's 1,000-result cap automatically."
         )
     )
     parser.add_argument("--repo", required=True, help="Canonical owner/repository")
@@ -507,6 +714,16 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=40,
         help="Human comments per batch file for iterative crunching (default: 40)",
+    )
+    parser.add_argument(
+        "--reviews-cap",
+        type=int,
+        default=300,
+        help=(
+            "Max most-recent reviewed PRs to fetch review verdicts for; bounds "
+            "the per-PR API calls needed to capture silent approvals "
+            "(default: 300, <=0 for no cap)"
+        ),
     )
     parser.add_argument(
         "--comments-dir",
@@ -548,6 +765,13 @@ def main() -> int:
                 "authored": counts["authored"],
                 "unique_prs": counts["unique_prs"],
                 "inline_review_comments": counts["inline_review_comments"],
+                "conversation_comments": counts["conversation_comments"],
+                "reviews_collected": counts["reviews_collected"],
+                "replies_on_own_prs": counts["replies_on_own_prs"],
+                "silent_approvals": result["verdict_summary"]["silent_approvals"],
+                "silent_approval_ratio": result["verdict_summary"][
+                    "silent_approval_ratio"
+                ],
                 "comments_with_links": counts["comments_with_links"],
                 "comment_batches": result["comment_batches"]["batch_count"],
                 "batch_dir": result["comment_batches"]["dir"],

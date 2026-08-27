@@ -90,12 +90,25 @@ python3 "$REVIEWER_CLONE_SKILL_DIR/scripts/collect-review-activity.py" \
   --output "$RUN/scratch/review-activity.json"
 ```
 
-It grabs every code-review comment the person left (each tagged with the file and
-line it was written on), splits them into small chunk-files
-(`scratch/comments/batch-*.json`), and counts how many landed in each area
-(`area_counts`). Read `review-activity.summary.json` first—the per-area counts
-already give you **WHERE** by volume, over every comment, not a sample. If it fails,
-fix args/auth and retry once; don't improvise a big script.
+It grabs every interaction point the person left on PRs, each tagged with a
+`kind` and an `as_author`/`as_reviewer` side:
+
+- **inline** review comments (file + line) and **inline_reply** threads;
+- **conversation** (non-inline) comments, including on their own PRs;
+- **review_summary** verdicts—approve / request-changes / comment plus any body.
+
+It splits the ones with words into small chunk-files
+(`scratch/comments/batch-*.json`) and counts areas (`area_counts`), kinds
+(`kind_counts`), and author-vs-reviewer side (`author_side_counts`). Wordless
+verdicts (silent approvals) carry no text to batch, so they land in
+`verdict_summary` instead—read it for the person's **default posture**:
+`silent_approval_ratio`, state breakdown, how often they attach a summary body.
+Read `review-activity.summary.json` first—these counts give you **WHERE**,
+**WHEN**, and the IF/silence picture over everything, not a sample. Silent
+approvals need one API call per reviewed PR, so they're capped to the most
+recent `--reviews-cap` PRs (default 300); `verdict_summary.cap_applied` tells you
+if older reviews were skipped. If it fails, fix args/auth and retry once; don't
+improvise a big script.
 
 While the collector runs, scan ownership yourself in one pass so you know which areas
 this person actually *wrote*, not just commented on:
@@ -114,8 +127,13 @@ Read one chunk-file at a time, filling in the lenses in the draft `MODEL.md`
 (`scratch/`). Never load every comment at once, and never conclude from a single
 comment. For each chunk, in order:
 
-1. Read it (~40 comments, each with its file/line).
-2. Add what's new to your notes; note what just repeats what you knew.
+1. Read it (~40 interaction points). Each carries a `kind` and side: inline
+   review comments have a file/line; `inline_reply`/`conversation` points marked
+   `as_author` are them answering feedback on their *own* code (a different voice
+   from reviewing others'); `review_summary` points carry the verdict `state`.
+2. Add what's new to your notes; note what just repeats what you knew. Read
+   author-side replies for voice under pushback (do they concede, defend, cite?),
+   not for review reflexes.
 3. When a pattern looks real, open the actual file they commented on and check git:
 
    ```bash
@@ -132,10 +150,14 @@ from where you left off). Reading all chunks is fine too.
 
 What to trust: the same concern across unrelated PRs, suggested fixes, links/precedent
 they cite, specific praise, human corrections of a Clone comment, and areas they both
-wrote and commented on. Weak—never a conclusion on its own: a bare approval, "LGTM",
-or silence—an area they didn't comment on is a question to ask, not proof they don't
-care. Only save something as learned when the human confirms it, the behavior repeats
-independently, or a correction to a Clone comment makes it explicit.
+wrote and commented on. The **aggregate** verdict pattern is also trustworthy—a high
+`silent_approval_ratio` over hundreds of reviews is a real default posture, and a
+consistent "always writes a one-line summary when blocking" is a real delivery habit.
+Weak—never a conclusion on its own: a *single* bare approval, "LGTM", or one silent
+merge—an area they didn't comment on is a question to ask, not proof they don't care.
+Only save something as learned when the human confirms it, the behavior repeats
+independently (or shows up strongly in `verdict_summary`), or a correction to a Clone
+comment makes it explicit.
 
 While reading, draft freely by lens—that's how you think—each claim carrying its
 grounding inline (this *is* the receipts):
