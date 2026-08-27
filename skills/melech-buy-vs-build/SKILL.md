@@ -1,30 +1,38 @@
 ---
-name: melech-scout
-description: Find and compare existing tools before building a capability from scratch.
+name: melech-buy-vs-build
+description: Decide whether to adopt an existing tool or build a capability yourself, grounded in verified research.
 disable-model-invocation: true
 ---
 
-# Scout
+# Buy vs Build
 
 An agent asked to "add background jobs" will happily write a `tasks` table, a
 polling worker, a retry column, and a dead-letter flag. It works. It is also
 BullMQ, or Trigger.dev, or Cloud Tasks, or the queue library already sitting in
 `package.json` — rebuilt badly, and now owned forever.
 
-Nobody checks. Repo-level review only ever asks *"does this already exist in
-our code?"*, and model memory answers external questions with confident,
-stale, sometimes invented package names.
+Nobody makes the call deliberately. Repo-level review only ever asks *"does
+this already exist in our code?"*, and model memory answers external questions
+with confident, stale, sometimes invented package names. The expensive,
+hard-to-reverse decision — own the implementation, or hand the capability to a
+third party — gets made by default instead of on evidence.
 
-`melech-scout` is a research partner that goes and finds what the rest of the world
-already shipped for a capability, verifies it against live sources, and brings
-back a shortlist you can act on.
+`melech-buy-vs-build` owns that decision. It looks **outward** — finding what the
+rest of the world already shipped for the capability, verified against live
+sources — and it runs one **inward** check first: *adopt-vs-rebuild*, is this
+already covered by a dependency or vendor you already have? Then it brings back
+a shortlist and a verdict: adopt, or keep building.
 
-Think *"is there an AI for that?"* — but for product and engineering work, and
+Think *"is there an AI for that?"* — but for the build-vs-buy call, and
 grounded in evidence instead of vibes.
 
 ---
 
 ## Two Intents
+
+Both intents are **outward** research feeding one build-vs-buy verdict. Whichever
+fires, run the inward **adopt-vs-rebuild** check first (step 2) — a capability you
+already own beats anything you would go find or build.
 
 | Intent | Trigger | Goal |
 |---|---|---|
@@ -66,8 +74,10 @@ If unsure of the canonical term, the **first** search is for the term itself:
 ## Workflow
 
 ```text
-1. Name the capability  ─►  2. Read the ground truth  ─►  3. Fan out lanes  ─►  4. Reduce  ─►  5. Shortlist + verdict  ─►  6. Hand off
-   (canonical vocabulary)     (stack, constraints)         (parallel, web)      (dedupe, kill dead)   (ask_question)
+1. Name the capability  ─►  2. Read the ground truth  ─►  3. Fan out lanes  ─────────►  4. Reduce  ─►  5. Shortlist + verdict  ─►  6. Hand off
+   (canonical vocabulary)     (stack, constraints)          adopt-vs-rebuild (inward) ┐   (dedupe, kill dead)   (ask_question)
+                                                            outward lanes (web)       ┴─ same concurrent batch;
+                                                                                          inward hit short-circuits
 ```
 
 ### 1. Name the capability
@@ -76,9 +86,10 @@ State in one line what the thing *does*, stripped of the local implementation.
 List 2–5 canonical search terms and any obvious synonyms. Show this to the user
 before fanning out — a wrong capability name wastes the whole run.
 
-### 2. Read the ground truth (cheap, do it first)
+### 2. Read the ground truth (inline, must be first)
 
-Before searching outward, gather the constraints that will decide fit:
+This quick read stays on the main thread because the outward lanes cannot be
+briefed without it. Gather the constraints that will decide fit:
 
 - **Language and runtime**, and what is already in the manifests
   (`package.json`, `requirements.txt`/`pyproject.toml`, `go.mod`, `Cargo.toml`,
@@ -90,26 +101,36 @@ Before searching outward, gather the constraints that will decide fit:
 - **Scale reality**: 100 jobs/day and 100k jobs/second do not shortlist the same
   tools
 
-A candidate that is already installed, or already covered by a service being
-paid for, beats every other candidate. Find those first.
+If this cheap read already surfaces a blatant hit — the capability is *literally*
+a direct dependency or an obviously enabled vendor feature — stop here and report
+it. Do not fan out to buy something you already own. Otherwise, carry the
+constraints into step 3 and let the deep adopt-vs-rebuild check run concurrently.
 
 ### 3. Fan out parallel lanes
 
 Dispatch independent research lanes concurrently — one subagent per lane, each
-running **multiple web searches** along its own path. Lanes hunt different
-*kinds* of answers, not different keywords.
+running **multiple web searches** along its own path (except adopt-vs-rebuild,
+which is mostly local). Lanes hunt different *kinds* of answers, not different
+keywords. The inward lane and the outward lanes launch in the **same concurrent
+batch**, so you do not pay the inward check as serial latency.
 
 | Lane | What it hunts |
 |---|---|
+| **Adopt-vs-rebuild** *(inward, privileged)* | The deep version of the step-2 check: transitive deps, framework/stdlib built-ins, a vendor plan that already covers this, an internal monorepo library. Mostly local work plus targeted doc lookups. **Short-circuit authority** — see below. |
 | **Canon** | The category's standard name and the 3–8 options every comparison lists. Awesome-lists, category pages, "X vs Y" roundups. |
 | **Ecosystem** | Libraries and OSS in *this project's* language. Package registries, GitHub, framework-native answers. |
 | **Commercial** | Managed services, dev tools, SaaS, cloud primitives. Includes the boring cloud answer nobody mentions. |
-| **Already yours** | Capability hiding in current deps, the framework's stdlib, or a vendor already on the invoice. Highest-value lane, cheapest to run. |
 | **Verdicts** | What practitioners actually say: HN/Reddit threads, "we migrated off X", postmortems, why people regret each option. |
 | **Counter-case** | Why rolling your own is sometimes right here, and the known failure modes of the incumbents. Keeps the shortlist honest. |
 
 For **explore** intent, add a **Frontier** lane for what shipped in the last
 6–12 months, since that is exactly where model memory is stale.
+
+**Short-circuit rule:** if the adopt-vs-rebuild lane returns a confirmed hit —
+a real, live capability you already own that covers the need — the run ends. The
+outward lanes' results are discarded (that wasted compute is the price of running
+inward and outward in parallel instead of gating). Report the owned option and
+stop; do not shop for a replacement for something already paid for.
 
 Scale the lane count to the stakes: 3 lanes for "is there a retry library",
 all 6 for "should we build our own orchestrator". Do not spawn a lane per
@@ -125,16 +146,11 @@ contract.
 
 ### 4. Reduce
 
-1. Merge candidate rows from all lanes.
-2. **Kill anything unverified.** No live URL, no candidate.
-3. **Kill anything dead**: no release or meaningful commit in ~18 months, an
-   archived repo, a sunset notice, or a company that no longer exists.
-4. Deduplicate across rebrands, forks, wrappers, and the same product named
-   differently by two lanes.
-5. Cluster by *approach*, not by name — e.g. managed service vs. self-hosted
-   broker vs. in-your-database library. The user is choosing an approach first.
-6. Rank by fit to the step-2 constraints, then adoption, then maturity.
-   Popularity is a tiebreaker, never the criterion.
+Merge all lanes, then: verify-or-drop → kill dead → dedupe identities → cluster
+by *approach* (not name) → rank by fit to the step-2 constraints (popularity is
+only a tiebreaker, never the criterion). The full merge rules — dead-cutoffs,
+identity and origin collapsing, hard-constraint disqualification — live in
+`references/lanes.md`.
 
 ### 5. Deliver the shortlist and the verdict
 
@@ -142,7 +158,7 @@ Cap at **3–6 candidates**. A list of twenty is a research dump, not a
 recommendation.
 
 ```markdown
-### 🔭 Scout: durable background jobs (Node/TypeScript, Postgres, no new vendors)
+### ⚖️ Buy vs Build: durable background jobs (Node/TypeScript, Postgres, no new vendors)
 
 | Option | Kind | Why it fits | Cost | What you give up | Adoption effort |
 |---|---|---|---|---|---|
@@ -160,8 +176,6 @@ no cross-process coordination — then your table plus a cron is genuinely less
 total complexity than a queue runtime.
 ```
 
-Every row must be traceable to a source URL captured during the run.
-
 Then put the decision to the user with `ask_question`:
 
 1. `Adopt <recommended option> and remove the hand-rolled version`
@@ -169,8 +183,8 @@ Then put the decision to the user with `ask_question`:
 3. `Keep the custom implementation (record why)`
 4. `Research further — different constraints or more options`
 
-**Never rip out working code on your own initiative.** Scout reports and
-recommends. The user rules.
+**Never rip out working code on your own initiative.** This skill reports and
+recommends the buy-vs-build call. The user rules.
 
 ### 6. Hand off
 

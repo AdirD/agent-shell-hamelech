@@ -1,4 +1,4 @@
-# Scout Lanes
+# Buy vs Build Lanes
 
 How to brief parallel research lanes, where each one hunts, and what it must
 return. One orchestrator owns the capability statement, the constraints, the
@@ -13,10 +13,10 @@ ORCHESTRATOR
   merges, dedupes, kills dead entries
   ranks against constraints and recommends
         |
+        +---- Adopt-vs-rebuild (inward; concurrent; short-circuits the run on a hit)
         +---- Canon
         +---- Ecosystem
         +---- Commercial
-        +---- Already yours
         +---- Verdicts
         +---- Counter-case
         +---- Frontier        (explore intent)
@@ -89,12 +89,14 @@ routinely omitted from OSS-focused roundups.
 Capture pricing *model* (free tier, usage-based, seat-based, enterprise-only)
 and self-host availability. Quote from the pricing page or omit.
 
-### Already yours
+### Adopt-vs-rebuild *(inward, privileged)*
 
 **Question:** Is this capability already installed, already bundled, or already
 paid for?
 
-Highest-value lane. It is mostly local work plus targeted doc lookups:
+Highest-value lane, and the one inward lane. It runs as its own subagent in the
+same concurrent batch as the outward lanes, so its latency overlaps theirs
+instead of gating them. It is mostly local work plus targeted doc lookups:
 
 1. Read the manifests and lockfiles for direct **and transitive** deps that
    cover the capability.
@@ -104,7 +106,11 @@ Highest-value lane. It is mostly local work plus targeted doc lookups:
    available on the current plan.
 4. Check for an internal package or shared library in a monorepo.
 
-A hit here usually ends the run.
+**Short-circuit authority:** it still returns a candidate row like every other
+lane (never its own verdict), but it flags a confirmed owned hit as
+`short_circuit: true`. On that flag the orchestrator ends the run and discards
+the outward lanes' work — you do not shop for a replacement for something already
+paid for. Only a *confirmed, live* hit short-circuits; a maybe does not.
 
 ### Verdicts
 
@@ -168,7 +174,8 @@ Every lane returns rows in this shape:
   "risk": "lock-in, relicensing history, sunset/acquisition, maintenance by one person",
   "source_url": "https://... (where these facts were read)",
   "checked": "YYYY-MM-DD",
-  "confidence": "high | medium | low"
+  "confidence": "high | medium | low",
+  "short_circuit": "true only from the adopt-vs-rebuild lane, on a confirmed live capability you already own; ends the run"
 }
 ```
 
@@ -210,8 +217,8 @@ Stop a lane, or the whole run, when:
 
 - the cap is reached with no new names appearing
 - new sources only recirculate the same origins
-- the "already yours" lane finds the capability already installed or already
-  billed
+- the adopt-vs-rebuild lane returns a confirmed owned hit (`short_circuit: true`)
+  — the capability is already installed or already billed
 - a hard constraint eliminates every remaining category, making the
   roll-your-own answer definitive
 - further research would cost more than the decision it informs

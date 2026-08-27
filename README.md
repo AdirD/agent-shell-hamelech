@@ -98,7 +98,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-distill-need`](#melech-distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
-| [`melech-scout`](#melech-scout) | Has someone already built this? | "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
+| [`melech-buy-vs-build`](#melech-buy-vs-build) | Should we adopt an existing tool or build this ourselves? | "build vs buy", "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
 | [`melech-market-validation`](#melech-market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
 
 ### Shape work before coding
@@ -133,9 +133,9 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`melech-market-validation`](#melech-market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
 | "Should our existing product add this feature?" | [`melech-distill-need`](#melech-distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
 | "Build a custom RBAC engine." | [`melech-distill-need`](#melech-distill-need) | The named implementation may be a faster horse; first uncover the actual need. |
-| "Is there already a library/tool/service that does this?" | [`melech-scout`](#melech-scout) | Parallel verified search of libraries, OSS, dev tools, managed services, and deps already installed. |
-| "The AI just hand-rolled a queue/retry/scheduler — check that." | [`melech-scout`](#melech-scout) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
-| "What's out there for X? Any new AI tools for it?" | [`melech-scout`](#melech-scout) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
+| "Should we adopt a library/tool/service or build this ourselves?" | [`melech-buy-vs-build`](#melech-buy-vs-build) | Runs the adopt-vs-rebuild check (already-owned deps/vendors), then a parallel verified search of OSS, dev tools, and managed services before the call. |
+| "The AI just hand-rolled a queue/retry/scheduler — check that." | [`melech-buy-vs-build`](#melech-buy-vs-build) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
+| "What's out there for X? Any new AI tools for it?" | [`melech-buy-vs-build`](#melech-buy-vs-build) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
 | "We decided to add RBAC; align it before planning." | [`melech-pre-plan`](#melech-pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
 | "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
 | "Are you sure? Consult another model on this architecture or idea." | [`melech-consult`](#melech-consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
@@ -169,7 +169,7 @@ Use when you are unsure what should exist. The flow may stop at
 ### Better engineering
 
 ```text
-melech-scout (if it might already exist) → melech-distill-need → melech-pre-plan → melech-consult (optional sanity check/council) → melech-8020 → melech-challenge (optional)
+melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional sanity check/council) → melech-8020 → melech-challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -394,18 +394,18 @@ Use it when:
 
 ---
 
-### [`melech-scout`](skills/melech-scout)
+### [`melech-buy-vs-build`](skills/melech-buy-vs-build)
 
-Finds and compares existing tools before building a capability from scratch.
+Decides whether to adopt an existing tool or build a capability yourself, grounded in verified research.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-scout
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-buy-vs-build
 ```
 
 Use it when:
 - an agent just hand-rolled a queue, retry policy, scheduler, state machine, parser, or auth layer and you suspect a known tool already does it
-- you want build-vs-buy answered with verified sources instead of a model's stale memory
-- you want to know whether the capability is already covered by an installed dependency or a vendor you already pay for
+- you want the build-vs-buy call answered with verified sources instead of a model's stale memory
+- you want the inward adopt-vs-rebuild check first — is the capability already covered by an installed dependency or a vendor you already pay for
 - you are exploring a space open-endedly — "what's out there for X", "what are people using now", "any new AI tools for this"
 - you want to seed the search with specific tools or sources and have them evaluated on the same contract
 - you want the honest counter-case for when writing it yourself is genuinely the smaller total cost
@@ -476,7 +476,7 @@ skills/
   melech-pre-plan/
   melech-prune/
   melech-code-review-clone/
-  melech-scout/
+  melech-buy-vs-build/
   melech-smart-comments/
   melech-visualize/
 ```
