@@ -46,15 +46,14 @@ When the developer wants the agent to drive an already-open Chrome tab:
 The agent still instruments as above, then tries live attach instead of
 handing over the clicks:
 
-1. Runs `dm mcp-setup`. If Chrome DevTools MCP is missing or has no
-   `--autoConnect`, that writes the official host config. If a reload is
-   required, it waits until the developer reloads MCP. The host, not the
-   skill, then starts the server.
-2. If this is the first attach on the machine, tells the developer to open
-   `chrome://inspect/#remote-debugging` once and enable remote debugging
-   (official Chrome M144 auto-connect; see
-   [CHROME_DEVTOOLS_MCP.md](CHROME_DEVTOOLS_MCP.md)).
-3. Lists pages through Chrome DevTools MCP and asks them to click **Allow**.
+1. Loads the installed `melech-live-browser` companion skill, following the
+   install-or-manual branch in `SKILL.md` if it is absent.
+2. States the exact starting state, actions, and visible result that count as
+   one reproduction.
+3. Lets `melech-live-browser` handle Chrome DevTools MCP setup, attach consent,
+   existing-tab selection, and safe browser interaction.
+4. Drives exactly one reproduction attempt, then returns to debug mode for
+   collector evidence.
 
 The developer then sees something like:
 
@@ -69,12 +68,11 @@ If attach fails (checkbox off, Allow dismissed, Chrome too old), the agent
 switches to **manual**, uses the hold-the-wheel text above, and waits for
 `proceed`. The collector still runs either way.
 
-After a successful driven run, the agent reads `dm logs` without waiting
-for `proceed`, then follows the same evidence paths as below.
+## Inspect reproduction evidence
 
-## After the developer replies `proceed`
-
-The agent reads the collected events and reports evidence:
+Manual mode reaches this step after the developer replies `proceed`; autopilot
+reaches it immediately after the driven attempt. The agent reads the collected
+events and reports evidence:
 
 > Reproduced. The submit handler ran, but the offline error branch returned before resetting `isSaving`. That explains the stuck state.
 
@@ -85,17 +83,25 @@ Then it chooses one path:
 - No events arrived → verify the collector and probe delivery, then retry.
 - The bug didn’t reproduce → adjust the starting conditions and retry.
 
-For another round:
+For another manual round:
 
 > I moved the probes around the retry boundary. Repeat the same workflow and reply `proceed` again.
 
+For another autopilot round, the agent increments the run ID, restates any
+changed starting conditions, uses `melech-live-browser` to repeat the workflow,
+and reads `dm logs` immediately. It does not ask for `proceed`.
+
 ## Fix verification
 
-After implementing a fix, the agent may ask for one final run:
+After implementing a fix, manual mode may ask for one final run:
 
 > The fix is applied, but debug mode remains active for verification. Repeat the workflow once more and reply `proceed`.
 
-After confirmation, it:
+In autopilot, the agent keeps the relevant probes, resets the same starting
+state, uses `melech-live-browser` for the verification run, and reads that run's
+events immediately.
+
+After verification, it:
 
 1. Removes every temporary probe and debug-only helper.
 2. Verifies no `DEBUG_MODE:` markers remain.

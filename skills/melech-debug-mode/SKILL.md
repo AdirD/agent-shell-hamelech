@@ -8,12 +8,11 @@ description: Diagnose reproducible bugs using temporary runtime probes and captu
 Treat the current task as an active debugging session. Diagnose from runtime
 evidence before proposing a fix.
 
-For the intended first-use, reproduction, iteration, verification, and later-use
-experience, read [DEVELOPER_JOURNEY_EXAMPLE.md](references/DEVELOPER_JOURNEY_EXAMPLE.md)
-and use it as the interaction model. For autopilot attach, read
-[LIVE_BROWSER.md](references/LIVE_BROWSER.md) when that mode starts. Chrome
-setup is the official M144 auto-connect flow in
-[CHROME_DEVTOOLS_MCP.md](references/CHROME_DEVTOOLS_MCP.md).
+Read [DEVELOPER_JOURNEY_EXAMPLE.md](references/DEVELOPER_JOURNEY_EXAMPLE.md)
+only for first-use guidance or when user-facing handoff examples are needed;
+routine runs follow this file directly. Autopilot reproduction composes with
+the separate `melech-live-browser` skill, which owns browser setup and
+operation.
 
 ## Guardrails
 
@@ -32,10 +31,8 @@ setup is the official M144 auto-connect flow in
   explicitly asks to skip diagnosis.
 - Stop only this session. Never run `portless proxy stop`, `portless clean`, or
   broad process-kill commands.
-- When driving Chrome, attach only. Never `state save` cookies or tokens, never
-  collect credentials from the page, never quit the user's Chrome, and never
-  close tabs you did not open. Do not tunnel CDP through Portless or any remote
-  exposure.
+- During autopilot, keep browser observations narrow enough to answer the
+  current hypotheses. The `melech-live-browser` guardrails still apply.
 
 ## Start A Session
 
@@ -120,10 +117,8 @@ Same collector and probes either way. Only who drives the repro changes.
 - **Manual** — the user holds the wheel. You instrument, tell them the exact
   clicks, then stop until they reply `proceed`.
 - **Autopilot** — you drive their already-open Chrome end-to-end with
-  Chrome DevTools MCP `--autoConnect` (same tabs, same logins). They only
-  enable remote debugging and click Allow. If this host is missing that
-  MCP, you write the official config with `dm mcp-setup` and wait for a
-  reload so the host can start the server.
+  `melech-live-browser` (same tabs, same logins), then inspect the collector
+  evidence.
 
 Choose once, then announce it in the user-facing message:
 
@@ -137,58 +132,30 @@ Choose once, then announce it in the user-facing message:
 4. Not a UI bug, or the tab looks like production you should not touch →
    **manual**.
 
-Never silently attach. Before any Chrome DevTools MCP call, tell the user
-they are in autopilot and what they must do in Chrome.
-
 ## Autopilot
 
-Keep probes in place. Snapshots are extra evidence, not a substitute for
-`dm logs`. Read [LIVE_BROWSER.md](references/LIVE_BROWSER.md) and
-[CHROME_DEVTOOLS_MCP.md](references/CHROME_DEVTOOLS_MCP.md).
-
-1. Check whether Chrome DevTools MCP tools are already available in this
-   session. Then run the bundled setup (idempotent):
+1. Locate and read the installed `melech-live-browser/SKILL.md`. If it is not
+   installed, show the exact install command:
 
    ```bash
-   dm mcp-setup
+   npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live-browser
    ```
 
-   That inspects known host MCP configs, writes the official
-   `chrome-devtools-mcp@latest --autoConnect` entry when it is missing, and
-   prefetches the npm package. It does not inject tools into a live host;
-   the host still has to spawn the server.
-
-   - Tools already present and `ready: true` → continue.
-   - `reload_required: true` → tell the user to reload the `chrome-devtools`
-     MCP server (or restart the host), then wait. Do not attach to a
-     profile that is missing `--autoConnect`.
-   - `ready: false` → show the official snippet from the command output and
-     switch to [Manual](#manual) unless they want the `dm browser-check`
-     fallback.
-
-   Do not silently switch to Playwright, Puppeteer, a fresh empty Chrome, a
-   cloud browser, or a custom extension.
-2. Before the first MCP call, tell the user verbatim:
-
-   > Autopilot is on. I will drive the tab you already have open.  
-   > One-time: open chrome://inspect/#remote-debugging and enable Allow
-   > remote debugging for this browser instance (Chrome 144+).  
-   > When Chrome prompts, click Allow. A “controlled by automated test
-   > software” banner is expected. I will not quit Chrome or close other tabs.
-
-   Then wait only if they have not confirmed they can click Allow. If they
-   already said to go, list pages and keep those steps visible.
-3. Discover pages through Chrome DevTools MCP. Select the existing app tab.
-   Do not open a new URL unless the repro needs a fresh navigation. Do not
-   close Chrome or other tabs. Do not close the last tab.
-4. Snapshot, then drive the workflow with click / fill / type on snapshot
-   uids. If they already selected a node in the Elements panel or a request
-   in the Network panel, start there.
-5. If attach fails, print the inspect-page + Allow steps and switch to
-   [Manual](#manual). Use `dm browser-check` only when this host has no
-   Chrome DevTools MCP at all.
-6. After one reproduction attempt, read `dm logs` the same as on `proceed`.
-   Do not claim a reproduction from a snapshot alone.
+   Ask whether to install it now or switch to [Manual](#manual). If they choose
+   installation, run the command, locate and read the installed `SKILL.md`,
+   then resume this autopilot flow. A host reload may still be required if
+   Chrome DevTools MCP itself must be added.
+2. State the exact starting state, actions, and visible outcome that count as
+   one reproduction. Stay inside those actions; debugging does not authorize
+   unrelated browser changes.
+3. Use `melech-live-browser` to attach, select the existing app tab, snapshot,
+   and drive one reproduction attempt. The live-browser commitment boundary
+   and tab-safety rules remain in force.
+4. If attach fails or the correct tab is unavailable, switch to
+   [Manual](#manual). Do not silently substitute another browser or profile.
+5. After every driven attempt, read `dm logs` for its run ID immediately; do
+   not ask the user to reply `proceed`. Optionally correlate narrow console or
+   network evidence, but do not claim a reproduction from a snapshot alone.
 
 ## Manual
 
@@ -203,33 +170,38 @@ denied, or you should not touch the open tabs. Tell the user:
 Then stop. Do not poll the event file or claim a reproduction before the user
 replies.
 
-## Inspect On `proceed`
+## Inspect Reproduction Evidence
 
-After an autopilot reproduction, use this same command and the same
-outcomes without waiting for `proceed`.
+In manual mode, start after the user replies `proceed`. In autopilot, start
+immediately after live browser finishes the driven attempt.
 
 Read the evidence with:
 
 ```bash
-dm logs <session-dir> --run run-1
+dm logs <session-dir> --run <run-id>
 ```
+
+Use `run-1` for the initial attempt and increment the ID for every retry or
+verification run.
 
 Correlate event order and values against the stated hypotheses, then choose
 one outcome:
 
 - **Reproduced and conclusive:** explain the observed causal chain, implement
-  the smallest root-cause fix, and verify it. Keep probes only if one user
-  rerun is still needed to validate the fix.
+  the smallest root-cause fix, and keep the relevant probes for one verification
+  run in the current reproduction mode. In autopilot, reset the same starting
+  state, return to live browser, and inspect that run before cleanup.
 - **Reproduced but inconclusive:** say what the evidence ruled out, revise the
-  hypothesis, add or move only the probes needed for `run-2`, and ask for the
-  precise workflow again.
+  hypothesis, add or move only the probes needed for the next run ID, and
+  restate changed starting conditions. Repeat in the current reproduction mode:
+  manual waits for another `proceed`; autopilot returns to live browser.
 - **No application events:** check session status (`dm status <session-dir>`) and send one synthetic event
   to distinguish collector delivery failure from an unvisited code path. Check
   browser CSP/CORS or environment reachability when relevant, then repair the
-  instrumentation and retry.
+  instrumentation and retry in the current reproduction mode.
 - **Workflow did not reproduce:** record that result, adjust the starting state
-  or probe placement, increment the run ID, and retry without pretending the
-  bug was observed.
+  or probe placement, increment the run ID, and retry in the current
+  reproduction mode without pretending the bug was observed.
 
 Do not equate correlation with cause. Cite the specific probe sequence and
 values that support the next action.
@@ -280,8 +252,8 @@ is idempotent. After reloading the shell:
 
 - `dm` — open the doctor TUI
 - `dm help` — list every command
-- `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>`,
-  `dm mcp-setup`, `dm browser-check` — launcher subcommands
+- `dm start`, `dm status <dir>`, `dm logs <dir>`, `dm stop <dir>` — launcher
+  subcommands
 
 `dm.sh` resolves its own location, so it keeps working wherever the skill is
 installed. Users who prefer not to touch their rc can call
