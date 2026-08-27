@@ -97,6 +97,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
+| [`melech-think-with-me`](#melech-think-with-me) | Can a sharp engineer peer expand this half-formed thought with real prior art? | "think with me", "let me think out loud", "just ideating", "what does this remind you of". |
 | [`melech-distill-need`](#melech-distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
 | [`melech-buy-vs-build`](#melech-buy-vs-build) | Should we adopt an existing tool or build this ourselves? | "build vs buy", "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
 | [`melech-market-validation`](#melech-market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
@@ -106,7 +107,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-pre-plan`](#melech-pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
-| [`melech-consult`](#melech-consult) | Did the AI miss a landmine, edge case, or simpler path? | The AI proposed an implementation, architecture, or idea and you say "double check", "proof this", or "are you sure". |
+| [`melech-consult`](#melech-consult) | What survives an honest machloket between the strongest competing readings? | The AI proposed an implementation, architecture, or idea and you want to "double check", "proof this", "argue both sides", or convene Beit Hillel and Beit Shammai. |
 | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
 | [`melech-8020`](#melech-8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`melech-challenge`](#melech-challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
@@ -129,6 +130,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | If you are saying… | Start with | Why |
 |---|---|---|
 | "What melech skills do I have / should I update?" | [`melech-sync-skills`](#melech-sync-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
+| "I'm just thinking out loud—riff with me on this." | [`melech-think-with-me`](#melech-think-with-me) | A single engineer-peer voice that expands each musing with prior art, patterns, and mechanisms, holds it loose, and never converges into a spec. |
 | "I have a startup/product idea." | [`melech-market-validation`](#melech-market-validation) | It can shape an open premise into a testable hypothesis before gathering market evidence. |
 | "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`melech-market-validation`](#melech-market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
 | "Should our existing product add this feature?" | [`melech-distill-need`](#melech-distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
@@ -137,8 +139,8 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "The AI just hand-rolled a queue/retry/scheduler — check that." | [`melech-buy-vs-build`](#melech-buy-vs-build) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
 | "What's out there for X? Any new AI tools for it?" | [`melech-buy-vs-build`](#melech-buy-vs-build) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
 | "We decided to add RBAC; align it before planning." | [`melech-pre-plan`](#melech-pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
-| "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Isolates the AI's proposal and briefs fresh subagents/councils to stress-test it without grading its own homework. |
-| "Are you sure? Consult another model on this architecture or idea." | [`melech-consult`](#melech-consult) | Unbiased second opinion or expert council to expose blindspots and failure modes. |
+| "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Takes the proposal away from its author and uses the freshest independent consultation available around its consequential disagreement. |
+| "I see two valid sides—argue both before we choose." | [`melech-consult`](#melech-consult) | Beit Hillel and Beit Shammai develop both positions, then return a psak for now without erasing the minority opinion. |
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
 | "Find the least invasive way to add role checks." | [`melech-8020`](#melech-8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`melech-debug-mode`](#melech-debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
@@ -157,19 +159,22 @@ question is already answered.
 ### Product discovery
 
 ```text
-melech-distill-need (if the ask is a proposed solution)
+melech-think-with-me (optional: think out loud before there's even an ask)
+  → melech-distill-need (if the ask is a proposed solution)
   → melech-market-validation (shape an open premise, then test it)
-  → melech-consult (optional idea council)
+  → melech-consult (optional machloket)
   → melech-pre-plan
 ```
 
-Use when you are unsure what should exist. The flow may stop at
-`melech-distill-need` or `melech-market-validation` if reuse, reshape, hold, or stop wins.
+Use when you are unsure what should exist. Start at `melech-think-with-me` when
+the idea is still a musing and you want it expanded, not decided. The flow may
+stop at `melech-distill-need` or `melech-market-validation` if reuse, reshape,
+hold, or stop wins.
 
 ### Better engineering
 
 ```text
-melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional sanity check/council) → melech-8020 → melech-challenge (optional)
+melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional machloket) → melech-8020 → melech-challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -211,6 +216,23 @@ Use it when:
 - the same set should show up in Cursor, Claude, Codex, Gemini, and the rest
 - you want to see what is on remote before applying (`melech-sync-skills list`)
 - a newly pushed skill is not showing up and you need to know whether it is a scope problem or just a stale session
+
+---
+
+### [`melech-think-with-me`](skills/melech-think-with-me)
+
+Think out loud with a sharp, well-read engineer peer that expands half-formed ideas with real prior art, patterns, and mechanisms.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-think-with-me
+```
+
+Use it when:
+- you're thinking out loud and nothing is set in stone yet — you want ideation, not a plan
+- you want a single engineer-friend voice that catches a thought and adds one substantive brick (a name, a parallel, a mechanism), then gets out of the way
+- you want musings grounded in the landscape ("that's basically the ___ pattern", "that's what ___ does, where they ___") instead of interrogated or converged
+- you explicitly do **not** want questions (`melech-challenge`/`melech-pre-plan`), a structured machloket (`melech-consult`), or a decision procedure (`melech-buy-vs-build`)
+- you want it to hand off to a convergent skill only once the thought firms into something buildable
 
 ---
 
@@ -303,7 +325,7 @@ Use it when:
 
 ### [`melech-consult`](skills/melech-consult)
 
-Gets independent model opinions on an AI-proposed plan, fix, architecture, or idea.
+Convenes Beit Hillel and Beit Shammai around an AI-proposed plan, fix, architecture, or idea, using independent models when available and disclosing lighter single-model passes.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-consult
@@ -311,9 +333,11 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-cons
 
 Use it when:
 - the AI proposed a plan, architecture, or fix and you say "double check", "proof this", or "are you sure"
-- you want an unbiased second opinion from a fresh subagent on a different model/provider than the thread that wrote the proposal
-- you want an expert council to triangulate a multi-variable trade-off (e.g., simplicity vs. scale vs. security)
-- you want a devil's advocate / red team to stress-test a proposal for hidden landmines before writing code
+- you want the strongest coherent positions developed around the proposal's real governing tension
+- you want independent houses by default, or one disclosed fresh-model second opinion for a light consultation
+- you want a deep consultation where the houses steelman each other before recommending what to do now
+- you want a clear psak while preserving the minority opinion and the evidence that should reopen the decision
+- you want convergence reported honestly when there is no legitimate machloket
 
 ---
 
@@ -464,6 +488,7 @@ Use it for:
 
 ```text
 skills/
+  melech-think-with-me/
   melech-8020/
   melech-babysit/
   melech-challenge/
