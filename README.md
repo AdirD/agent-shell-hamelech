@@ -109,6 +109,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
+| [`melech-prompt-shake`](#melech-prompt-shake) | What prompt bloat crept into these prompts, skills, or instructions? | After editing a prompt/skill/instruction file, when you want to strip over-explanation, duplicate/subset rules, and never-fires branches down to the leanest version that still covers 100%. |
 | [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
@@ -139,6 +140,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
 | "Drive the Chrome tab I'm already logged into while we debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns evidence and diagnosis; live browser owns safe attach and interaction. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
+| "My prompt/skill/instructions got bloated — tighten them." | [`melech-prompt-shake`](#melech-prompt-shake) | Tree-shaking for prose: audits the diff against 5 prompt proofs and recommends cuts, keeping edits inside the diff window. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our product or market direction." | [`melech-market-validation`](#melech-market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
@@ -495,6 +497,23 @@ Use it when:
 
 ---
 
+### [`melech-prompt-shake`](skills/melech-prompt-shake)
+
+Tree-shaking for prompts — strips bloat from prompts, skills, and instruction docs down to the leanest version that still covers 100% of needed cases.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-prompt-shake
+```
+
+Use it when:
+- you just edited a prompt, skill file, or instruction doc and want the bloat shaken out
+- prompts written by an AI are over-explained, duplicated, or full of never-fires edge cases
+- you want minimal-that-covers-100% over maximal — leaner prompt, same coverage
+- you want a diff-driven audit that reads the whole file but keeps recommendations inside the diff window
+- you want a scannable findings table with a named proof per cut, not a silent rewrite
+
+---
+
 ### [`melech-visualize`](skills/melech-visualize)
 
 Turns an idea, flow, or structure into a compact ASCII diagram.
@@ -529,6 +548,7 @@ skills/
   melech-market-validation/
   melech-pre-plan/
   melech-prune/
+  melech-prompt-shake/
   melech-code-review-clone/
   melech-buy-vs-build/
   melech-smart-comments/
