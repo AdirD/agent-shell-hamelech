@@ -320,6 +320,10 @@ Optional: install the bundled `dm` shell command for one-keystroke access from a
 sh <skill-dir>/scripts/install-dm.sh
 ```
 
+The installer guards the line it adds, so an uninstalled or renamed skill never
+breaks shell startup. If the skill directory moves, re-run the same command to
+repoint it — re-running rewrites the block in place instead of duplicating it.
+
 ---
 
 ### [`melech-challenge`](skills/melech-challenge)

@@ -246,9 +246,11 @@ own terminals only after a one-time install. Offer it once per machine:
 sh <skill-dir>/scripts/install-dm.sh
 ```
 
-This appends a single `source <skill-dir>/scripts/dm.sh` line to the user's
-shell rc (`~/.zshrc` or `~/.bashrc`, auto-detected; pass a path to override) and
-is idempotent. After reloading the shell:
+This writes a marked block to the user's shell rc (`~/.zshrc` or `~/.bashrc`,
+auto-detected; pass a path to override) that sources `dm.sh` behind an `-f`
+guard. Re-running rewrites that block in place and strips dm lines left by
+earlier installs, so a moved or renamed skill directory is repaired rather than
+duplicated. After reloading the shell:
 
 - `dm` — open the doctor TUI
 - `dm help` — list every command
@@ -256,7 +258,10 @@ is idempotent. After reloading the shell:
   subcommands
 
 `dm.sh` resolves its own location, so it keeps working wherever the skill is
-installed. Users who prefer not to touch their rc can call
+installed. The rc block, however, records an absolute path, so if the skill
+directory moves or is renamed, re-run `install-dm.sh` to point it at the new
+location — until then the guard makes `dm` simply absent instead of erroring on
+every new shell. Users who prefer not to touch their rc can call
 `python3 <skill-dir>/scripts/debug_session.py doctor` directly.
 
 ## Finish Or Abort
