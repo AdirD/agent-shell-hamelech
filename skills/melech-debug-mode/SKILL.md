@@ -84,17 +84,17 @@ Always pass `--once` to `doctor`: bare `dm doctor` (and bare `dm`) opens a curse
 TUI for the user's own terminal and will hang or crash a non-interactive shell.
 
 `dm start` prints the facts every later step needs: `session_id`, `session_dir`,
-`log_endpoint`, `health_url`, `events_file`, and `backend_host`/`backend_port`.
-Save them, then confirm the collector answers before editing application code:
+`log_endpoint`, `backend_log_endpoint`, `health_url`, `events_file`, and
+`backend_host`/`backend_port`. Save them, then confirm the collector answers
+before editing application code:
 
 ```bash
 curl -s "<health_url>"    # {"ok":true,"entries":0}
 ```
 
-`health_url` and `log_endpoint` route through Portless. If that route is
-unreachable, the same collector answers on
-`http://<backend_host>:<backend_port>`; swap only the origin and keep the
-`/log/<token>` path from `log_endpoint`.
+Use `log_endpoint` for browser probes. Use `backend_log_endpoint` for
+server-process probes. Never put the Portless URL in server code: its DNS may
+not resolve there and a fire-and-forget `fetch` will hide the failure.
 
 Keep the collector local; never enable LAN mode, tunnels, Tailscale, Funnel,
 ngrok, or other remote exposure.
@@ -107,8 +107,10 @@ output, and the error path. Instrument whichever layer owns the question — for
 browser workflow that means page or component state for rendering and
 interaction, and server handlers for persistence, validation, and integration.
 
-POST one small JSON object per observation to `log_endpoint` exactly as returned
-(it embeds the session token):
+Use `log_endpoint` for browser probes and `backend_log_endpoint` for
+server-process probes.
+
+POST one small JSON object per observation:
 
 ```json
 {
@@ -119,11 +121,12 @@ POST one small JSON object per observation to `log_endpoint` exactly as returned
 }
 ```
 
-Fire and forget, so a collector failure cannot change product behavior:
+Fire and forget, so a collector failure cannot change product behavior. Replace
+`<probe-endpoint>` with the correct endpoint above:
 
 ```js
 // DEBUG_MODE:<session-id>:checkout-before-submit
-void fetch("<log-endpoint>", {
+void fetch("<probe-endpoint>", {
   method: "POST",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({
@@ -141,11 +144,11 @@ booleans, counts, enum values, IDs already safe in development, and short
 summaries — never credentials, tokens, cookies, authorization headers, personal
 data, full bodies, or unrelated state.
 
-Because a fire-and-forget probe cannot see a refusal, prove delivery once with
-the real payload shape before the attempt:
+Because a fire-and-forget probe cannot see a refusal, prove delivery once
+against each endpoint type used before the attempt:
 
 ```bash
-curl -s -X POST "<log_endpoint>" -H 'content-type: application/json' \
+curl -s -X POST "<probe-endpoint>" -H 'content-type: application/json' \
   -d '{"run":"run-0","probe":"delivery-check","data":{"ok":true}}'
 # {"accepted":true,"seq":1}
 ```
