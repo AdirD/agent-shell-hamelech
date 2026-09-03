@@ -28,7 +28,7 @@ If the input is rough or unstructured, make reasonable inferences to fill gaps, 
 
 Presentation principles:
 - Less is more. Do not reproduce the input section by section.
-- Prefer showing over explaining.
+- Prefer showing over explaining. The result should read as a set of infographics, not a document with pictures in it.
 - Use short, direct text only where visuals cannot carry the meaning.
 - Compartmentalize information into independently understandable views.
 - Establish a strong hierarchy: essential understanding first, implementation detail second.
@@ -39,6 +39,13 @@ Presentation principles:
 - Do not give every detail equal visual weight.
 - Do not add decorative charts, generic cards, fake metrics, or visuals that explain nothing.
 - Do not overemphasize sign-off, approval status, stakeholder debate, or governance.
+
+Visual density:
+- Treat crowded or text-heavy areas as a defect. Density means the visual that belonged there is missing.
+- Every dense block already has a shape inside it — a sequence, a funnel, a fork, a convergence, a timing race, a boundary. Find that shape and make it spatial instead of describing it in sentences.
+- A table whose cells are sentences is prose in a grid, not a visual.
+- Text and visual must depend on each other. If the surrounding text restates what the visual already shows, cut the text.
+- Do not let the prebuilt components available to you define what you can draw. When the built-in pieces would only put text into boxes, compose the arrangement the idea actually needs.
 
 Drawings:
 - Use drawings whenever they communicate a point faster or more clearly than prose.
@@ -89,3 +96,4 @@ For every section, ask:
 1. What must the reader understand here?
 2. Can it be shown more clearly than written?
 3. What can be removed without losing meaning?
+4. If this section is still mostly text, which shape did I fail to find?

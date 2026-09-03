@@ -98,7 +98,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-pre-plan`](#melech-pre-plan) | Do we share a precise, buildable concept? | You want alignment before plan mode or code, with calibrated question depth. |
-| [`melech-consult`](#melech-consult) | What survives an honest machloket between the strongest competing readings? | The AI proposed an implementation, architecture, or idea and you want to "double check", "proof this", "argue both sides", or convene Beit Hillel and Beit Shammai. |
+| [`melech-consult`](#melech-consult) | What do independent models conclude once the premises are verified? | The AI proposed an implementation, architecture, or idea and you want to "double check", "proof this", "are you sure", a second opinion, or "am I right or is he right". |
 | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Can the team absorb this idea without rereading the whole input? | You have any idea, note, brief, or doc and want a standalone knowledge-transfer Canvas. |
 | [`melech-8020`](#melech-8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`melech-challenge`](#melech-challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
@@ -108,6 +108,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
+| [`melech-verify`](#melech-verify) | Does this claim, conclusion, or approach hold up against the source of truth? | Say "verify" mid-thread when you want an independent second opinion that understands the discussion but does not defend its earlier conclusion. |
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`melech-prompt-shake`](#melech-prompt-shake) | What prompt bloat crept into these prompts, skills, or instructions? | After editing a prompt/skill/instruction file, when you want to strip over-explanation, duplicate/subset rules, and never-fires branches down to the leanest version that still covers 100%. |
 | [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
@@ -132,9 +133,11 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "The AI just hand-rolled a queue/retry/scheduler — check that." | [`melech-buy-vs-build`](#melech-buy-vs-build) | Names the capability, then finds the incumbents instead of guessing package names from memory. |
 | "What's out there for X? Any new AI tools for it?" | [`melech-buy-vs-build`](#melech-buy-vs-build) | Open-ended landscape discovery with a frontier lane for what shipped recently. |
 | "We decided to add RBAC; align it before planning." | [`melech-pre-plan`](#melech-pre-plan) | The work is build-shaped, but the design concept still needs alignment. |
-| "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Takes the proposal away from its author and uses the freshest independent consultation available around its consequential disagreement. |
-| "I see two valid sides—argue both before we choose." | [`melech-consult`](#melech-consult) | Beit Hillel and Beit Shammai develop both positions, then return a psak for now without erasing the minority opinion. |
-| "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into a scannable Canvas. |
+| "Double-check / proof this proposal before building." | [`melech-consult`](#melech-consult) | Verifies the load-bearing premises against the real artifact, then gets independent reads from fresh models on different providers. |
+| "Is that actually right? Verify it." | [`melech-verify`](#melech-verify) | Understands what was discussed, checks it against the source of truth, and returns a concise second opinion. |
+| "It's still not working / I don't trust this thread anymore." | [`melech-consult`](#melech-consult) | Checks whether the premise itself is false before anyone argues about the fix, and may end right there. |
+| "Am I right or is he right?" | [`melech-consult`](#melech-consult) | Records both positions in their own words and returns a psak with what it costs and the one next step. |
+| "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into an infographic-first Canvas. |
 | "Find the least invasive way to add role checks." | [`melech-8020`](#melech-8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`melech-debug-mode`](#melech-debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
@@ -157,7 +160,7 @@ question is already answered.
 melech-think-with-me (optional: think out loud before there's even an ask)
   → melech-distill-need (if the ask is a proposed solution)
   → melech-market-validation (shape an open premise, then test it)
-  → melech-consult (optional machloket)
+  → melech-consult (optional independent check)
   → melech-pre-plan
 ```
 
@@ -169,7 +172,7 @@ hold, or stop wins.
 ### Better engineering
 
 ```text
-melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional machloket) → melech-8020 → melech-challenge (optional)
+melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional independent check) → melech-8020 → melech-challenge (optional)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -226,7 +229,7 @@ Use it when:
 - you're thinking out loud and nothing is set in stone yet — you want ideation, not a plan
 - you want a single engineer-friend voice that catches a thought and adds one substantive brick (a name, a parallel, a mechanism), then gets out of the way
 - you want musings grounded in the landscape ("that's basically the ___ pattern", "that's what ___ does, where they ___") instead of interrogated or converged
-- you explicitly do **not** want questions (`melech-challenge`/`melech-pre-plan`), a structured machloket (`melech-consult`), or a decision procedure (`melech-buy-vs-build`)
+- you explicitly do **not** want questions (`melech-challenge`/`melech-pre-plan`), an independent panel and a verdict (`melech-consult`), or a decision procedure (`melech-buy-vs-build`)
 - you want it to hand off to a convergent skill only once the thought firms into something buildable
 
 ---
@@ -359,7 +362,7 @@ Use it when:
 
 ### [`melech-consult`](skills/melech-consult)
 
-Convenes Beit Hillel and Beit Shammai around an AI-proposed plan, fix, architecture, or idea, using independent models when available and disclosing lighter single-model passes.
+Verifies an AI-proposed plan, fix, architecture, or claim against the real artifact, then dispatches a panel of fresh models from different providers that answer independently — no assigned sides.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-consult
@@ -367,11 +370,14 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-cons
 
 Use it when:
 - the AI proposed a plan, architecture, or fix and you say "double check", "proof this", or "are you sure"
-- you want the strongest coherent positions developed around the proposal's real governing tension
-- you want independent houses by default, or one disclosed fresh-model second opinion for a light consultation
-- you want a deep consultation where the houses steelman each other before recommending what to do now
-- you want a clear psak while preserving the minority opinion and the evidence that should reopen the decision
-- you want convergence reported honestly when there is no legitimate machloket
+- you have stopped trusting the thread and want a fact or a verdict, not more deliberation
+- you want the load-bearing premises checked against code, data, or logs before anyone argues about the fix
+- you want independent reads from different providers, with calibrated confidence and the real dispatch disclosed
+- you and someone else disagree and you want both positions recorded before a psak
+- you want a clear answer with one next step, and a genuine tradeoff laid out only when there actually is one
+
+The design rationale and the research it is built on are documented in
+[`skills/melech-consult/README.md`](skills/melech-consult/README.md).
 
 ---
 
@@ -388,6 +394,7 @@ Use it when:
 - you want a knowledge-transfer Canvas, not a debate space or sign-off flow
 - the input is rough and needs structuring before it can be shared
 - prose is hiding the mental model, ownership, flows, or decisions
+- you want infographics rather than a document with pictures — crowded text is treated as a missing visual, not a formatting problem
 
 ---
 
@@ -485,6 +492,22 @@ Use it when:
 
 ---
 
+### [`melech-verify`](skills/melech-verify)
+
+Gives the caller a genuine second opinion on a claim, conclusion, or approach already discussed.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-verify
+```
+
+Use it when:
+- you say "verify" or ask for a second opinion on something already discussed
+- you want the discussion used as context, not as evidence for its own conclusion
+
+For multiple independent opinions or a judgment among competing paths, use `melech-consult`.
+
+---
+
 ### [`melech-prune`](skills/melech-prune)
 
 Audits and removes dead code, AI residue, and unnecessary complexity after iteration.
@@ -553,6 +576,7 @@ skills/
   melech-pre-plan/
   melech-prune/
   melech-prompt-shake/
+  melech-verify/
   melech-code-review-clone/
   melech-buy-vs-build/
   melech-smart-comments/

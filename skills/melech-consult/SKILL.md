@@ -1,211 +1,146 @@
 ---
 name: melech-consult
-description: Convene Beit Hillel and Beit Shammai to expose the real disagreement inside an AI-proposed plan, fix, architecture, or idea, using fresh independent models when available, then preserve both arguments while recommending what to do now. Use for "double check", "proof this", "are you sure", "argue both sides", second opinions, or an expert council before implementation.
+description: Get an independent verdict on an AI-proposed plan, fix, architecture, or claim by verifying its premises against the real artifact, then dispatching a panel of fresh models from different providers that answer independently. Use for "double check", "proof this", "are you sure", "second opinion", "am I right or is he right", "this still isn't working", or "not sure this is the right approach".
 disable-model-invocation: true
 ---
 
 # Consult
 
-When an AI proposes an architecture, implementation plan, or idea, asking the *same* conversation thread *"are you sure?"* fails:
-- It suffers from **self-grading bias** (eagerly rationalizing its own proposal).
-- It suffers from **thread fatigue** (trapped in the same assumptions and blind spots).
-- It agrees too easily with whatever direction was already discussed.
+Asking the *same* thread *"are you sure?"* fails. It self-grades, it is trapped in the assumptions that produced the proposal, and it agrees with whatever direction was already discussed.
 
-`melech-consult` is a **machloket l'shem shamayim**: a disagreement in service of finding what is true and useful, not winning.
+Consult buys back independence. It is a **machloket l'shem shamayim** — disagreement in service of what is true and useful, not winning — but the disagreement has to be earned by looking, not staged by assigning sides.
 
-Take the proposal off the author's desk and into the beit midrash. Find the consequential tension inside it, then constitute **Beit Hillel** and **Beit Shammai** around the two strongest coherent readings. At standard and deep effort, give each house a fresh isolated model from a different provider when available. The houses argue the question, not the user. Neither is a disposable devil's advocate.
-
-The result is not flattened consensus. Deliver a **psak for now** while preserving the minority opinion and the conditions that should reopen the decision.
+You are the clerk, not a party. Verify what can be verified, get real independent reads, then deliver a **psak**: the answer, what it costs, and the one thing to do next.
 
 ---
 
-## When to Reach for Consult
+## When Consult Gets Invoked
 
-Reach for `melech-consult` **after a direction, plan, or architecture has been proposed** and you want it proofed before building:
+Always by a deliberate human act, mid-flow, with someone waiting. Usually terse, often irritated:
 
-- *"Double-check this implementation plan before we start coding."*
-- *"Proof this architecture with another model."*
-- *"Are you sure about this fix? Get a second opinion."*
-- *"I can see two valid sides. Argue both before we choose."*
-- *"Convene Beit Hillel and Beit Shammai on this idea."*
+- *"double check this plan before we build"* / *"proof this"* / *"are you sure?"*
+- *"it's still bad, something isn't working"*
+- *"not sure that's the correct approach"*
+- *"am I right or is he right?"*
+- *"what should we do before continuing?"*
 
-Do not use it for loose ideation with no proposal yet. Do not use it when the user wants one conversational partner or a sequence of clarifying questions. Consult begins when there is something concrete enough to disagree about.
+Read that as **the developer has lost confidence in this thread** and wants escape velocity — a fact or a verdict. It is rarely a request for a symposium.
 
----
+Infer the target from the thread and the files. State your reading in one line and proceed. Do not open with a list of clarifying questions; the human is mid-task. Ask at most one question, and only if you genuinely cannot identify what is being questioned.
 
-## The Core Distinction
-
-This is not generic "pros and cons."
-
-- **Pros and cons** produce a bag of points.
-- **Red teaming** appoints one side to attack.
-- **An expert council** often collects unrelated lenses and averages them.
-- **Machloket** identifies the decision's governing tension and develops both positions as complete, defensible approaches.
-
-Beit Hillel and Beit Shammai are not fixed personality presets. Do not caricature Hillel as always permissive or Shammai as always strict. Derive the houses from the actual fork:
-
-| One house protects | The other protects |
-|---|---|
-| Simplicity and reversibility now | Guarantees and future failure cost |
-| Developer autonomy | Organizational consistency |
-| Speed to market | Operational resilience |
-| User delight | Commercial viability |
-| Adopting a mature capability | Owning a strategic capability |
-
-The names create a structure for principled disagreement; they do not predetermine which principle wins.
+**Refuse cheaply.** If the answer is knowable in a couple of tool calls, or there is one obviously right answer, say so and answer it. `"This doesn't need a panel — [answer]."` Spending five agents on a settled question is the failure mode users notice first.
 
 ---
 
-## Effort
+## Non-Negotiables
 
-Calibrate the consultation to the stakes:
+These four rules are the skill. Everything below is procedure.
 
-| Level | Use when | Dispatch |
-|---|---|---|
-| **Light** | A narrow fix or direct "get a second opinion" request | One fresh model develops both readings. Label it a single-model machloket, not independent corroboration. |
-| **Standard** *(default)* | A meaningful technical or product fork | Two houses, two fresh models from different providers, dispatched independently. |
-| **Deep** | The decision is expensive, hard to reverse, or genuinely balanced | Standard, followed by one steelman-and-response round. Add a specialist only for an orthogonal factual invariant. |
-
-Never add agents merely to make the court look impressive. A security, legal, data, or concurrency invariant may need a specialist; it is not automatically a third "opinion."
+1. **Consultants get the artifact, never the narration.** Send the file, diff, page, log, or schema plus the question and the hard constraints. Never send the conversation, your summary of it, or your proposed answer. Pasting thread history is how you get three models agreeing with a mistake and mistake it for corroboration.
+2. **Verify before you consult.** Any premise that decides the outcome and is checkable now gets checked against code, data, or logs. Report which premises were **verified** and which remain **assumed**.
+3. **Nobody is assigned a side.** Each consultant answers the question and says what it actually concludes. Assigned advocacy destroys the only signal worth having.
+4. **Different models from different providers.** Same-model panels share blind spots and produce confident agreement on shared errors. Never `inherit`. Never the model that authored the proposal, when known.
 
 ---
 
 ## Workflow
 
-### 1. Freeze the Proposal
+### 1. Name the target
 
-You are no longer defending your idea. Extract the current proposal into a clean, standalone brief:
-- **Core Objective**: What problem this is trying to solve.
-- **The Proposed Approach**: The exact mechanism, architecture, or workflow proposed.
-- **Key Invariants & Constraints**: Performance limits, existing patterns, backward compatibility.
-- **Alternatives Already Rejected**: What was considered and ruled out (so consultants don't waste time suggesting them).
+One line: what specifically is in doubt, and who holds which position — the AI's proposal, the user's position, a colleague's position, or a claim about how the system behaves.
 
-### 2. Find the Live Machloket
+If two humans disagree, record both positions in their own words. Do not merge them into one axis; that conflation is how a consult ends up restating someone's own view back to them.
 
-State the real fork in one sentence:
+Also name **what has to leave the room**: a decision, a fact, a fix, a comment to post, a measurement. The answer is shaped by the deliverable.
 
-> Should we optimize for **A**, accepting **its cost**, or for **B**, accepting **its cost**?
+### 2. Ground it
 
-A live machloket requires two approaches that can both plausibly satisfy the objective while protecting different values or assumptions.
+Before framing anything, spend a few tool calls on the premises the answer turns on. Read the code path the proposal assumes. Check whether the constraint actually holds. Look at the data instead of estimating it.
 
-Do not manufacture symmetry:
-- If one side already violates a hard requirement, stop before constituting houses and use the **No Live Machloket** output below.
-- If the disagreement is factual, stop and use the **No Live Machloket** output with the evidence or measurement needed next. Do not turn missing data into a philosophical dispute.
-- If both houses later converge, use the **No Live Machloket** output rather than inventing conflict or a minority opinion.
+External facts are the only thing that breaks correlated model error. Models arguing with each other cannot get you out of a shared wrong belief; evidence can.
 
-### 3. Constitute the Houses
+**Consult may end here**, and often should: *"Your premise is wrong — here's the evidence. The question dissolves."* That is the best available outcome, not a fallback.
 
-Give both houses the same frozen brief, then assign each a positive mandate:
+### 3. Build the packet
 
-- **Beit Hillel**: develop the strongest workable case for one side. State what it protects, what it sacrifices, its failure modes, and the conditions under which the other house would be right.
-- **Beit Shammai**: do the same for the competing side.
+One neutral packet, identical for every consultant:
 
-Each house must argue an implementable position, not merely criticize the other. The assignment should follow the actual tension, not stereotypes attached to the house names.
+- **Question** — the decision or claim, stated without a preferred answer.
+- **Artifact** — the actual code, diff, doc, or data. Inline it or give exact paths.
+- **Verified facts** — what grounding established, with how it was established.
+- **Hard constraints** — invariants, compatibility, deadlines, scale.
+- **Already ruled out** — with the reason, so nobody re-proposes it.
 
-Brief neutrally. Never lead the witness or ask for validation.
+Never lead the witness.
 
-- **DON'T SAY**: *"I proposed using a Redis queue because it's fast. Do you think that's a good idea?"*
-- **DO SAY**: *"We need durable task execution under constraints [X, Y]. The live fork is Postgres-backed simplicity now versus Redis-backed operational capability. Argue the assigned side as the strongest complete approach; name its costs, failure modes, and when the other side should win."*
+- **DON'T**: *"I proposed a Redis queue because it's fast — good idea?"*
+- **DO**: *"Durable task execution under constraints [X, Y]. Volume measured at 900 jobs/day (verified, see logs). What should this use, and why?"*
 
-### 4. Dispatch Independently
+### 4. Dispatch the panel
 
-- **Light**:
-  - Give one fresh eligible model the neutral brief and ask it to develop both houses.
-  - Exclude the model that authored the proposal when its identity is known.
-  - Label the result **single-model machloket / second opinion**, not independent corroboration.
-- **Standard or deep**:
-  - Give each house a deliberately distinct model from a different provider.
-  - Exclude the model that authored the proposal when its identity is known. Never use `inherit`.
-  - Dispatch both houses concurrently in one call and keep first-round arguments isolated.
-  - If two eligible providers are unavailable, prefer two distinct models and disclose the limitation. If only one fresh eligible model is available, downgrade to light rather than manufacturing diverse corroboration.
-- **Without subagent tools**:
-  - Construct both positions explicitly in the main thread.
-  - Label the result **thread-local single-model machloket** and disclose that it does not solve self-grading bias.
+**Default — three consultants, concurrently, in one call.** Different providers. Isolated; no consultant sees another's answer. Each returns:
 
-If subagent tools exist but no fresh model is eligible because only the author model or `inherit` is available, use the same disclosed thread-local fallback. A weaker honest consultation is better than a fake independent one.
+1. Its answer, and the reasoning that produced it.
+2. Whether it rejects the question's framing, and why — this is explicitly invited.
+3. **Confidence, 1–10**, and the one thing that would change it.
+4. The strongest case against its own answer.
 
-Shared models create shared blind spots. Report the actual dispatch honestly, including when the author model is unknown; never imply provider or model independence you did not achieve.
+Optionally give each a distinct **reasoning method** to decorrelate further — one inverts (assume it shipped and broke, trace back), one decomposes (list the load-bearing assumptions, test each), one traces dependencies and base rates (what blocks what, how have similar efforts actually gone). Methods and models decorrelate; personas and job titles do not.
 
-### 5. Let the Houses Answer Each Other (Deep Only)
+Every consultant prompt carries: *"Do not defer to the answer the framing seems to expect. Reason to wherever it leads. If your conclusion is that the question is wrong, say that."*
 
-Give each house the other's exact argument. Ask it to:
+**Escalate only on disagreement.** If the three converge, stop — that convergence is your evidence. If they split materially, spawn **one** devil's advocate on a strong model, aimed at the *emerging* answer: *"The panel is converging on X. Make the strongest case that following X is a mistake. Name the one thing that, if unrebutted, should change the verdict."* Then rebut or concede it explicitly.
 
-1. steelman the strongest point before disagreeing,
-2. identify genuine common ground,
-3. answer the central objection,
-4. state what evidence would change its position.
+**Weaker configurations, honestly labeled:**
 
-Run one exchange, not an endless role-play. The purpose is to sharpen the hinge, not produce theater.
+| Situation | Do | Call it |
+|---|---|---|
+| Only one fresh provider available | One fresh model, one read | single-model second opinion |
+| No subagents available | Reason it out in-thread | thread-local — does not solve self-grading bias |
+| Panel is same-model | Run it, flag it | shared-blind-spot panel, not independent corroboration |
 
-### 6. Pasken Without Erasing
+A weaker honest consultation beats a fake independent one. Report the actual dispatch — which models answered, and whether provider independence was achieved. Never imply independence you did not get.
 
-Do not dump raw transcripts or count votes. Synthesize the reasoning:
+### 5. Answer
 
-1. **Common Ground (Davar Muskam)**: Facts, constraints, and parts of the proposal both houses accept.
-2. **Beit Hillel**: Its complete case, what it protects, and the price it accepts.
-3. **Beit Shammai**: Its complete case, what it protects, and the price it accepts.
-4. **The Machloket**: The precise assumption, value, or trade-off separating them.
-5. **Psak for Now**: The recommended direction for the present constraints and the concrete adjusted proposal.
-6. **Minority Opinion Preserved**: What the chosen direction risks missing; do not erase the losing house's strongest warning.
-7. **Reopen When**: Observable evidence, thresholds, or changed conditions that should return the minority view to the table.
+Lead with the claim. Scale length to the question — a naming call gets a paragraph, a migration gets the full treatment. Pick the shape the finding earned:
 
-The user still rules. A psak is a clear recommendation, not permission to implement without approval.
+**Settled by evidence** — grounding or the panel resolved it.
+> The claim, the evidence that settles it, what to do now.
 
-If a hard invariant decides the case or both houses converge, do not force the seven-part structure. Use:
+**Panel converged** — all consultants landed together.
+> The answer. Confidence, and whether it was unanimous or weighted. What would have to be true for this to be wrong. The one next step.
 
-1. **Verified Common Ground**: What scrutiny established.
-2. **No Live Machloket**: Why the apparent fork collapsed.
-3. **Decisive Constraint or Evidence**: The requirement, fact, or shared finding that settles it.
-4. **Adjusted Proposal / Next Measurement**: What to do now, or what evidence is still needed.
+**Split on a fact** — they disagree about what is true.
+> The competing claims, the measurement that separates them, and the result if it was cheap enough to just go take. Do not turn a factual gap into a philosophical dispute.
 
-There is no minority opinion when no defensible minority position remains.
+**Split on values** — a real tradeoff; both paths satisfy the requirements.
+> The tension in one sentence. Each position with what it protects and the price it accepts. The psak for present constraints. What you give up by taking it. The observable condition that should reopen it.
 
----
+Always close with **one** concrete next action, and — where it applies — how to tell later whether the call was right.
 
-## Example
+Report agreement honestly. If the panel converged only because it shared an assumption, say so and downgrade confidence. Unanimity on a shared blind spot is not strength.
 
-```markdown
-**Question**: Use the existing Postgres database for durable background jobs, or introduce Redis and a queue runtime?
-
-## Common Ground (Davar Muskam)
-Both houses agree jobs must survive process restarts and need bounded retries. Current volume is under 1,000 jobs/day; Redis is not otherwise provisioned.
-
-## Beit Hillel — Postgres-backed simplicity
-Use the infrastructure already operated. The current scale does not justify another datastore and operational surface. Accept lower throughput and fewer queue-native tools.
-
-## Beit Shammai — Redis-backed queue capability
-Use a mature queue runtime with explicit concurrency, retry, scheduling, and observability semantics. Accept new infrastructure now to avoid a risky migration after volume grows.
-
-## The Machloket
-Whether expected growth is credible enough to pay the operational cost before the limit is measured.
-
-## Psak for Now
-Use the Postgres-backed option behind a narrow queue interface. Do not provision Redis yet.
-
-## Minority Opinion Preserved
-The Postgres design must not spread queue semantics through business code; otherwise later migration cost validates Beit Shammai's warning.
-
-## Reopen When
-Reconsider Redis when measured queue latency breaches the product SLO, sustained volume exceeds the declared threshold, or required scheduling semantics outgrow the Postgres library.
-```
+The user still rules. A psak is a recommendation, not permission to implement.
 
 ---
 
 ## Do / Don't
 
 **Do:**
-- Derive the houses from the decision's real governing tension.
-- Make both sides coherent enough that an intelligent person could choose either under different conditions.
-- Keep first-round reasoning independent at standard/deep effort and always disclose the actual dispatch.
-- Recommend what to do now and preserve what would make the other house right.
-- Say when there is no legitimate machloket.
+- Answer directly and skip the panel when the question doesn't need one.
+- Verify the load-bearing premises first, and label verified versus assumed.
+- Send artifacts; withhold the thread.
+- Let consultants reject the question and propose an option nobody named.
+- Require calibrated confidence and weight it over eloquence and length.
+- Escalate to a devil's advocate only after an answer emerges, and aim it at that answer.
+- Disclose the real dispatch, including when independence failed.
 
 **Don't:**
-- Turn Beit Hillel and Beit Shammai into lenient/strict mascots.
-- Assign one house to advocate an obviously broken strawman.
-- Manufacture disagreement when evidence converges or a hard invariant decides the case.
-- Let the original author pose as an independent house or defend its proposal without disclosing the thread-local fallback.
-- Reuse the main thread's model or duplicate models and call the result independent corroboration.
-- Dump raw subagent logs or transcripts into the chat.
-- Average the houses into a vague compromise that protects neither principle.
-- Erase the minority opinion after issuing the psak.
+- Assign anyone a side to defend.
+- Paste conversation history into consultant prompts.
+- Reuse the author's model, duplicate models, or `inherit`, then call it independent.
+- Manufacture a two-sided tradeoff when evidence settles it, or when the honest answer is "we don't know yet — go measure."
+- Present a hedge as a verdict, or bury the answer under structure.
+- Dump raw subagent transcripts into the chat.
+- Run five agents on a question one grep would have closed.
