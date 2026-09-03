@@ -1,6 +1,6 @@
 ---
 name: melech-debug-mode
-description: Run an evidence-gated end-to-end session with temporary runtime probes and optional control of the user's existing Chrome tab.
+description: Debug or verify a local UI end to end in the user's existing Chrome tab, with temporary runtime probes and a manual browser fallback.
 ---
 
 # Debug Mode
@@ -8,24 +8,31 @@ description: Run an evidence-gated end-to-end session with temporary runtime pro
 Follow this protocol for the user's requested workflow:
 
 ```text
-choose driver → attach if autopilot → define one complete attempt
+choose browser driver → attach if autopilot → define one complete attempt
 → start collector → add probes → prove probes loaded → run E2E → read evidence
 → act on evidence → rerun E2E if code changed → clean up
 ```
 
-A unit test, direct call, ad hoc script, synthetic request, or isolated endpoint
-never counts as the initial E2E attempt or post-change verification.
+The E2E boundary is the local UI in a browser. A unit, integration, AI, or
+test-harness run never counts as E2E, even when it uses a real model, tool,
+sandbox, filesystem, or backend. Neither does a direct call, script, synthetic
+request, or isolated endpoint.
+
+Do not create or run a test harness before the first browser attempt. Tests and
+direct calls are supplemental diagnostics only after browser reproduction. If
+the requested behavior cannot be exercised through a local UI, say this skill
+does not provide its E2E path; do not relabel a harness as E2E.
 
 ## 1. Choose The Driver
 
-- Browser workflow → **autopilot** by default.
+- Use **autopilot** by default for every local UI workflow.
 - User explicitly says they will drive, hold the wheel, or use `proceed` →
   **manual**.
-- The user denies attach, the target tab is ambiguous or unsafe, or the target
-  appears to be production → **manual**.
-- Non-browser workflow → use its real external entry point.
+- The user denies browser control, the target tab is ambiguous or unsafe, the
+  target appears to be production, or attach remains unavailable after retry →
+  **manual**.
 
-Do not ask the user to choose for an ordinary local browser workflow.
+Do not ask the user to choose for an ordinary local UI.
 
 For autopilot, read the installed `melech-live-browser/SKILL.md`, show its
 Chrome consent notice, and begin its attach flow before any diagnostic
@@ -42,6 +49,11 @@ Autopilot always starts by asking the user to enable remote debugging at
 `chrome://inspect/#remote-debugging` and click **Allow** when Chrome prompts.
 If attach fails, repeat that request and retry once. Manual is a fallback only
 after that retry fails.
+
+Manual still uses the running local UI and the same probes. Give the user the
+reset, actions, and deciding outcomes, ask them to reply exactly `proceed` after
+one reproduction, then stop and listen. Read the evidence only after that
+reply.
 
 ## 2. Define One Attempt
 
@@ -76,7 +88,8 @@ undefined, re-source `dm.sh` or call that path directly.
 |---|---|
 | `dm start` | start one temporary collector |
 | `dm status <session-dir>` | that session's metadata and process liveness |
-| `dm logs <session-dir> [--run ID] [--after-seq N] [--tail N]` | read events |
+| `dm logs <session-dir> [--run ID] [--after-seq N] [--tail N]` | read compact JSONL, one complete event per line |
+| `dm logs <session-dir> --pretty` | human-readable multi-line events |
 | `dm stop <session-dir>` | tear down that session |
 | `dm doctor --once` | JSON snapshot of every live session |
 
@@ -165,6 +178,8 @@ field descriptively (`hasSessionToken`) instead of removing the observation.
 Mark every temporary edit `DEBUG_MODE:<session-id>:<probe-id>` and track touched
 files. Run only the cheapest compile, type, or syntax check needed to prove the
 instrumentation is valid; probe events from that check are not E2E evidence.
+Do not create a test file or harness to load probes. Load them in the same dev
+services that serve the browser workflow.
 
 Before E2E, prove each long-running or prebuilt target loaded the probe. Require
 evidence produced after the probe edit and tied to that source or artifact: a
@@ -172,7 +187,8 @@ new build/HMR/restart marker for the edited target, a source-loaded process
 started after the edit, or a probe-specific load event. For prebuilt runtimes,
 verify both that the artifact was built after the edit and that the process
 loaded it. A changing terminal mtime or old restart text does not prove
-freshness.
+freshness. A Jest, Vitest, AI-harness, or other test process does not prove that
+the browser-serving runtime loaded the probe.
 
 If the runtime is stale, an existing trace, persisted input, audit record, or
 other authoritative boundary record may replace the probe only when it captures
@@ -187,7 +203,7 @@ process or a restart may interrupt active work, stop and ask:
 
 A successful shell delivery check proves only the collector works.
 
-## 5. Run The Attempt
+## 5. Run The Browser Attempt
 
 Use `run-1` initially and increment the run ID for every retry, supplemental
 diagnostic, and post-change verification. After each complete attempt, read:
@@ -197,8 +213,10 @@ dm logs <session-dir> --run <run-id>
 ```
 
 Every line is an envelope: your object under `payload`, plus `seq` and
-`received_at`. Read `--after-seq` to see only what the newest attempt added, and
-`--tail` when a run is noisy.
+`received_at`. Default output is JSONL: each line is one complete JSON object
+and can be parsed independently. Use `--after-seq` to see only what the newest
+attempt added, `--tail` when a run is noisy, and `--pretty` only for human
+reading.
 
 ### Autopilot
 
@@ -213,12 +231,6 @@ selection fails, switch to manual.
 Tell the user manual mode is active, give the defined reset, actions, and
 deciding outcomes, and ask them to reply exactly `proceed` after one attempt.
 Then stop. Read that run only after `proceed`.
-
-### Non-browser
-
-Execute the defined workflow through its real external entry point, then read
-that run. Do not substitute an isolated function, tool, controller, or ad hoc
-diagnostic script.
 
 ## 6. Act On Evidence
 
@@ -241,10 +253,10 @@ from correlation.
 
 ## Supplemental Diagnostics
 
-Only after the first E2E attempt, focused tests, direct calls, ad hoc diagnostic
-scripts, endpoint requests, or synthetic requests may isolate a narrower
-question. For browser workflows, use them only after successful attach. Label
-them supplemental with separate run IDs; they never satisfy an E2E gate.
+Only after the first browser E2E attempt, focused tests, direct calls, ad hoc
+diagnostic scripts, endpoint requests, or synthetic requests may isolate a
+narrower question. Label them supplemental with separate run IDs; they never
+satisfy an E2E gate or post-change verification.
 
 ## 7. Clean Up
 

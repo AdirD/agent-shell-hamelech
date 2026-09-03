@@ -370,7 +370,10 @@ def logs_session(args: argparse.Namespace) -> int:
         events.append(event)
 
     for event in events[-args.tail :]:
-        print(json.dumps(event, indent=2, sort_keys=True))
+        if args.pretty:
+            print(json.dumps(event, indent=2, sort_keys=True))
+        else:
+            print(json.dumps(event, separators=(",", ":"), sort_keys=True))
     return 0
 
 
@@ -691,11 +694,19 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("session_dir")
     status.set_defaults(func=status_session)
 
-    logs = subparsers.add_parser("logs", help="print collected JSON events")
+    logs = subparsers.add_parser(
+        "logs",
+        help="print collected events as compact JSONL (one event per line)",
+    )
     logs.add_argument("session_dir")
     logs.add_argument("--run")
     logs.add_argument("--after-seq", type=int, default=0)
     logs.add_argument("--tail", type=int, default=200)
+    logs.add_argument(
+        "--pretty",
+        action="store_true",
+        help="print human-readable multi-line JSON instead of JSONL",
+    )
     logs.set_defaults(func=logs_session)
 
     stop = subparsers.add_parser("stop", help="stop and remove one collector session")

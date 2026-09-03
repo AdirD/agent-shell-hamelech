@@ -10,7 +10,7 @@
 #   dm help           list every command
 #   dm start          start a new collector session
 #   dm status <dir>   show one session's status
-#   dm logs <dir>     print collected events
+#   dm logs <dir>     print collected events as compact JSONL
 #   dm stop <dir>     stop and remove one session
 
 # Resolve this file's own directory so `dm` finds the co-located launcher,
