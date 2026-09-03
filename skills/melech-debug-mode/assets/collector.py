@@ -181,15 +181,11 @@ def main() -> int:
     state = CollectorState(session_dir, token)
     server = ThreadingHTTPServer((host, port), CollectorHandler)
     server.state = state  # type: ignore[attr-defined]
-    backend_url = f"http://{host}:{server.server_address[1]}"
 
     metadata = {
         "collector_pid": os.getpid(),
         "backend_host": host,
         "backend_port": server.server_address[1],
-        "backend_url": backend_url,
-        "backend_health_url": f"{backend_url}/health",
-        "backend_log_endpoint": f"{backend_url}/log/{token}",
         "collector_url": public_url,
         "health_url": f"{public_url}/health",
         "log_endpoint": f"{public_url}/log/{token}",
