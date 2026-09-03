@@ -9,7 +9,7 @@ Follow this protocol for the user's requested workflow:
 
 ```text
 choose driver → attach if autopilot → define one complete attempt
-→ start collector → add probes → run E2E → read evidence
+→ start collector → add probes → prove probes loaded → run E2E → read evidence
 → act on evidence → rerun E2E if code changed → clean up
 ```
 
@@ -107,6 +107,10 @@ output, and the error path. Instrument whichever layer owns the question — for
 browser workflow that means page or component state for rendering and
 interaction, and server handlers for persistence, validation, and integration.
 
+For each already-running target, record the available freshness baseline that
+fits its lifecycle: process start, build identity, or build/reload log cursor.
+One-shot source-loaded commands run after the edit need no prior baseline.
+
 POST one small JSON object per observation to `log_endpoint` exactly as returned
 (it embeds the session token):
 
@@ -162,10 +166,26 @@ Mark every temporary edit `DEBUG_MODE:<session-id>:<probe-id>` and track touched
 files. Run only the cheapest compile, type, or syntax check needed to prove the
 instrumentation is valid; probe events from that check are not E2E evidence.
 
-Before E2E, verify each instrumented runtime loaded the edit by observing its
-rebuild, HMR, or process restart. If its dev output says it will not restart
-after file changes, restart that service. A successful shell delivery check
-proves the collector works; it does not prove the application loaded the probe.
+Before E2E, prove each long-running or prebuilt target loaded the probe. Require
+evidence produced after the probe edit and tied to that source or artifact: a
+new build/HMR/restart marker for the edited target, a source-loaded process
+started after the edit, or a probe-specific load event. For prebuilt runtimes,
+verify both that the artifact was built after the edit and that the process
+loaded it. A changing terminal mtime or old restart text does not prove
+freshness.
+
+If the runtime is stale, an existing trace, persisted input, audit record, or
+other authoritative boundary record may replace the probe only when it captures
+the same deciding fact. Name the exact record; app prose and inferred UI
+behavior do not qualify.
+
+Otherwise restart only the target service when safe. If the user owns that
+process or a restart may interrupt active work, stop and ask:
+
+> `<service>` is still running pre-probe code. Rebuild or restart it, then tell
+> me and I'll continue.
+
+A successful shell delivery check proves only the collector works.
 
 ## 5. Run The Attempt
 
@@ -209,12 +229,13 @@ from correlation.
   broadening it.
 - Evidence is incomplete → revise the minimum probes and repeat with a new run
   ID through the same E2E driver.
-- No events → first confirm the instrumented runtime rebuilt or restarted after
-  the probe edit. Then confirm the collector is serving with the `health_url`
-  curl or `dm doctor --once` (`dm status` only reports process liveness), and
-  repeat the delivery check. The collector already allows cross-origin posts,
-  so for page-side probes suspect the app's CSP `connect-src` or an unreachable
-  route; repair, then repeat E2E.
+- Unexpectedly no events from a probe still in the evidence plan → first
+  confirm the instrumented runtime rebuilt or restarted after the probe edit.
+  Then confirm the collector is serving with the `health_url` curl or
+  `dm doctor --once` (`dm status` only reports process liveness), and repeat the
+  delivery check. The collector already allows cross-origin posts, so for
+  page-side probes suspect the app's CSP `connect-src` or an unreachable route;
+  repair, then repeat E2E.
 - Code changed → keep relevant probes and repeat the same E2E workflow before
   cleanup.
 

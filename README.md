@@ -298,7 +298,10 @@ whether to install it or switch to manual. The initial attempt, revised-probe
 runs, and post-change verification all pass through the same E2E gate. Focused
 tests or endpoint requests are allowed only afterward as supplemental
 diagnostics; for browser workflows they also require successful attach. They
-never replace E2E verification.
+never replace E2E verification. Probe-based attempts also wait for causal proof
+that each target runtime loaded the instrumentation; if a required restart is
+user-owned or disruptive, the agent asks the user to restart that service
+before continuing.
 
 Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, and `dm start`/`dm status <dir>`/`dm logs <dir>`/`dm stop <dir>` manage collectors):
 
