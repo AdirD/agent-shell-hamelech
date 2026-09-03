@@ -111,7 +111,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-verify`](#melech-verify) | Does this claim, conclusion, or approach hold up against the source of truth? | Say "verify" mid-thread when you want an independent second opinion that understands the discussion but does not defend its earlier conclusion. |
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`melech-prompt-shake`](#melech-prompt-shake) | What prompt bloat crept into these prompts, skills, or instructions? | After editing a prompt/skill/instruction file, when you want to strip over-explanation, duplicate/subset rules, and never-fires branches down to the leanest version that still covers 100%. |
-| [`melech-debug-mode`](#melech-debug-mode) | What runtime evidence explains this reproducible bug? | A user can exercise a failing workflow but static inspection and existing logs are insufficient. Manual: they reproduce. Autopilot: the agent drives an already-open logged-in Chrome tab. |
+| [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this workflow end to end? | Run a real local workflow with temporary probes. Browser workflows default to autopilot; tests and direct calls remain supplemental. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR interaction points—inline comments, replies on your own PRs, conversation comments, and review verdicts including silent approvals—correlated to local code and git history. |
@@ -140,8 +140,9 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Turn this idea/doc/notes into a Canvas the team can absorb." | [`melech-idea-to-canvas`](#melech-idea-to-canvas) | Knowledge transfer from any idea, note, or doc into an infographic-first Canvas. |
 | "Find the least invasive way to add role checks." | [`melech-8020`](#melech-8020) | The outcome is understood; now minimize the implementation. |
 | "I can reproduce this bug, but the existing logs do not explain it." | [`melech-debug-mode`](#melech-debug-mode) | Temporary runtime probes can narrow the real failing path before a fix. |
+| "Test this local UI flow for me so I don't have to click through it myself." | [`melech-debug-mode`](#melech-debug-mode) | Drives the existing browser tab, captures runtime evidence, and reports the observed result. |
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
-| "Drive the Chrome tab I'm already logged into while we debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns evidence and diagnosis; live browser owns safe attach and interaction. |
+| "Drive the Chrome tab I'm already logged into while we test or debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns probes and evidence; live browser owns safe attach and interaction. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "My prompt/skill/instructions got bloated — tighten them." | [`melech-prompt-shake`](#melech-prompt-shake) | Tree-shaking for prose: audits the diff against 5 prompt proofs and recommends cuts, keeping edits inside the diff window. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
@@ -288,22 +289,24 @@ on the machine.
 
 ### [`melech-debug-mode`](skills/melech-debug-mode)
 
-Diagnoses reproducible bugs using temporary runtime probes and captured evidence.
+Runs a requested workflow end to end with temporary runtime probes and captured
+evidence.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-debug-mode
 ```
 
 Use it when:
-- you can reproduce a UI, API, desktop, or integration bug but current logs are insufficient
-- runtime state or control flow must be observed before choosing a fix
-- you want hypothesis-driven instrumentation with an explicit user reproduction gate (**manual**)
-- you want the agent to reproduce a UI end-to-end in the Chrome tab you already have open (**autopilot**)
+- you want the agent to exercise and inspect a local UI instead of clicking through it yourself
+- you need runtime evidence from a complete UI, agent, API, desktop, or integration workflow
+- you want browser-facing workflows to default to automatic execution in the Chrome tab you already have open (**autopilot**)
+- you want an explicit `proceed` gate when you choose to drive the complete workflow (**manual**)
+- unit tests, ad hoc diagnostic scripts, direct tool calls, synthetic requests, or isolated endpoints must not be mistaken for E2E evidence
 - temporary probes and the local collector must be removed cleanly afterward
 - you want a live view of running collectors, their health, and streamed logs, with the ability to kill one manually (`doctor`)
 
 Requires Python 3.9+ and the official Vercel Labs `portless` CLI. Manual
-reproduction is self-contained. Autopilot additionally requires
+execution is self-contained. Autopilot additionally requires
 `melech-live-browser`, which owns Chrome DevTools MCP setup, attach consent, and
 browser interaction:
 
@@ -311,11 +314,14 @@ browser interaction:
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live-browser
 ```
 
-If the companion is missing during autopilot, debug mode shows this exact
-command and asks whether to install it or switch to manual reproduction. For
-initial reproduction, revised-probe reruns, and fix verification, live browser
-drives one bounded attempt and then returns immediately to debug mode for
-collector evidence; autopilot never waits for a `proceed` reply.
+Browser workflows enter autopilot without a mode-selection question unless the
+user explicitly chooses manual or attach is unavailable, ambiguous, or unsafe.
+If the companion is missing, debug mode shows this exact command and asks
+whether to install it or switch to manual. The initial attempt, revised-probe
+runs, and post-change verification all pass through the same E2E gate. Focused
+tests or endpoint requests are allowed only afterward as supplemental
+diagnostics; for browser workflows they also require successful attach. They
+never replace E2E verification.
 
 Optional: install the bundled `dm` shell command for one-keystroke access from any directory (`dm` opens the doctor TUI, `dm help` lists commands, and `dm start`/`dm status <dir>`/`dm logs <dir>`/`dm stop <dir>` manage collectors):
 
@@ -585,7 +591,7 @@ skills/
 
 Every skill has its own `SKILL.md` with frontmatter plus optional `scripts/` and
 `references/`. Skills can explicitly compose: debug mode remains independent
-for manual reproduction and uses `melech-live-browser` only for autopilot.
+for manual execution and uses `melech-live-browser` only for autopilot.
 
 ## Contributing
 
