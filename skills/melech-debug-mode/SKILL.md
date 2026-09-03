@@ -38,10 +38,10 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live
 Ask whether to install it or switch to manual. Never substitute another browser
 or profile.
 
-A failed attach call is not a driver decision. Read the live-browser failure
-matrix, tell the user the one action that unblocks autopilot, and retry page
-listing once after they confirm. Downgrade to manual only after that retry
-fails, and name the unresolved blocker in the same message.
+Autopilot always starts by asking the user to enable remote debugging at
+`chrome://inspect/#remote-debugging` and click **Allow** when Chrome prompts.
+If attach fails, repeat that request and retry once. Manual is a fallback only
+after that retry fails.
 
 ## 2. Define One Attempt
 

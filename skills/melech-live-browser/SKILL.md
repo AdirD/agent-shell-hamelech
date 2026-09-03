@@ -67,10 +67,8 @@ visible side effects. Never infer approval for adjacent actions.
    material page change.
 
 Do not silently fall back to Playwright, Puppeteer, a fresh browser profile, or
-a cloud browser. Treat a failed attach call as a repairable blocker: work the
-failure matrix in [CHROME_DEVTOOLS_MCP.md](references/CHROME_DEVTOOLS_MCP.md),
-give the user the one action that fixes it, and retry page listing once before
-reporting attach as unavailable or asking about a different browser driver.
+a cloud browser. If attach fails, repeat the consent notice, retry page listing
+once, then report the blocker and ask before using a different browser driver.
 
 ## Perform and verify the task
 
