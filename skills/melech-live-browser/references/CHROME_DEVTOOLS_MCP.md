@@ -54,6 +54,12 @@ live host.
 5. Expect the *Chrome is being controlled by automated test software* banner
    while attached.
 
+The toggle is a per-profile preference that can be off even though it worked
+before, and Chrome leaves its `DevToolsActivePort` file behind when the port
+closes. A stale file makes `--autoConnect` report a missing port when the real
+state is remote debugging disabled, so treat that error as "ask the user to
+re-enable the toggle" rather than a broken configuration.
+
 Do not relaunch the user's daily Chrome with `--remote-debugging-port` and a
 custom `--user-data-dir`; that creates the isolated-profile path and loses the
 session this skill is meant to reuse.
@@ -65,6 +71,7 @@ session this skill is meant to reuse.
 | MCP tools are absent | Configure only the current host, then reload it. |
 | MCP starts without `--autoConnect` | Add the flag to that host's local command entry, then reload it. |
 | Chrome does not offer the connection | Enable remote debugging in Chrome 144+ and retry page listing. |
+| `Could not find DevToolsActivePort` | Remote debugging is off in the running Chrome. Ask the user to enable it at `chrome://inspect/#remote-debugging`, then retry page listing once. |
 | Chrome shows a dialog but attach fails | Click **Allow**, retry once, then report the blocker. |
 | The expected tab is missing | Ask the user to bring it forward or identify it; do not open an unauthenticated replacement. |
 | The host uses a remote-URL MCP server | Do not rewrite it; use that host's supported configuration path. |

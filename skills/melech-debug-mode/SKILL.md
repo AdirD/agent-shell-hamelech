@@ -21,8 +21,8 @@ never counts as the initial E2E attempt or post-change verification.
 - Browser workflow → **autopilot** by default.
 - User explicitly says they will drive, hold the wheel, or use `proceed` →
   **manual**.
-- Attach is unavailable, denied, ambiguous, or unsafe; or the target appears to
-  be production → **manual**.
+- The user denies attach, the target tab is ambiguous or unsafe, or the target
+  appears to be production → **manual**.
 - Non-browser workflow → use its real external entry point.
 
 Do not ask the user to choose for an ordinary local browser workflow.
@@ -37,6 +37,11 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live
 
 Ask whether to install it or switch to manual. Never substitute another browser
 or profile.
+
+A failed attach call is not a driver decision. Read the live-browser failure
+matrix, tell the user the one action that unblocks autopilot, and retry page
+listing once after they confirm. Downgrade to manual only after that retry
+fails, and name the unresolved blocker in the same message.
 
 ## 2. Define One Attempt
 
