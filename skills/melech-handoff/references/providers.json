@@ -1,0 +1,641 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "ctx": {
+      "url": "https://github.com/ctxrs/ctx",
+      "revision": "1e199c7e95960f48af4d5dbb02f2d259a5aea26c",
+      "license": "Apache-2.0"
+    },
+    "agent_sessions": {
+      "url": "https://jazzyalex.github.io/agent-sessions/blog/where-agents-store-history/"
+    }
+  },
+  "providers": [
+    {
+      "id": "codex",
+      "name": "Codex",
+      "unit": "file",
+      "format": "jsonl",
+      "identity_hint": "session id is in the rollout filename and the first session_meta record",
+      "locations": [
+        {
+          "root": "${CODEX_HOME:-~/.codex}",
+          "session_glob": "sessions/**/*.jsonl"
+        },
+        {
+          "root": "${CODEX_HOME:-~/.codex}",
+          "session_glob": "archived_sessions/**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "deepseek_harness",
+      "name": "DeepSeek Harness",
+      "unit": "file",
+      "format": "jsonl",
+      "identity_hint": "prefer raw session.jsonl leaves; ignore .zstd",
+      "locations": [
+        {
+          "root": "${DSH_HOME:-~/.dsh}",
+          "session_glob": "sessions/**/session.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "grok_build",
+      "name": "Grok Build",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${GROK_HOME:-~/.grok}",
+          "session_glob": "sessions/**/updates.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "pi",
+      "name": "Pi",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "~/.pi/agent/sessions",
+          "session_glob": "**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "claude_code",
+      "name": "Claude Code",
+      "unit": "file",
+      "format": "jsonl",
+      "identity_hint": "project folder is the cwd with / and . turned into -; filename is the session id",
+      "locations": [
+        {
+          "root": "${CLAUDE_CONFIG_DIR:-~/.claude}/projects",
+          "session_glob": "**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "open_code",
+      "name": "OpenCode",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in a SQLite database",
+      "locations": [
+        {
+          "root": "${XDG_DATA_HOME:-~/.local/share}/opencode",
+          "session_glob": "opencode.db"
+        }
+      ]
+    },
+    {
+      "id": "kilo",
+      "name": "Kilo Code",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in a SQLite database",
+      "locations": [
+        {
+          "root": "${XDG_DATA_HOME:-~/.local/share}/kilo",
+          "session_glob": "kilo.db"
+        }
+      ]
+    },
+    {
+      "id": "mimocode",
+      "name": "MiMo Code",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in a SQLite database",
+      "locations": [
+        {
+          "root": "${XDG_DATA_HOME:-~/.local/share}/mimocode",
+          "session_glob": "mimocode.db"
+        }
+      ]
+    },
+    {
+      "id": "kiro_cli",
+      "name": "Kiro",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "current sessions are unsupported; legacy history is SQLite",
+      "locations": [
+        {
+          "root": "${KIRO_HOME:-~/.kiro}",
+          "session_glob": "sessions"
+        }
+      ]
+    },
+    {
+      "id": "crush",
+      "name": "Crush",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in crush.db",
+      "locations": [
+        {
+          "root": ".",
+          "session_glob": "**/.crush/crush.db"
+        }
+      ]
+    },
+    {
+      "id": "goose",
+      "name": "Goose",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in sessions.db",
+      "locations": [
+        {
+          "root": "${GOOSE_PATH_ROOT:-${XDG_DATA_HOME:-~/.local/share}/goose}",
+          "session_glob": "data/sessions/sessions.db"
+        }
+      ]
+    },
+    {
+      "id": "lingma",
+      "name": "Lingma",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in client local.db files",
+      "locations": [
+        {
+          "root": "~/.lingma",
+          "session_glob": "**/local.db"
+        }
+      ]
+    },
+    {
+      "id": "qoder",
+      "name": "Qoder",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "~/.qoder/projects",
+          "session_glob": "**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "warp",
+      "name": "Warp",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in warp.sqlite with protobuf payloads",
+      "locations": [
+        {
+          "root": "~/Library/Application Support/dev.warp.Warp-Stable",
+          "session_glob": "warp.sqlite"
+        }
+      ]
+    },
+    {
+      "id": "codebuddy",
+      "name": "CodeBuddy",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${CODEBUDDY_CONFIG_DIR:-~/.codebuddy}",
+          "session_glob": "projects/**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "openclaw",
+      "name": "OpenClaw",
+      "unit": "file",
+      "format": "jsonl",
+      "identity_hint": "plaintext fallback only; ignore agent sqlite databases",
+      "locations": [
+        {
+          "root": "~/.openclaw",
+          "session_glob": "agents/*/sessions/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "hermes",
+      "name": "Hermes Agent",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in state.db",
+      "locations": [
+        {
+          "root": "${HERMES_HOME:-~/.hermes}",
+          "session_glob": "state.db"
+        }
+      ]
+    },
+    {
+      "id": "nanoclaw",
+      "name": "NanoClaw",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history is a multi-database project layout",
+      "locations": [
+        {
+          "root": ".",
+          "session_glob": "data/v2.db"
+        }
+      ]
+    },
+    {
+      "id": "astrbot",
+      "name": "AstrBot",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in data_v4.db",
+      "locations": [
+        {
+          "root": "${ASTRBOT_ROOT:-~/.astrbot}",
+          "session_glob": "data/data_v4.db"
+        }
+      ]
+    },
+    {
+      "id": "shelley",
+      "name": "Shelley",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in a CWD sqlite file",
+      "locations": [
+        {
+          "root": ".",
+          "session_glob": "shelley.db"
+        }
+      ]
+    },
+    {
+      "id": "continue",
+      "name": "Continue",
+      "unit": "file",
+      "format": "json",
+      "locations": [
+        {
+          "root": "${CONTINUE_GLOBAL_DIR:-~/.continue}/sessions",
+          "session_glob": "*.json"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "openhands",
+      "name": "OpenHands",
+      "unit": "directory",
+      "format": "json",
+      "locations": [
+        {
+          "root": "${OH_PERSISTENCE_DIR:-${FILE_STORE_PATH:-~/.openhands}}",
+          "session_glob": "conversations/*/events"
+        },
+        {
+          "root": "${OH_PERSISTENCE_DIR:-${FILE_STORE_PATH:-~/.openhands}}",
+          "session_glob": "**/v1_conversations/*"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "antigravity_cli",
+      "name": "Antigravity",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "~/.gemini/antigravity-cli/brain",
+          "session_glob": "*/.system_generated/logs/transcript.jsonl"
+        },
+        {
+          "root": "~/.gemini/antigravity-ide/brain",
+          "session_glob": "*/.system_generated/logs/transcript.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "gemini_cli",
+      "name": "Gemini",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${GEMINI_CLI_HOME:-~}/.gemini/tmp",
+          "session_glob": "*/chats/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "tabnine",
+      "name": "Tabnine",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${GEMINI_CLI_HOME:-~}/.tabnine/agent/tmp",
+          "session_glob": "*/chats/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "unit": "file",
+      "format": "jsonl",
+      "identity_hint": "session id is the transcript filename stem under agent-transcripts",
+      "locations": [
+        {
+          "root": "${CURSOR_DATA_DIR:-~/.cursor}/projects",
+          "session_glob": "*/agent-transcripts/*/*.jsonl"
+        }
+      ],
+      "verification": "local",
+      "support": "full"
+    },
+    {
+      "id": "zed",
+      "name": "Zed",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in threads.db",
+      "locations": [
+        {
+          "root": "${XDG_DATA_HOME:-~/.local/share}/zed",
+          "session_glob": "threads/threads.db"
+        }
+      ]
+    },
+    {
+      "id": "copilot_cli",
+      "name": "GitHub Copilot",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${COPILOT_HOME:-~/.copilot}/session-state",
+          "session_glob": "**/events.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "factory_ai_droid",
+      "name": "Factory AI Droid",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "~/.factory/sessions",
+          "session_glob": "**/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "qwen_code",
+      "name": "Qwen Code",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${QWEN_RUNTIME_DIR:-${QWEN_HOME:-~/.qwen}}/projects",
+          "session_glob": "**/chats/*.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "kimi_code_cli",
+      "name": "Kimi Code",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${KIMI_CODE_HOME:-~/.kimi-code}",
+          "session_glob": "**/agents/*/wire.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "auggie",
+      "name": "Auggie",
+      "unit": "file",
+      "format": "json",
+      "locations": [
+        {
+          "root": "~/.augment/sessions",
+          "session_glob": "*.json"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "junie",
+      "name": "Junie",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${JUNIE_HOME:-~/.junie}/sessions",
+          "session_glob": "session-*/events.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "firebender",
+      "name": "Firebender",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in .idea/firebender/chat_history.db",
+      "locations": [
+        {
+          "root": ".",
+          "session_glob": ".idea/firebender/chat_history.db"
+        }
+      ]
+    },
+    {
+      "id": "forgecode",
+      "name": "ForgeCode",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in .forge.db",
+      "locations": [
+        {
+          "root": "${FORGE_CONFIG:-~/.forge}",
+          "session_glob": ".forge.db"
+        }
+      ]
+    },
+    {
+      "id": "deepagents",
+      "name": "Deep Agents",
+      "support": "excluded",
+      "unit": "database",
+      "format": "sqlite",
+      "verification": "sourced",
+      "excluded_reason": "history lives in sessions.db",
+      "locations": [
+        {
+          "root": "~/.deepagents/.state",
+          "session_glob": "sessions.db"
+        }
+      ]
+    },
+    {
+      "id": "mistral_vibe",
+      "name": "Mistral Vibe",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${VIBE_HOME:-~/.vibe}/logs/session",
+          "session_glob": "*/messages.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "mux",
+      "name": "Mux",
+      "unit": "file",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "${MUX_ROOT:-~/.mux}/sessions",
+          "session_glob": "*/chat.jsonl"
+        },
+        {
+          "root": "~/.mux-dev/sessions",
+          "session_glob": "*/chat.jsonl"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "rovodev",
+      "name": "Rovo Dev",
+      "unit": "file",
+      "format": "json",
+      "locations": [
+        {
+          "root": "~/.rovodev/sessions",
+          "session_glob": "**/session_context.json"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "cline",
+      "name": "Cline",
+      "unit": "directory",
+      "format": "json",
+      "identity_hint": "legacy task directories only; ignore sessions.db",
+      "locations": [
+        {
+          "root": "${CLINE_DATA_DIR:-${CLINE_DIR:-~/.cline}/data}",
+          "session_glob": "tasks/*"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "roo_code",
+      "name": "Roo Code",
+      "unit": "directory",
+      "format": "json",
+      "locations": [
+        {
+          "root": "~/.vscode-mock/global-storage",
+          "session_glob": "**/tasks/*"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    },
+    {
+      "id": "fx",
+      "name": "fx",
+      "unit": "directory",
+      "format": "jsonl",
+      "locations": [
+        {
+          "root": "~/.fx/sessions",
+          "session_glob": "*"
+        }
+      ],
+      "support": "full",
+      "verification": "sourced"
+    }
+  ]
+}

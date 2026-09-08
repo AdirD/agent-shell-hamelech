@@ -2,50 +2,51 @@
 
 A king's problem was never obedience — it was a court that only ever agreed with him.
 
-![A fictional Moroccan sultan on a palace terrace at sunset, overlooking an ancient medina and the Atlas mountains](assets/moroccan-sultan-cover.jpg)
-
 Which is why every throne kept a wazir: one advisor close enough to speak plainly and trusted enough to be believed. This library makes your agent that wazir instead of another courtier. It questions the decree before carrying it out, prices the campaign before marching, demands evidence before naming a culprit, and burns what the last campaign left behind. It counsels. You rule.
 
-Plain `SKILL.md` files in the [Agent Skills](https://github.com/anthropics/skills) format — drop into Cursor, Claude Code, Codex, or anything that reads `.agents/skills/`.
+![A fictional Moroccan sultan on a palace terrace at sunset, overlooking an ancient medina and the Atlas mountains](assets/moroccan-sultan-cover.jpg)
 
 ## Quick start
 
-Three ways in — pick one.
+Pick the easiest route.
 
-### 1. Install via agent
+### 1. Install in your agent
 
-Click your editor. The prompt is prefilled; review it and press Enter — the agent installs the skills and walks you through what each one is for and when to reach for it on your repo.
+Click your agent, then press Enter.
 
-[![Open in Cursor](https://img.shields.io/badge/Open_in-Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/link/prompt?text=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.)
-[![Open in Claude Code](https://img.shields.io/badge/Open_in-Claude_Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code/new?q=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.&repo=AdirD%2Fagent-shell-hamelech)
-[![Open in Codex](https://img.shields.io/badge/Open_in-Codex-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/codex?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.%0AAt%20the%20end%2C%20tell%20me%20how%20to%20star%20the%20repo%20if%20it%20was%20worth%20it.)
-[![Open in Windsurf](https://img.shields.io/badge/Open_in-Windsurf-0084FF?style=for-the-badge&logo=wind&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/windsurf?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.%0AAt%20the%20end%2C%20tell%20me%20how%20to%20star%20the%20repo%20if%20it%20was%20worth%20it.)
-[![Open in Bolt](https://img.shields.io/badge/Open_in-Bolt-000000?style=for-the-badge&logo=stackblitz&logoColor=white)](https://bolt.new/?prompt=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.)
-
-Codex and Windsurf route through [open-in-agent](https://github.com/anxkhn/open-in-agent) because GitHub strips custom URL schemes from markdown links; Cursor, Claude Code, and Bolt use each product's official HTTPS deeplink.
+[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/link/prompt?text=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.)
+[![Install in Claude Code](https://img.shields.io/badge/Install_in-Claude_Code-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code/new?q=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.&repo=AdirD%2Fagent-shell-hamelech)
+[![Install in Codex](https://img.shields.io/badge/Install_in-Codex-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/codex?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.%0AAt%20the%20end%2C%20tell%20me%20how%20to%20star%20the%20repo%20if%20it%20was%20worth%20it.)
+[![Install in Windsurf](https://img.shields.io/badge/Install_in-Windsurf-0084FF?style=for-the-badge&logo=wind&logoColor=white)](https://open-in-agent.anaskhaaan-28.workers.dev/open/windsurf?prompt=Install%20this%2C%20then%20onboard%20me%20to%20agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow%20me%20around%20the%20skills%20and%20how%20I%20can%20leverage%20them%20on%20this%20repo.%0AAt%20the%20end%2C%20tell%20me%20how%20to%20star%20the%20repo%20if%20it%20was%20worth%20it.)
+[![Install in Bolt](https://img.shields.io/badge/Install_in-Bolt-000000?style=for-the-badge&logo=stackblitz&logoColor=white)](https://bolt.new/?prompt=Install+this%2C+then+onboard+me+to+agent-shell-hamelech%3A%0Ahttps%3A%2F%2Fgithub.com%2FAdirD%2Fagent-shell-hamelech%0A%0AShow+me+around+the+skills+and+how+I+can+leverage+them+on+this+repo.%0AAt+the+end%2C+tell+me+how+to+star+the+repo+if+it+was+worth+it.)
 
 ### 2. Install via prompt
 
-Paste into any agent chat:
+Copy-paste this into any agent chat:
 
 ```text
-Install the agent-shell-hamelech skills from https://github.com/AdirD/agent-shell-hamelech,
-then show me which ones fit this repo.
+Install every skill from https://github.com/AdirD/agent-shell-hamelech with:
+npx skills add AdirD/agent-shell-hamelech --all
+
+Then show me which ones fit this repo.
 ```
 
-### 3. Install via `skills`
+### 3. Install via [Skills](https://github.com/vercel-labs/skills)
 
-Install any skill with a single command (needs [`skills`](https://www.npmjs.com/package/skills)):
+Copy-paste into your terminal. `npx` downloads the CLI if needed.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill <name>
+npx skills add AdirD/agent-shell-hamelech --all
 ```
 
-Manual fallback (any agent that reads `.agents/skills/`):
+### Manual fallback
+
+If `npx` is unavailable, clone the repo and copy the skill you want into `.agents/skills/`:
 
 ```bash
+git clone --depth 1 https://github.com/AdirD/agent-shell-hamelech.git
 mkdir -p .agents/skills
-cp -R skills/<name> .agents/skills/<name>
+cp -R agent-shell-hamelech/skills/<name> .agents/skills/
 ```
 
 ---
@@ -93,6 +94,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR interaction points—inline comments, replies on your own PRs, conversation comments, and review verdicts including silent approvals—correlated to local code and git history. |
 | [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
+| [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
 
 ---
 
@@ -120,6 +122,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Test this local UI flow for me so I don't have to click through it myself." | [`melech-debug-mode`](#melech-debug-mode) | Drives the existing browser tab, captures runtime evidence, and reports the observed result. |
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
 | "Drive the Chrome tab I'm already logged into while we test or debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns probes and evidence; live browser owns safe attach and interaction. |
+| "Hand this session to another agent / find that transcript." | [`melech-handoff`](#melech-handoff) | Lists recent transcripts newest-first, then continues by ID or intent. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "My prompt/skill/instructions got bloated — tighten them." | [`melech-prompt-shake`](#melech-prompt-shake) | Tree-shaking for prose: audits the diff against 5 prompt proofs and recommends cuts, keeping edits inside the diff window. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
@@ -239,6 +242,27 @@ Use it when:
 - you have an open PR and want it driven to merge without polling every few minutes
 - review bots (Bugbot, CodeRabbit, …) and CI keep making a one-shot check go stale
 - you want the agent to stop cleanly on real blockers instead of spinning
+
+---
+
+### [`melech-handoff`](skills/melech-handoff)
+
+Lists and continues coding-agent transcripts without copying paths or writing
+handoff files into the repo.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-handoff
+```
+
+Use it when:
+- you say `/melech-handoff` (lists this worktree's recent transcripts)
+- you want a newest-first table with agent (`cursor`, `claude`, …), worktree, created/modified times, user-message count, approximate tokens, and a copyable ID
+- you want to continue a prior session by ID (`/melech-handoff cont 1bc549f6`) or by intent; the agent searches only the discovered transcript candidates and reads small relevant ranges
+
+Provider locations come from a single mapping file; database and compressed
+histories are recorded but unsupported. The Python helper performs mechanical
+discovery and lookup only; it does not rank natural-language objectives.
+Requires Python 3.9+.
 
 ---
 
@@ -557,6 +581,7 @@ skills/
   melech-idea-to-canvas/
   melech-distill-need/
   melech-debug-mode/
+  melech-handoff/
   melech-live-browser/
   melech-sync-skills/
   melech-market-validation/

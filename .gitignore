@@ -17,5 +17,9 @@ node_modules/
 .ops/
 
 
+# Interpreter junk
+__pycache__/
+*.py[cod]
+
 # macOS Finder metadata
 .DS_Store
