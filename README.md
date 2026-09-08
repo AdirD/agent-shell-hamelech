@@ -92,7 +92,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this local UI end to end? | Run the UI in your existing Chrome tab with temporary probes. Browser control defaults to autopilot; tests and direct calls remain supplemental. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
-| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR interaction points—inline comments, replies on your own PRs, conversation comments, and review verdicts including silent approvals—correlated to local code and git history. |
+| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
 | [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 | [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
 
@@ -464,6 +464,10 @@ Use it when:
 - you want fresh bounded subagents only for genuinely heavy read-only lookups (ownership is scanned inline)
 - you want approvals, change requests, and comments performed through the GitHub CLI
 - you want the human—not the trainer—to choose whether to publish, continue, or pause
+- you want optional host-owned automation with live eligibility, exact-head
+  deduplication, race checks, bounded runs, and durable cross-PR context
+- you want scheduling and autonomous posting to remain disabled until eligibility,
+  review identity, and posting mode are explicitly configured
 - a week of new human and Clone review activity is ready to resync
 - you want direct edits, rejected comments, missed concerns, and replies to teach the Clone what to learn or unlearn
 - you need personalized review memory to stay private and out of project git

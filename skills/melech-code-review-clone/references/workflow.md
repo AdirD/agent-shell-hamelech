@@ -243,7 +243,10 @@ the backup and report. A paused/failed run resumes from `RUN.md` + the draft
 
 Then report: status, honest coverage, why you stopped and what the human chose, what
 was learned (the model + their voice) and anything dropped, and the Clone + run paths.
-The Clone is a transparent, correctable stand-in—never claim it's the person.
+Offer to configure the Clone in the user's current automation/task host. If accepted,
+follow the host-owned setup in `output-contract.md`; do not put automation files or
+runtime state in the Clone folder. The Clone is a transparent, correctable
+stand-in—never claim it's the person.
 
 ## Resync (updating an existing Clone)
 

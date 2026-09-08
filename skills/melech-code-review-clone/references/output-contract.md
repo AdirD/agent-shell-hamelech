@@ -116,7 +116,7 @@ HOW (the wording); this file is substance only. Reflexes are patterns to reason
 Only an explicit publish decision changes active memory: stage complete files in
 `scratch/`, re-read the live active files so human edits survive, back up the old
 copies into the run, check privacy/consistency, swap in the new files, update
-`state.json`. If it fails, restore the backup. That's enough safety for two local
+`state.json`. If it fails, restore the backup. That's enough safety for the local
 files—no transaction protocol.
 
 ## Generated runtime `SKILL.md`
@@ -139,6 +139,40 @@ tell the Clone to:
 6. Write the comment in the person's own voice—no prefix, no emoji, nothing that
    outs it as a bot. Append the hidden trace below. Never edit its own memory or
    claim to be the human. Suggest a resync when memory is clearly stale.
+
+## Optional automation setup — outside the Clone
+
+Automation belongs to the agent host that runs it, not to the generated skill.
+Never add its prompt, schedule, state, or memory to `cr-clone-<login>`.
+
+After publishing the Clone, offer to configure recurring/background review in
+the developer's current agent host. Only continue when they accept. Then:
+
+1. Detect the host's native automation, routine, task, or scheduler mechanism
+   and its durable-state conventions. Do not assume another vendor's paths.
+2. Fill what is already known: `{{CLONE_INVOCATION}}` is the current host's
+   invocation syntax for `cr-clone-<login>`, `{{BASE_REPOSITORY}}` is the
+   current base repository, and `{{MAX_CANDIDATES}}` defaults to `3`.
+3. Ask only for policy the trainer cannot infer:
+   - the live author-eligibility source and any additional eligible authors;
+   - `draft-only` or explicitly authorized `autonomous` posting;
+   - the schedule/cadence the host should use.
+   Render the eligibility answer as direct runtime instructions in
+   `{{ELIGIBILITY_INSTRUCTION}}`, not as configuration commentary. Render the
+   posting choice in `{{POSTING_INSTRUCTION}}`: either explicit authorization
+   to post comments and verdicts, or an explicit prohibition on GitHub writes.
+4. Resolve `{{REVIEW_ACTOR_LOGIN}}` from the credentials the automation will
+   actually use, and show it to the human if it differs from the cloned login.
+5. Resolve `{{STATE_FILE}}` and `{{MEMORY_FILE}}` using private, host-owned
+   durable storage. If the host provides native task memory/state, adapt those
+   two prompt sections to use it instead of inventing files.
+6. Render the prompt body from `references/automation-prompt-template.md`,
+   verify that no `{{...}}` placeholders remain, then create it through the
+   current host's mechanism.
+
+If the host cannot create automations, ask where that host expects its prompt
+and durable state, then return the fully rendered prompt plus the exact manual
+setup step. Do not save it inside the Clone as a fallback.
 
 ## Comment trace
 
