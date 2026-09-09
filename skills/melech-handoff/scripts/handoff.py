@@ -15,8 +15,8 @@ from typing import Any, Iterable, Optional
 
 DEFAULT_LIMIT = 7
 LIST_MAX_AGE_S = 14 * 24 * 60 * 60
-GLIMPSE_READ_BYTES = 64 * 1024
-GLIMPSE_MAX_CHARS = 96
+GLIMPSE_MESSAGE_MAX_CHARS = 160
+TOPIC_MAX_CHARS = 64
 INNER_ENV = re.compile(r"\$\{([A-Z0-9_]+)(?::-([^{}]*))?\}")
 GENERIC_NAMES = {
     "events",
@@ -191,15 +191,15 @@ def attach_dates(
 def age_label(seconds_ago: float) -> str:
     seconds = max(0, int(seconds_ago))
     if seconds < 60:
-        return f"{seconds}s"
+        return f"{seconds}s ago"
     minutes = seconds // 60
     if minutes < 60:
-        return f"{minutes}m"
+        return f"{minutes}m ago"
     hours = minutes // 60
     if hours < 48:
-        return f"{hours}h"
+        return f"{hours}h ago"
     days = hours // 24
-    return f"{days}d"
+    return f"{days}d ago"
 
 
 def claude_slug(worktree: Path) -> str:
@@ -274,6 +274,91 @@ def message_roles(value: Any) -> list[str]:
     return []
 
 
+def text_content(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        texts: list[str] = []
+        for item in value:
+            texts.extend(text_content(item))
+        return texts
+    if not isinstance(value, dict):
+        return []
+
+    content_type = str(value.get("type") or "").lower()
+    if content_type in {
+        "image",
+        "image_url",
+        "tool_result",
+        "tool_use",
+        "thinking",
+    }:
+        return []
+
+    texts = []
+    for key in ("text", "input_text"):
+        text = value.get(key)
+        if isinstance(text, str):
+            texts.append(text)
+    if "content" in value:
+        texts.extend(text_content(value["content"]))
+    return texts
+
+
+def clean_user_text(text: str) -> str:
+    queries = re.findall(r"<user_query>\s*(.*?)\s*</user_query>", text, re.DOTALL | re.I)
+    if queries:
+        text = " ".join(queries)
+    text = re.sub(r"<timestamp>.*?</timestamp>", " ", text, flags=re.DOTALL | re.I)
+    text = re.sub(r"<system_reminder>.*?</system_reminder>", " ", text, flags=re.DOTALL | re.I)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def user_message_texts(value: Any) -> list[str]:
+    if isinstance(value, dict):
+        direct_role = ""
+        for key in ("role", "type"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.lower() in {
+                "user",
+                "assistant",
+                "system",
+                "developer",
+            }:
+                direct_role = candidate.lower()
+                break
+
+        if direct_role == "user":
+            if value.get("isMeta") or value.get("turnCompanion"):
+                return []
+            payload = value.get("message", value)
+            text = clean_user_text(" ".join(text_content(payload)))
+            return [text] if text else []
+        if direct_role:
+            return []
+
+        texts: list[str] = []
+        for key in (
+            "message",
+            "payload",
+            "data",
+            "event",
+            "messages",
+            "events",
+            "history",
+            "conversation",
+            "items",
+        ):
+            texts.extend(user_message_texts(value.get(key)))
+        return texts
+    if isinstance(value, list):
+        texts = []
+        for item in value:
+            texts.extend(user_message_texts(item))
+        return texts
+    return []
+
+
 def transcript_stats(path: Path) -> dict[str, Any]:
     target = primary_transcript_file(path)
     if target is None:
@@ -334,34 +419,66 @@ def transcript_stats(path: Path) -> dict[str, Any]:
     }
 
 
-def extract_glimpse(path: Path) -> str:
+def extract_user_messages(path: Path) -> list[str]:
     target = primary_transcript_file(path)
     if target is None:
-        return ""
+        return []
+    collected: list[str] = []
     try:
-        data = target.read_bytes()[:GLIMPSE_READ_BYTES]
+        with target.open("r", encoding="utf-8", errors="replace") as handle:
+            for line in handle:
+                try:
+                    messages = user_message_texts(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+                collected.extend(messages)
     except OSError:
+        return []
+
+    if not collected and target.suffix.lower() == ".json":
+        try:
+            collected = user_message_texts(
+                json.loads(target.read_text(encoding="utf-8"))
+            )
+        except (OSError, json.JSONDecodeError):
+            return []
+    return collected
+
+
+def shorten_text(message: str, max_chars: int) -> str:
+    if len(message) <= max_chars:
+        return message
+    return message[: max_chars - 1].rstrip() + "…"
+
+
+def topic_from_messages(messages: list[str]) -> str:
+    if not messages:
         return ""
-    text = data.decode("utf-8", errors="replace")
-    strings = re.findall(r'"((?:\\.|[^"\\]){12,400})"', text)
-    if not strings:
-        for line in text.splitlines():
-            stripped = line.strip()
-            if len(stripped) >= 12 and not stripped.startswith("{"):
-                strings.append(stripped)
-    skip = re.compile(
-        r"^(https?://|file://|/|~|[\w.-]+/)|^(system|assistant|user|tool)$",
+    generic = re.compile(
+        r"^(?:hi|hello|hey|yo|ok(?:ay)?|thanks?|thank you|yes|no|"
+        r"/?melech-handoff(?:\s+(?:list|cont))?)\W*$",
         re.I,
     )
-    for raw in strings:
-        value = bytes(raw, "utf-8").decode("unicode_escape", errors="replace")
-        value = re.sub(r"\s+", " ", value).strip()
-        if len(value) < 12 or skip.match(value):
-            continue
-        if value.startswith("<") and value.endswith(">"):
-            continue
-        return value[:GLIMPSE_MAX_CHARS]
-    return ""
+    source = next(
+        (message for message in messages if not generic.fullmatch(message.strip())),
+        messages[0],
+    )
+    first_sentence = re.split(r"(?<=[.!?])\s+", source, maxsplit=1)[0]
+    return shorten_text(first_sentence, TOPIC_MAX_CHARS)
+
+
+def extract_session_preview(path: Path) -> dict[str, str]:
+    messages = extract_user_messages(path)
+    recent = messages[-3:]
+    glimpse = "\n".join(
+        f"{index}. {shorten_text(message, GLIMPSE_MESSAGE_MAX_CHARS)}"
+        for index, message in enumerate(recent, start=1)
+    )
+    return {"topic": topic_from_messages(messages), "glimpse": glimpse}
+
+
+def extract_glimpse(path: Path) -> str:
+    return extract_session_preview(path)["glimpse"]
 
 
 def discover_sessions(
@@ -412,6 +529,7 @@ def discover_sessions(
                 seen.add(key)
                 session_id = session_id_from_path(match if match.is_file() else path)
                 primary = primary_transcript_file(path)
+                preview = extract_session_preview(path)
                 found.append(
                     attach_dates(
                         {
@@ -424,7 +542,8 @@ def discover_sessions(
                                 str(primary.resolve()) if primary else ""
                             ),
                             "transcript_kind": "directory" if path.is_dir() else "file",
-                            "glimpse": extract_glimpse(path),
+                            "topic": preview["topic"],
+                            "glimpse": preview["glimpse"],
                         },
                         path,
                         now,
@@ -465,6 +584,7 @@ def resolve_exact_cursor(env: dict[str, str]) -> Optional[dict[str, Any]]:
     path = Path(transcripts) / session_id / f"{session_id}.jsonl"
     if not path.is_file():
         return None
+    preview = extract_session_preview(path)
     return attach_dates(
         {
             "provider": "cursor",
@@ -474,7 +594,8 @@ def resolve_exact_cursor(env: dict[str, str]) -> Optional[dict[str, Any]]:
             "transcript_path": str(path),
             "primary_transcript_path": str(path),
             "transcript_kind": "file",
-            "glimpse": extract_glimpse(path),
+            "topic": preview["topic"],
+            "glimpse": preview["glimpse"],
         },
         path,
         time.time(),
@@ -497,6 +618,7 @@ def resolve_exact_claude(
     if len(matches) != 1:
         return None
     path = matches[0]
+    preview = extract_session_preview(path)
     return attach_dates(
         {
             "provider": "claude_code",
@@ -506,7 +628,8 @@ def resolve_exact_claude(
             "transcript_path": str(path),
             "primary_transcript_path": str(path),
             "transcript_kind": "file",
-            "glimpse": extract_glimpse(path),
+            "topic": preview["topic"],
+            "glimpse": preview["glimpse"],
         },
         path,
         time.time(),

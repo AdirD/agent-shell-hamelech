@@ -35,19 +35,33 @@ Run:
 python3 "$HANDOFF_SCRIPT" list --cwd "$PWD" --limit 12
 ```
 
-Show the rows newest first as a markdown table. Use the script fields; do not
-invent dates, agents, worktrees, or counts.
+Show the rows newest first as compact Markdown cards. Do not use a table: CLI
+table renderers crush the metadata columns and cannot display multiline
+glimpses. Use the script fields; do not invent dates, agents, worktrees, or
+counts.
 
 ```text
-| id | agent | worktree | created | modified | user msgs | ~tokens | glimpse |
-|---|---|---|---|---|---:|---:|---|
-| <short_id> | <provider> | <worktree> | <YYYY-MM-DD HH:MM> | <YYYY-MM-DD HH:MM> | <stats.user_messages> | <stats.approx_tokens> | <glimpse> |
+### `<short_id>` · <topic>
+<provider> · <age>
+`<worktree>` · <stats.user_messages> user msgs · ~<stats.approx_tokens> tokens
+
+1. <third-to-last user message>
+2. <second-to-last user message>
+3. <latest user message>
 ```
 
-`created` is the transcript file's creation/birth time. `modified` is its last
-write. `worktree` is `main` for the repository's main worktree and otherwise
-the worktree directory name. `stats.approx_tokens` is a cheap `chars / 4`
-estimate, not a tokenizer result.
+`age` is the compact time since the transcript was last written, such as `8m
+ago`, `3h ago`, or `2d ago`; this is the only timestamp shown because the list
+is ordered by recent activity. Exact `created` and `modified` values remain in
+the script output for lookup or debugging. `worktree` is `main` for the
+repository's main worktree and otherwise the worktree directory name.
+`stats.approx_tokens` is a cheap `chars / 4` estimate, not a tokenizer result.
+`topic` is a short hint derived from the first meaningful human request.
+`glimpse` contains up to the three latest human user messages as real numbered
+lines. Preserve the newlines when rendering the card; do not duplicate messages
+when fewer than three exist. Each message may use up to 160 characters. Do not
+remove the cap because individual transcript turns can be thousands of
+characters. Tool results and metadata-only user records are ignored.
 
 `list` is read-only. Show enough information for the user to invoke
 `/melech-handoff cont <id>`, then stop. Do not start working or read full
@@ -68,10 +82,21 @@ understand the objective. Choose distinctive terms from the objective and
 search only the returned `primary_transcript_path` files with `rg`.
 
 - One clear transcript match: run `lookup` on its id, then continue.
-- Several plausible matches: use AskQuestion with agent, worktree, created,
-  modified, ID, stats, and glimpse. After the pick, run `lookup`.
-- No argument: show the recent AskQuestion picker with the same fields as the
-  list table. After the pick, run `lookup`.
+- Several plausible matches: use one combined AskQuestion picker with the
+  matching candidates. After the pick, run `lookup`.
+- No argument: show the five newest rows in one combined AskQuestion picker.
+  Each option starts with
+  `<age> · <provider> · <topic> · <short_id>`, followed by worktree, stats, and
+  the three-line glimpse. If undisplayed rows remain, append an
+  `Older sessions…` option that opens the next five rows using the same layout.
+  Do not add multiple questions to one picker because that requires one answer
+  per question.
+- If the user selects the picker's automatic `Other` option and enters text,
+  treat that text as the continuation objective and relevance query. Search
+  the returned `primary_transcript_path` candidates for distinctive terms,
+  independent of recency. Continue a single clear match; otherwise show one
+  refreshed picker containing only the strongest relevant candidates.
+- After a session is picked, run `lookup`.
 - No match among the listed candidates: say so. Do not broaden into an
   unbounded home-directory scan.
 

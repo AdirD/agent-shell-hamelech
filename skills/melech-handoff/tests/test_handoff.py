@@ -102,6 +102,12 @@ class HandoffTests(unittest.TestCase):
     def test_slug_uses_worktree_root(self) -> None:
         self.assertTrue(handoff.slug_path(self.worktree).endswith("Users-demo-worktrees-feature-a"))
 
+    def test_age_label_is_compact_and_relative(self) -> None:
+        self.assertEqual(handoff.age_label(12), "12s ago")
+        self.assertEqual(handoff.age_label(8 * 60), "8m ago")
+        self.assertEqual(handoff.age_label(3 * 60 * 60), "3h ago")
+        self.assertEqual(handoff.age_label(2 * 24 * 60 * 60), "2d ago")
+
     def test_cursor_dotless_hidden_directory_slug_matches_worktree(self) -> None:
         worktree = Path("/Users/demo/.superset/worktrees/repo/feature-a")
         transcript = Path(
@@ -129,7 +135,15 @@ class HandoffTests(unittest.TestCase):
         session = "1bc549f6-96f0-4d53-84d5-b138d46c51f0"
         transcript = self.write_cursor(session, "Investigate context usage.")
         records = [
-            {"role": "user", "message": {"content": "Investigate context usage."}},
+            {
+                "role": "user",
+                "message": {
+                    "content": (
+                        "<timestamp>Tuesday</timestamp>"
+                        "<user_query>Investigate context usage.</user_query>"
+                    )
+                },
+            },
             {"role": "assistant", "message": {"content": "I will inspect it."}},
             {"role": "user", "message": {"content": "Compare the token totals too."}},
         ]
@@ -143,6 +157,7 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(listed["worktree_name"], "feature-a")
         self.assertEqual(listed["rows"][0]["session_id"], session)
         self.assertEqual(listed["rows"][0]["worktree"], "feature-a")
+        self.assertRegex(listed["rows"][0]["age"], r"^\d+[smhd] ago$")
         self.assertRegex(
             listed["rows"][0]["created"], r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$"
         )
@@ -155,6 +170,11 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(stats["user_messages"], 2)
         self.assertEqual(stats["chars"], len(transcript.read_text(encoding="utf-8")))
         self.assertEqual(stats["approx_tokens"], stats["chars"] // 4)
+        self.assertEqual(listed["rows"][0]["topic"], "Investigate context usage.")
+        self.assertEqual(
+            listed["rows"][0]["glimpse"],
+            "1. Investigate context usage.\n2. Compare the token totals too.",
+        )
 
         looked = self.run_cli(["lookup", "--id", "1bc549f6"])
         self.assertEqual(looked["status"], "exact")
@@ -221,7 +241,137 @@ class HandoffTests(unittest.TestCase):
         matches = [row for row in sessions if row["provider"] == "copilot_cli"]
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0]["session_id"], "abc123")
-        self.assertIn("checkout plan", matches[0]["glimpse"])
+        self.assertEqual(
+            matches[0]["glimpse"],
+            "1. Continue from the checkout plan tomorrow",
+        )
+
+    def test_preview_uses_last_three_human_messages_and_ignores_claude_meta(self) -> None:
+        transcript = self.write_claude("claude-session", "First human request")
+        records = [
+            {
+                "type": "user",
+                "message": {"role": "user", "content": "First human request"},
+            },
+            {
+                "type": "assistant",
+                "message": {
+                    "role": "assistant",
+                    "content": 'Example payload: {"role":"user","content":"not a user"}',
+                },
+            },
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [{"type": "tool_result", "content": "tool output"}],
+                },
+            },
+            {
+                "type": "user",
+                "isMeta": True,
+                "message": {
+                    "role": "user",
+                    "content": [{"type": "text", "text": "image metadata"}],
+                },
+            },
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [{"type": "text", "text": "Middle human request"}],
+                },
+            },
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [{"type": "text", "text": "Last human request"}],
+                },
+            },
+        ]
+        transcript.write_text(
+            "".join(json.dumps(record) + "\n" for record in records),
+            encoding="utf-8",
+        )
+
+        preview = handoff.extract_session_preview(transcript)
+        self.assertEqual(preview["topic"], "First human request")
+        self.assertEqual(
+            preview["glimpse"],
+            (
+                "1. First human request\n"
+                "2. Middle human request\n"
+                "3. Last human request"
+            ),
+        )
+
+    def test_glimpse_supports_whole_json_conversations(self) -> None:
+        transcript = self.tmpdir / "conversation.json"
+        transcript.write_text(
+            json.dumps(
+                {
+                    "messages": [
+                        {"role": "user", "content": "Start the migration"},
+                        {"role": "assistant", "content": "Checking"},
+                        {"role": "user", "content": "Preserve the audit log"},
+                        {"role": "user", "content": "Keep the old IDs"},
+                    ]
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+        preview = handoff.extract_session_preview(transcript)
+        self.assertEqual(preview["topic"], "Start the migration")
+        self.assertEqual(
+            preview["glimpse"],
+            (
+                "1. Start the migration\n"
+                "2. Preserve the audit log\n"
+                "3. Keep the old IDs"
+            ),
+        )
+
+    def test_topic_skips_greetings_and_handoff_commands(self) -> None:
+        transcript = self.tmpdir / "topic.jsonl"
+        records = [
+            {"role": "user", "content": "hi"},
+            {"role": "user", "content": "/melech-handoff list"},
+            {"role": "user", "content": "Improve the grouped session picker"},
+            {"role": "user", "content": "Show the latest three per agent"},
+        ]
+        transcript.write_text(
+            "".join(json.dumps(record) + "\n" for record in records),
+            encoding="utf-8",
+        )
+
+        preview = handoff.extract_session_preview(transcript)
+        self.assertEqual(preview["topic"], "Improve the grouped session picker")
+        self.assertEqual(
+            preview["glimpse"],
+            (
+                "1. /melech-handoff list\n"
+                "2. Improve the grouped session picker\n"
+                "3. Show the latest three per agent"
+            ),
+        )
+
+    def test_glimpse_allows_160_chars_per_numbered_message(self) -> None:
+        transcript = self.tmpdir / "long.jsonl"
+        records = [
+            {"role": "user", "content": "a" * 200},
+            {"role": "user", "content": "b" * 200},
+        ]
+        transcript.write_text(
+            "".join(json.dumps(record) + "\n" for record in records),
+            encoding="utf-8",
+        )
+
+        first, last = handoff.extract_glimpse(transcript).splitlines()
+        self.assertEqual(first, "1. " + ("a" * 159) + "…")
+        self.assertEqual(last, "2. " + ("b" * 159) + "…")
 
     def test_excludes_sqlite_and_compressed_leaves(self) -> None:
         db = self.home / ".local" / "share" / "opencode" / "opencode.db"

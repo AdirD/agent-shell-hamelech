@@ -256,8 +256,8 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-hand
 
 Use it when:
 - you say `/melech-handoff` (lists this worktree's recent transcripts)
-- you want a newest-first table with agent (`cursor`, `claude`, …), worktree, created/modified times, user-message count, approximate tokens, and a copyable ID
-- you want to continue a prior session by ID (`/melech-handoff cont 1bc549f6`) or by intent; the agent searches only the discovered transcript candidates and reads small relevant ranges
+- you want newest-first CLI-friendly cards with a quick topic, agent (`cursor`, `claude`, …), worktree, relative last activity, session stats, up to three recent user messages, and a copyable ID
+- you want to continue a prior session by ID (`/melech-handoff cont 1bc549f6`) or by intent; without an ID, one combined picker shows the five newest sessions plus an older-sessions fallback, while custom `Other` text searches for relevant sessions independent of recency
 
 Provider locations come from a single mapping file; database and compressed
 histories are recorded but unsupported. The Python helper performs mechanical
