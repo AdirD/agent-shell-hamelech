@@ -93,7 +93,6 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
-| [`melech-babysit`](#melech-babysit) | Can this PR be kept moving until it is merge-ready? | Comments, conflicts, and CI need recurring attention. |
 | [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
 | [`melech-pr-gardener`](#melech-pr-gardener) | Can all my open PRs be kept green unattended on a schedule? | You want a scheduled agent to sweep your open PRs, round-robin the least-recently-served one, and reconcile it toward merge-ready — one stateless pass per run. |
 
@@ -173,10 +172,10 @@ useful implementation.
 ### Shipping
 
 ```text
-melech-prune (after AI iteration) → melech-smart-comments (during implementation) → melech-babysit
+melech-prune (after AI iteration) → melech-smart-comments (during implementation) → melech-pr-gardener
 ```
 
-Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving the PR to merge-ready. End on `melech-babysit` to drive one PR interactively, or `melech-pr-gardener` to keep all your open PRs green unattended on a schedule. `melech-visualize` can assist any bundle when structure or flow is unclear.
+Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving PRs to merge-ready. End on `melech-pr-gardener` to keep all your open PRs green unattended on a schedule. `melech-visualize` can assist any bundle when structure or flow is unclear.
 
 ---
 
@@ -232,21 +231,6 @@ Use it when:
 
 ---
 
-### [`melech-babysit`](skills/melech-babysit)
-
-Keeps a PR moving through review, conflicts, and CI until merge-ready.
-
-```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-babysit
-```
-
-Use it when:
-- you have an open PR and want it driven to merge without polling every few minutes
-- review bots (Bugbot, CodeRabbit, …) and CI keep making a one-shot check go stale
-- you want the agent to stop cleanly on real blockers instead of spinning
-
----
-
 ### [`melech-handoff`](skills/melech-handoff)
 
 Lists and continues coding-agent transcripts without copying paths or writing
@@ -283,7 +267,7 @@ Use it when:
 - you want all code work done in a throwaway git worktree so it never disturbs a local checkout (you can't know if the scheduler runs in the cloud or on your laptop)
 - you want replies in your own maintainer voice (each prefixed with a 🪴 mark so you can scan a thread and spot the gardener's comments), a local-tooling scope (lint, typecheck, unit tests, build — but no live environments, E2E, or infra), and a hard rule that it never merges or force-pushes
 
-Unlike `melech-babysit` (an in-process loop that drives one PR you point it at), the gardener assumes it's already inside a scheduled tick, treats any host memory as a hint (reconstructing state from the PR), and spreads across all your PRs over successive runs. It expects to be invoked authenticated as you, on a cadence.
+The gardener assumes it's already inside a scheduled tick, treats any host memory as a hint (reconstructing state from the PR), and spreads across all your PRs over successive runs. It expects to be invoked authenticated as you, on a cadence.
 
 ---
 
@@ -600,7 +584,6 @@ Use it for:
 skills/
   melech-think-with-me/
   melech-8020/
-  melech-babysit/
   melech-pr-gardener/
   melech-challenge/
   melech-consult/
