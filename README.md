@@ -261,13 +261,14 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-pr-g
 ```
 
 Use it when:
-- you want a scheduled runtime (Claude routine, Cursor automation, Codex schedule, cron agent) to keep your open PRs merge-ready without you babysitting each one
+- you want a scheduled runtime (Claude Routine, Cursor Automation, Codex Automation, Antigravity Scheduled Task, or cron) to keep your open PRs merge-ready without you babysitting each one
 - you want one pass per firing: sweep authored non-draft open PRs, fair-pick the least-recently-served one (round-robin), reconcile conflicts/comments/CI, then return
 - you want fair rotation with no starvation — per-PR state in one sticky comment on the PR itself: a visible status card of where it stands now, plus a hidden append-only run log (the round-robin timestamp and a human/AI-readable audit trail). Any host memory is just a hint; it reconstructs truth from the PR each run
 - you want all code work done in a throwaway git worktree so it never disturbs a local checkout (you can't know if the scheduler runs in the cloud or on your laptop)
 - you want replies in your own maintainer voice (each prefixed with a 🪴 mark so you can scan a thread and spot the gardener's comments), a local-tooling scope (lint, typecheck, unit tests, build — but no live environments, E2E, or infra), and a hard rule that it never merges or force-pushes
+- you don't have the schedule yet: run it by hand once and it offers to create one for the current repo using Cursor, Claude Code, Codex, or Antigravity
 
-The gardener assumes it's already inside a scheduled tick, treats any host memory as a hint (reconstructing state from the PR), and spreads across all your PRs over successive runs. It expects to be invoked authenticated as you, on a cadence.
+The gardener assumes it's already inside a scheduled tick in the repo it should tend, treats any host memory as a hint (reconstructing state from the PR), and spreads across that repo's PRs over successive runs.
 
 ---
 

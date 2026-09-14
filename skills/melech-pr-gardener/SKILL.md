@@ -9,13 +9,17 @@ disable-model-invocation: true
 ## What This Is
 
 A **single-pass playbook**, not a loop or a long-lived agent. A scheduled runtime
-(Claude routine, Cursor automation, Codex schedule, cron) invokes you once: make
-one picked PR a little more merge-ready, log it, and **return**. The scheduler is
-the loop; you're one tick.
+(Claude Routine, Cursor Automation, Codex Automation, Antigravity Scheduled
+Task, or cron) invokes you once: make one picked PR a little more merge-ready,
+log it, and **return**. The scheduler is the loop; you're one tick.
 
 Any memory the host hands you is a **hint, never authority**. Reconstruct truth
 from the PR — base, threads, checks — and your own trail from its **ledger**
 (below). The PR is the database; if they disagree, the PR wins.
+
+No scheduler driving you yet — the user invoked this by hand? Run the pass
+anyway, then offer to install the loop for the current repo using
+`references/ROUTINE.md`.
 
 ## Stay In Scope
 
@@ -42,10 +46,10 @@ Follow these steps in order, once, then stop.
 
 ### 1. Discover candidates
 
-List the user's **authored, non-draft, open** PRs (`gh pr list --author @me
---state open`, minus drafts). Drop any already merge-ready (mergeable, CI green,
-no unresolved threads). What's left is the candidate set — if empty, report
-"nothing to tend" and stop.
+In the current repo, list the user's **authored, non-draft, open** PRs
+(`gh pr list --author @me --state open`, minus drafts). Drop any already
+merge-ready (mergeable, CI green, no unresolved threads). What's left is the
+candidate set — if empty, report "nothing to tend" and stop.
 
 ### 2. Pick one (fair round-robin)
 
