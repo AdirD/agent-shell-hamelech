@@ -1,6 +1,7 @@
 ---
 name: melech-debug-mode
 description: Debug or verify a local UI end to end in the user's existing Chrome tab, with temporary runtime probes and a manual browser fallback.
+disable-model-invocation: true
 ---
 
 # Debug Mode

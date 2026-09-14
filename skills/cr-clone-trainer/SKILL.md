@@ -1,6 +1,7 @@
 ---
 name: cr-clone-trainer
 description: Build or resync a private reviewer that learns your GitHub code-review style.
+disable-model-invocation: true
 ---
 
 # Reviewer Clone trainer

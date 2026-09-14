@@ -1,6 +1,7 @@
 ---
 name: melech-handoff
 description: List and continue coding-agent transcripts across Cursor, Claude Code, Codex, Gemini, and other local agents. Use when finding a recent transcript, resuming prior work, or invoking `/melech-handoff`.
+disable-model-invocation: true
 ---
 
 # Melech Handoff

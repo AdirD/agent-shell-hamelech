@@ -1,6 +1,7 @@
 ---
 name: melech-sync-skills
 description: Sync this skill library globally across supported coding agents.
+disable-model-invocation: true
 ---
 
 # Sync Melech Skills — global library sync

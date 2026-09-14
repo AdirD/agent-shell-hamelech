@@ -1,6 +1,7 @@
 ---
 name: melech-live-browser
 description: Operate the user's already-open, logged-in Chrome tabs through Chrome DevTools MCP. Use whenever the user asks the agent to jump into their current browser, continue work in an existing tab, fill or submit a form, write or post a comment or reply, update a page, inspect what is open, or interact with signed-in web apps such as Confluence. Also use as the browser-driving companion to melech-debug-mode; do not start a debugging collector for ordinary browser work.
+disable-model-invocation: true
 ---
 
 # Live Browser

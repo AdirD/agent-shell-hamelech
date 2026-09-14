@@ -1,6 +1,7 @@
 ---
 name: melech-smart-comments
 description: Preserve code intent with selective comments and protect meaningful existing comments.
+disable-model-invocation: true
 ---
 
 # Smart Comments

@@ -39,6 +39,26 @@ Copy-paste into your terminal. `npx` downloads the CLI if needed.
 npx skills add AdirD/agent-shell-hamelech --all
 ```
 
+### Why install all skills?
+
+Melech is a command-first library. Installing everything gives you the complete
+command palette without loading every workflow into every conversation.
+
+Every Melech skill sets `disable-model-invocation: true`. In Cursor and Claude
+Code, this keeps the skill out of the model's automatic context while preserving
+`/skill-name` autocomplete; the full `SKILL.md` is loaded only when you invoke
+it. Other Agent Skills hosts still progressively load skill bodies, but may keep
+discovery metadata in context or use different invocation syntax—for example,
+Codex uses `$skill-name` or `/skills`.
+
+So `--all` means **all commands installed**, not **all instructions always
+loaded**. If you prefer a smaller local palette, install selected skills instead:
+
+```bash
+npx skills add AdirD/agent-shell-hamelech \
+  --skill melech-think-with-me melech-verify
+```
+
 ### Manual fallback
 
 If `npx` is unavailable, clone the repo and copy the skill you want into `.agents/skills/`:
@@ -610,8 +630,11 @@ skills/
 ```
 
 Every skill has its own `SKILL.md` with frontmatter plus optional `scripts/` and
-`references/`. Skills can explicitly compose: debug mode remains independent
-for manual execution and uses `melech-live-browser` only for autopilot.
+`references/`. Every skill is marked for explicit user invocation, so supporting
+hosts treat the installed library as a command palette instead of an always-on
+instruction bundle. Skills can explicitly compose: debug mode remains
+independent for manual execution and uses `melech-live-browser` only for
+autopilot.
 
 ## Contributing
 

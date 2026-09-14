@@ -1,6 +1,7 @@
 ---
 name: melech-market-validation
 description: Test whether a product or market opportunity has real demand and willingness to pay.
+disable-model-invocation: true
 ---
 
 # Market Validation
