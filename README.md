@@ -94,7 +94,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`cr-clone-trainer`](#cr-clone-trainer) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
 | [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
-| [`melech-pr-gardener`](#melech-pr-gardener) | Can all my open PRs be kept green unattended on a schedule? | You want a scheduled agent to sweep your open PRs, round-robin the least-recently-served one, and reconcile it toward merge-ready — one stateless pass per run. |
+| [`melech-pr-gardener`](#melech-pr-gardener) | Can all my open PRs be kept green unattended on a schedule? | You want a scheduled agent to sweep PRs by an explicit GitHub author, round-robin the least-recently-served one, and reconcile it toward merge-ready — one stateless pass per run. |
 
 ---
 
@@ -129,7 +129,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our product or market direction." | [`melech-market-validation`](#melech-market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
-| "Keep all my open PRs green on a schedule while I'm away." | [`melech-pr-gardener`](#melech-pr-gardener) | A single-pass playbook a scheduled agent runs: round-robins the least-recently-served PR, works it in an isolated git worktree, and keeps a readable per-run audit log on the PR itself — reconstructing its state from the PR each run, so it needs no runtime memory. |
+| "Keep all my open PRs green on a schedule while I'm away." | [`melech-pr-gardener`](#melech-pr-gardener) | A single-pass playbook a scheduled agent runs for an explicit `GARDENER_AUTHOR`: round-robins the least-recently-served PR, works it in an isolated git worktree, and keeps a readable per-run audit log on the PR itself — reconstructing its state from the PR each run, so it needs no runtime memory. |
 
 ## Workflow bundles
 
@@ -254,7 +254,7 @@ Requires Python 3.9+.
 
 ### [`melech-pr-gardener`](skills/melech-pr-gardener)
 
-Tends all your open PRs and keeps them green — one stateless pass per scheduled run.
+Tends one selected author's open PRs and keeps them green — one stateless pass per scheduled run.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-pr-gardener
@@ -262,13 +262,15 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-pr-g
 
 Use it when:
 - you want a scheduled runtime (Claude Routine, Cursor Automation, Codex Automation, Antigravity Scheduled Task, or cron) to keep your open PRs merge-ready without you babysitting each one
+- you can provide the required `GARDENER_AUTHOR` GitHub login; the system `gh` identity still performs every API and git operation, so app-token hosts select the human's PRs without impersonating them or falling through to the app's `@me`
 - you want one pass per firing: sweep authored non-draft open PRs, fair-pick the least-recently-served one (round-robin), reconcile conflicts/comments/CI, then return
 - you want fair rotation with no starvation — per-PR state in one sticky comment on the PR itself: a visible status card of where it stands now, plus a hidden append-only run log (the round-robin timestamp and a human/AI-readable audit trail). Any host memory is just a hint; it reconstructs truth from the PR each run
-- you want all code work done in a throwaway git worktree so it never disturbs a local checkout (you can't know if the scheduler runs in the cloud or on your laptop)
-- you want replies in your own maintainer voice (each prefixed with a 🪴 mark so you can scan a thread and spot the gardener's comments), a local-tooling scope (lint, typecheck, unit tests, build — but no live environments, E2E, or infra), and a hard rule that it never merges or force-pushes
-- you want easy setup: give your coding agent [`ROUTINE.md`](skills/melech-pr-gardener/references/ROUTINE.md) and it creates the schedule for the current repo, defaulting to every 2 hours
+- you want all code work done on an attached branch in a throwaway git worktree so it never disturbs a local checkout, with cleanup performed from the main checkout and missing worktree dependencies explicitly delegated to CI for narrow low-risk changes
+- you want replies in maintainer voice (each prefixed with a 🪴 mark), including a top-level linked fallback when an app token cannot reply in-thread, plus a ledger containing only real GitHub URLs
+- you want a local-tooling scope (lint, typecheck, unit tests, build — but no live environments, E2E, or infra) and a hard rule that it never merges or force-pushes
+- you want easy setup: give your coding agent [`ROUTINE.md`](skills/melech-pr-gardener/references/ROUTINE.md), provide the author login, and it creates the schedule for the current repo, defaulting to every 2 hours
 
-The gardener assumes it's already inside a scheduled tick in the repo it should tend, treats any host memory as a hint (reconstructing state from the PR), and spreads across that repo's PRs over successive runs.
+The gardener assumes it's already inside a scheduled tick in the repo it should tend, requires the selected author as run input, treats any host memory as a hint (reconstructing state from the PR), and spreads across that author's PRs over successive runs.
 
 ---
 

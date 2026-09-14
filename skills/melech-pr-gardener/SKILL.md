@@ -1,6 +1,6 @@
 ---
 name: melech-pr-gardener
-description: Tend all my open PRs and keep them green — one stateless pass per scheduled run.
+description: Tend one explicit GitHub author's open PRs and keep them green — one stateless pass per scheduled run.
 disable-model-invocation: true
 ---
 
@@ -39,6 +39,24 @@ when clear and handing it back when it needs your call.
 
 **Never** merge, enable auto-merge, or mark a draft ready. You report readiness;
 PR-state changes belong to the user.
+Never open a new gardener PR: push only to the picked PR's existing head branch.
+
+## Required Run Input And Auth
+
+Require `GARDENER_AUTHOR`, as an environment variable or explicit run input,
+with the GitHub login whose PRs this run should tend. Export an explicit input
+before shell calls. It selects an author; it does **not** select or impersonate
+the API identity.
+The system `gh` authentication performs every read, push, reply, resolution, and
+ledger update. Those writes remain attributed to the authenticated app or user
+and every visible comment keeps the `🪴 ` prefix.
+
+If `GARDENER_AUTHOR` is absent, inspect `gh auth status` only. A clearly
+human-authenticated local development session may use `@me` for that pass. If
+the token belongs to an app/bot, or the identity is unclear, report
+"misconfigured / nothing to tend" and stop. Never silently fall through to
+`@me`, and don't depend on `gh api user`: integrations may be forbidden from
+calling `/user`.
 
 ## Workflow
 
@@ -46,10 +64,15 @@ Follow these steps in order, once, then stop.
 
 ### 1. Discover candidates
 
-In the current repo, list the user's **authored, non-draft, open** PRs
-(`gh pr list --author @me --state open`, minus drafts). Drop any already
-merge-ready (mergeable, CI green, no unresolved threads). What's left is the
-candidate set — if empty, report "nothing to tend" and stop.
+In the current repo, list the selected human's **authored, non-draft, open** PRs:
+
+```bash
+gh pr list --author "$GARDENER_AUTHOR" --state open
+```
+
+Drop drafts and any already merge-ready (mergeable, CI green, no unresolved
+threads). What's left is the candidate set — if empty, report "nothing to tend"
+and stop.
 
 ### 2. Pick one (fair round-robin)
 
@@ -71,19 +94,37 @@ its state — a cloud checkout, or the user's laptop mid-edit). One per run, nev
 reused:
 
 ```bash
-git fetch origin
-git worktree add /tmp/gardener-<pr> <pr-head-branch>
+main_repo="$(git rev-parse --show-toplevel)"
+git -C "$main_repo" fetch origin <pr-head-branch>
+git -C "$main_repo" worktree add /tmp/gardener-<pr> \
+  -b <pr-head-branch> origin/<pr-head-branch>
 # edit, commit, push — all inside /tmp/gardener-<pr>
 git -C /tmp/gardener-<pr> push
-git worktree remove /tmp/gardener-<pr> --force && git worktree prune
+cd "$main_repo"
+git -C "$main_repo" worktree remove /tmp/gardener-<pr> --force
+git -C "$main_repo" worktree prune
 ```
 
 - **Never** `checkout`, `switch`, `stash`, reset, or clean the main checkout to
   "make room" — it clobbers whatever's open there.
+- Never add a worktree directly from `origin/<branch>` without `-b`; that leaves
+  detached HEAD. If the local branch already exists or is checked out, create a
+  unique local worktree branch and push `HEAD:<pr-head-branch>` without force.
 - Fork PR: fetch the head ref first
-  (`git fetch origin pull/<n>/head:gardener-<pr>`), add the worktree from that.
+  (`git -C "$main_repo" fetch origin pull/<n>/head:gardener-<pr>`), add the
+  worktree from that local branch.
 - Can't create one (no access, detached env)? Stop and report — never fall back
   to the main checkout.
+- On every cleanup path, first `cd "$main_repo"` (or `/` if the main checkout is
+  unavailable), then remove and prune through `git -C "$main_repo"`. Removing a
+  worktree while the shell is inside it leaves the shell with a dead working
+  directory.
+- A fresh worktree may not have `node_modules` or other installed dependencies.
+  Do not perform a full monorepo install by default. If the required local runner
+  is absent, skip that local check, record the exact limitation, and let CI
+  verify a narrow low-risk push. If the change is unsafe without local
+  verification, hand it back instead. Never report an unavailable check as
+  passing.
 
 The three fronts, in priority order:
 
@@ -92,20 +133,30 @@ The three fronts, in priority order:
    can't coexist — clearing it would mean deciding for the author — abort and
    surface the hunks for the user.
 2. **Review comments** (incl. Bugbot, CodeRabbit). Fetch only unresolved threads;
-   skip any that already carry your own reply. Classify each, and **always reply**
-   whichever way you go:
+   skip any that already carry your own reply. Classify each, and **always leave
+   a visible response** whichever way you go:
 
    | Verdict | When | Do |
    |---|---|---|
    | **Fix** | clear, local, low-risk — bug, typo, lint, obvious nit | smallest safe change; reply referencing the commit; resolve the thread |
    | **Dismiss** | invalid or moot | reply the concrete reason; resolve; don't churn code for noise |
    | **Activate HITL** (human-in-the-loop) | non-obvious, or when unsure — a medium/large or architectural change, a redesign or trade-off, or anything touching security, privacy, auth, billing, data, migrations, or concurrency | don't edit; leave the thread open with a brief 🪴 flag; put the decision to your runtime owner — the human who triggered this run, **not** the reviewer — with your host's `AskQuestion`-style tool (don't block the pass on the answer), falling back to the run report and status card if the host has none |
-3. **CI checks.** Only failures from this PR's diff, and only ones you can
-   reproduce locally (rerun the failing lint/test/build). Read the actual failing
-   log first; verify the narrowest proving check before pushing. Never edit
-   workflow YAML or unrelated code to force green. If a blocker looks unrelated,
-   merge latest base first (another PR may have fixed it); still red, or it needs
-   a live environment → stop and report.
+
+   Prefer replying in-thread. If `addPullRequestReviewThreadReply` returns
+   `FORBIDDEN` / `Resource not accessible by integration`, post a top-level
+   `🪴 ` issue comment linking the real review-thread comment URL and explaining
+   that the response could not land in-thread. For Fix or Dismiss, then resolve
+   the review thread; a forbidden reply must not discard a successful code fix
+   or prevent resolution. For HITL, leave it unresolved. If resolution itself
+   fails, keep it open and report the failure.
+3. **CI checks.** Only failures caused by this PR's diff. Read the actual failing
+   log first and reproduce the narrowest failing lint/test/build when its local
+   runner is available. If dependencies are absent, follow the worktree policy
+   above: a narrow low-risk fix may rely on CI after push; a change that needs
+   local proof is handed back. Never edit workflow YAML or unrelated code to
+   force green. If a blocker looks unrelated, merge latest base first (another
+   PR may have fixed it); still red, or it needs a live environment → stop and
+   report.
 
 Batch fixes into one push from the worktree; integrate latest remote first.
 **Never force-push.** Remove the worktree when done.
@@ -142,8 +193,9 @@ marker, never duplicated). Two layers:
 - **Picked because:** least-recently-tended (prev run 22:00)
 - **Saw:** `db-migration` check failing; 1 unresolved thread (CodeRabbit)
 - **Did:**
-  - Replied to CodeRabbit on `src/db.ts` L40 — dismissed, guard already exists at L44
-    → https://github.com/AdirD/repo/pull/128#discussion_r123456
+  - Thread reply was forbidden; posted a top-level fallback linking CodeRabbit's
+    `src/db.ts` L40 thread, then dismissed it because the guard exists at L44
+    → https://github.com/example-org/example-repo/issues/128#issuecomment-123456
   - Looked at `db-migration` fail: timeout on infra, not our diff — no code change
 - **Pushed:** none
 - **Outcome:** handed back — infra flakiness, not statically fixable. 2nd pass seeing this.
@@ -152,7 +204,7 @@ marker, never duplicated). Two layers:
 - **Saw:** `lint` check red
 - **Did:** ran lint autofix in worktree
 - **Pushed:** `abc1234` "fix: lint"
-    → https://github.com/AdirD/repo/pull/128/commits/abc1234
+    → https://github.com/example-org/example-repo/pull/128/commits/abc1234
 - **Outcome:** checks rerunning; expected green next pass
 ## Run 1 — 2026-09-10 21:30 UTC
 - **Picked because:** first sighting
@@ -172,6 +224,11 @@ marker, never duplicated). Two layers:
   (actions + reasoning) / `Pushed` (commits, with links) / `Outcome` (what's left
   for next run).
 - **Link, don't paste** — commits and threads by URL, never diffs or payloads.
+- Use only URLs returned by GitHub or verified from live PR data. Never invent a
+  discussion, comment, commit, or check URL. When an in-thread reply is
+  forbidden, link the resulting top-level issue-comment URL in the ledger and
+  label it as the fallback response; also name the linked review thread in the
+  action text. If GitHub provides no URL, state that plainly and omit the link.
 - **Hidden log is history, not state** — record what was true *that run* ("saw
   lint red, pushed `abc1234`"), never a live claim. The visible status is the one
   exception: overwrite it from fresh reads each run, never trust it to decide.
@@ -185,6 +242,9 @@ marker, never duplicated). Two layers:
 Every reply reads as the maintainer, not a bot — plain and decisive, the way
 they'd answer on their own PR ("handled in <commit>", "already covers the null
 case at L42, not changing it"). No "as an AI", no hedging.
+
+`GARDENER_AUTHOR` never changes who is speaking: GitHub attributes each write to
+the system `gh` app or user actually authenticated for the run.
 
 **Prefix every visible comment with `🪴 `** (emoji + space) — the one deliberate
 tell that a reply came from the gardener, so the user can scan for it. Tone stays

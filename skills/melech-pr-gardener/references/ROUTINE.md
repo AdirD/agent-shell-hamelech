@@ -1,7 +1,11 @@
 # Install The Gardener As A Routine
 
 Set up the PR Gardener on the current repo now. Assume `gh` is authenticated.
-Do not ask setup questions; default to every 2 hours.
+Default to every 2 hours.
+
+Require the GitHub login whose authored PRs should be tended. If the caller did
+not provide it, ask exactly that one setup question; do not infer it from the
+system `gh` identity because scheduled hosts may authenticate as an app.
 
 Create the schedule through the current host:
 
@@ -15,8 +19,11 @@ Create the schedule through the current host:
 Schedule this prompt:
 
 ```text
+Required run input: GARDENER_AUTHOR=<github-login>
 npx -y skills add AdirD/agent-shell-hamelech --skill melech-pr-gardener -g -y -a '*'
 Read ~/.agents/skills/melech-pr-gardener/SKILL.md and follow it exactly.
 ```
 
-Confirm the cadence after creating it. Do not run a test pass unless asked.
+Replace `<github-login>` with the literal login before creating the schedule.
+Confirm the author and cadence after creating it. Do not run a test pass unless
+asked.
