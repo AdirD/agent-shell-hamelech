@@ -81,7 +81,7 @@ this person — scan the `cr-clone-*` folders and match `state.json` on their lo
 the folder name (the name is theirs, so it needn't contain the login):
 
 ```bash
-ls -d ~/.agents/skills/cr-clone-*/ 2>/dev/null   # skip cr-clone-trainer — that's you
+ls -d ~/.agents/skills/cr-clone-*/ 2>/dev/null   # trainer is melech-cr-clone-trainer, not in this glob
 ```
 
 **Found one → it keeps its name.** This is a resync; never rename or re-ask.
@@ -101,7 +101,7 @@ Whatever comes back — a pick or free text — normalize it before you create a
 force lowercase, prefix `cr-clone-` if they left it off, and collapse everything outside
 `[a-z0-9-]` into single dashes. The folder, the generated `SKILL.md` `name:`, and every
 later reference to the Clone all use that one normalized string. Clone names are always
-lowercase, even when the GitHub login isn't, and `cr-clone-trainer` is taken — if they
+lowercase, even when the GitHub login isn't, and `cr-clone-trainer` is reserved — if they
 ask for it, ask again.
 
 Then decide from what's already there whether this is a first-time run, an update of an

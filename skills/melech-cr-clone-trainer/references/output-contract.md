@@ -127,7 +127,7 @@ files—no transaction protocol.
 Create it only after the first publish. Its `name:` is the lowercase `cr-clone-<name>`
 the human picked, matching the folder exactly. It tells the Clone to:
 
-1. Resolve the PR's base repo and load its `MODEL.md` (ask for `cr-clone-trainer`
+1. Resolve the PR's base repo and load its `MODEL.md` (ask for `melech-cr-clone-trainer`
    init if missing).
 2. Read the live PR and current code before trusting cached context.
 3. Mimic the person, don't correct them: use the attention map for where to look,
