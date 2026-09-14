@@ -92,7 +92,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this local UI end to end? | Run the UI in your existing Chrome tab with temporary probes. Browser control defaults to autopilot; tests and direct calls remain supplemental. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
-| [`melech-code-review-clone`](#melech-code-review-clone) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
+| [`cr-clone-trainer`](#cr-clone-trainer) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
 | [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
 | [`melech-pr-gardener`](#melech-pr-gardener) | Can all my open PRs be kept green unattended on a schedule? | You want a scheduled agent to sweep your open PRs, round-robin the least-recently-served one, and reconcile it toward merge-ready — one stateless pass per run. |
 
@@ -125,7 +125,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Hand this session to another agent / find that transcript." | [`melech-handoff`](#melech-handoff) | Lists recent transcripts newest-first, then continues by ID or intent. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "My prompt/skill/instructions got bloated — tighten them." | [`melech-prompt-shake`](#melech-prompt-shake) | Tree-shaking for prose: audits the diff against 5 prompt proofs and recommends cuts, keeping edits inside the diff window. |
-| "Learn how I review PRs and make me a reviewer Clone." | [`melech-code-review-clone`](#melech-code-review-clone) | Builds or resyncs one private user-global Clone with repo-specific memory. |
+| "Learn how I review PRs and make me a reviewer Clone." | [`cr-clone-trainer`](#cr-clone-trainer) | Builds or resyncs one private user-global Clone, named by you, with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
 | "Research competitors to help choose our product or market direction." | [`melech-market-validation`](#melech-market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
@@ -450,18 +450,20 @@ For a concrete feature or implementation request, use `melech-distill-need` firs
 
 ---
 
-### [`melech-code-review-clone`](skills/melech-code-review-clone)
+### [`cr-clone-trainer`](skills/cr-clone-trainer)
 
-Builds or resyncs a private reviewer that learns your GitHub code-review style.
+Builds or resyncs a private reviewer that learns your GitHub code-review style. The trainer
+is `cr-clone-trainer`; the Clone it generates is `cr-clone-<name>`, always lowercase.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-code-review-clone
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill cr-clone-trainer
 ```
 
 Use it when:
 - you want an agent to review PRs with your attention, judgment threshold, and writing voice
 - you want it to mimic your themes and biases, not correct them or impose "best practices"
 - you want it to just use the repo you run it from, with no repo-picker step
+- you want to name the Clone yourself from suggestions built off your GitHub login and display name
 - you want it to learn across IF/WHAT/WHERE/WHEN/WHO/WHY plus your voice, then act from reflexes, an attention map, and negative space
 - you want learning grounded by correlating your real comments, author-side replies, and review verdicts (including silent approvals) to the actual local code and git history, not deep-read PR narratives
 - you want a compact `Calibrate Clone` question set where every question names a real package/file/area
@@ -598,7 +600,7 @@ skills/
   melech-prune/
   melech-prompt-shake/
   melech-verify/
-  melech-code-review-clone/
+  cr-clone-trainer/
   melech-buy-vs-build/
   melech-smart-comments/
   melech-visualize/

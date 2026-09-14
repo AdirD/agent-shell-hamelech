@@ -1,12 +1,15 @@
 # What you generate
 
-You (the trainer) write these files; the Clone (`cr-clone-<login>`) is the only thing
-that reads them at review time. Write for that reader.
+You (the trainer) write these files; the Clone (`cr-clone-<name>`) is the only thing
+that reads them at review time. Write for that reader. `<name>` is the lowercase name
+the human picked in step 2 of `workflow.md`; use that exact string everywhere below,
+and record their GitHub login inside `state.json` so a resync can find this folder
+without relying on the name.
 
 One private user-global skill per GitHub identity, kept outside project repos:
 
 ```text
-~/.agents/skills/cr-clone-<login>/
+~/.agents/skills/cr-clone-<name>/
   SKILL.md
   VOICE.md            # transferable HOW
   state.json          # machine facts: identity, revisions, sync cursors, run path
@@ -121,10 +124,10 @@ files—no transaction protocol.
 
 ## Generated runtime `SKILL.md`
 
-Create it only after the first publish. It should be named `cr-clone-<login>` and
-tell the Clone to:
+Create it only after the first publish. Its `name:` is the lowercase `cr-clone-<name>`
+the human picked, matching the folder exactly. It tells the Clone to:
 
-1. Resolve the PR's base repo and load its `MODEL.md` (ask for `melech-code-review-clone`
+1. Resolve the PR's base repo and load its `MODEL.md` (ask for `cr-clone-trainer`
    init if missing).
 2. Read the live PR and current code before trusting cached context.
 3. Mimic the person, don't correct them: use the attention map for where to look,
@@ -143,7 +146,7 @@ tell the Clone to:
 ## Optional automation setup — outside the Clone
 
 Automation belongs to the agent host that runs it, not to the generated skill.
-Never add its prompt, schedule, state, or memory to `cr-clone-<login>`.
+Never add its prompt, schedule, state, or memory to `cr-clone-<name>`.
 
 After publishing the Clone, offer to configure recurring/background review in
 the developer's current agent host. Only continue when they accept. Then:
@@ -151,7 +154,7 @@ the developer's current agent host. Only continue when they accept. Then:
 1. Detect the host's native automation, routine, task, or scheduler mechanism
    and its durable-state conventions. Do not assume another vendor's paths.
 2. Fill what is already known: `{{CLONE_INVOCATION}}` is the current host's
-   invocation syntax for `cr-clone-<login>`, `{{BASE_REPOSITORY}}` is the
+   invocation syntax for `cr-clone-<name>`, `{{BASE_REPOSITORY}}` is the
    current base repository, and `{{MAX_CANDIDATES}}` defaults to `3`.
 3. Ask only for policy the trainer cannot infer:
    - the live author-eligibility source and any additional eligible authors;

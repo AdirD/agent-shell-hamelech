@@ -2,7 +2,7 @@
 
 This is a trainer-side source template, not a generated Clone artifact. During
 optional automation setup, render the content below into the current agent
-host's automation/task system. Never save it in `cr-clone-<login>`.
+host's automation/task system. Never save it in `cr-clone-<name>`.
 
 Replace every `{{...}}` value before scheduling. If the host provides native
 durable memory or state, adapt the corresponding file-based paragraphs to use

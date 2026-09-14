@@ -1,9 +1,9 @@
 ---
-name: melech-code-review-clone
+name: cr-clone-trainer
 description: Build or resync a private reviewer that learns your GitHub code-review style.
 ---
 
-# Reviewer Clone
+# Reviewer Clone trainer
 
 Build a private reviewer that reviews PRs like this specific person—not a generic
 checklist bot. Every reviewer has their own themes and biases—areas they obsess
@@ -15,9 +15,10 @@ over, things they wave through, ways they push back. We don't fix that or impose
 - **You (this skill, the trainer).** You *learn*. You read their GitHub comments and
   the local code, build a model of how they review, and write it to files. You never
   review a PR yourself.
-- **The Clone (`cr-clone-<login>`, generated).** It *acts*. Later, in a PR, it reads
+- **The Clone (`cr-clone-<name>`, generated).** It *acts*. Later, in a PR, it reads
   the files you wrote and reviews like the person. It never learns or edits its own
-  memory.
+  memory. `<name>` is theirs to pick — you offer candidates and they choose — and it
+  is always lowercase.
 
 So everything you produce (`MODEL.md`, `VOICE.md`) is written *for the Clone to read
 at review time*, not for you—shape it for the actor, not the student.

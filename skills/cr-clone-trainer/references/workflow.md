@@ -39,7 +39,8 @@ resync resumes where you left off.
 ```text
 1. WHERE AM I   Find the repo + GitHub user from the current folder (no menu).
        │
-2. SET UP       Open this person's training folder (start fresh or continue an old one).
+2. SET UP       Open this person's training folder — continue an existing Clone, or
+       │        let them name a new one — then start the run.
        │
 3. GATHER       Download every review comment they left here (split into chunk-files),
        │        and in parallel read the code + git to see what they wrote and own.
@@ -67,7 +68,7 @@ which (e.g. "chunk 6 of 11"). Between routine tool calls, say nothing.
 The repo is wherever the skill runs. Don't ask.
 
 ```bash
-gh api user --jq .login
+gh api user --jq '.login, .name'    # login + display name — you need both in step 2
 git -C . remote get-url origin      # → canonical owner/repo (base, not a fork head)
 ```
 
@@ -75,10 +76,38 @@ Only if there's no remote, ask the user for `owner/repo`.
 
 ## 2 — Open the training folder
 
-In `~/.agents/skills/cr-clone-<login>`, decide from what's already there whether
-this is a first-time run, an update of an existing one, or nothing-to-do. Make a run
-dir with a real UTC timestamp (`output-contract.md`). Don't wipe existing memory
-just because someone said "init"—that needs explicit confirmation.
+Clones live at `~/.agents/skills/cr-clone-<name>`. Look for one that already belongs to
+this person — scan the `cr-clone-*` folders and match `state.json` on their login, not on
+the folder name (the name is theirs, so it needn't contain the login):
+
+```bash
+ls -d ~/.agents/skills/cr-clone-*/ 2>/dev/null   # skip cr-clone-trainer — that's you
+```
+
+**Found one → it keeps its name.** This is a resync; never rename or re-ask.
+
+**None → they name it.** One `AskQuestion` titled `Name your Clone`, before any
+downloading. Say what you're doing in one line ("I'm going to build a reviewer Clone
+for you — what should it be called?"), then offer candidates built from *their real
+login and display name*, plus `Other` so they can type their own:
+
+```text
+cr-clone-adird         ← from login AdirD
+cr-clone-adir-duchan   ← from display name Adir Duchan
+cr-clone-adirdu        ← short handle
+```
+
+Whatever comes back — a pick or free text — normalize it before you create anything:
+force lowercase, prefix `cr-clone-` if they left it off, and collapse everything outside
+`[a-z0-9-]` into single dashes. The folder, the generated `SKILL.md` `name:`, and every
+later reference to the Clone all use that one normalized string. Clone names are always
+lowercase, even when the GitHub login isn't, and `cr-clone-trainer` is taken — if they
+ask for it, ask again.
+
+Then decide from what's already there whether this is a first-time run, an update of an
+existing one, or nothing-to-do, and make a run dir with a real UTC timestamp
+(`output-contract.md`). Don't wipe existing memory just because someone said
+"init"—that needs explicit confirmation.
 
 ## 3 — Gather comments, scan ownership (parallel)
 
