@@ -266,7 +266,7 @@ Use it when:
 - you want fair rotation with no starvation — per-PR state in one sticky comment on the PR itself: a visible status card of where it stands now, plus a hidden append-only run log (the round-robin timestamp and a human/AI-readable audit trail). Any host memory is just a hint; it reconstructs truth from the PR each run
 - you want all code work done in a throwaway git worktree so it never disturbs a local checkout (you can't know if the scheduler runs in the cloud or on your laptop)
 - you want replies in your own maintainer voice (each prefixed with a 🪴 mark so you can scan a thread and spot the gardener's comments), a local-tooling scope (lint, typecheck, unit tests, build — but no live environments, E2E, or infra), and a hard rule that it never merges or force-pushes
-- you don't have the schedule yet: run it by hand once and it offers to create one for the current repo using Cursor, Claude Code, Codex, or Antigravity
+- you want easy setup: give your coding agent [`ROUTINE.md`](skills/melech-pr-gardener/references/ROUTINE.md) and it creates the schedule for the current repo, defaulting to every 2 hours
 
 The gardener assumes it's already inside a scheduled tick in the repo it should tend, treats any host memory as a hint (reconstructing state from the PR), and spreads across that repo's PRs over successive runs.
 
