@@ -87,6 +87,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-think-with-me`](#melech-think-with-me) | Can a sharp engineer peer expand this half-formed thought with real prior art? | "think with me", "let me think out loud", "just ideating", "what does this remind you of". |
+| [`melech-make-it-click`](#melech-make-it-click) | Can you replace the explanation that lost me with a concrete mental model? | The agent is being smart but you cannot follow it: "make it click", "ELI5", "I don't understand", "simulate this". |
 | [`melech-distill-need`](#melech-distill-need) | Is the requested thing actually the right solution? | "distill this", "faster horse", "what do I actually need". |
 | [`melech-buy-vs-build`](#melech-buy-vs-build) | Should we adopt an existing tool or build this ourselves? | "build vs buy", "does this already exist", "is there a tool for this", "don't reinvent the wheel", "what's out there for X". |
 | [`melech-market-validation`](#melech-market-validation) | What market premise should we test, and does it survive customer and commercial evidence? | Shape or validate a startup, product opportunity, ICP, buyer, demand, willingness to pay, or paid expansion. |
@@ -125,6 +126,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | "What melech skills do I have / should I update?" | [`melech-sync-skills`](#melech-sync-skills) | Global sync of this library into `~/.agents/skills` and every agent. |
 | "I'm just thinking out loud—riff with me on this." | [`melech-think-with-me`](#melech-think-with-me) | A single engineer-peer voice that expands each musing with prior art, patterns, and mechanisms, holds it loose, and never converges into a spec. |
+| "You're being smart, but I don't understand—make it click." | [`melech-make-it-click`](#melech-make-it-click) | Finds the smallest blocker, abandons the failed explanation, and rebuilds the idea through a concrete example, trace, or simpler model. |
 | "I have a startup/product idea." | [`melech-market-validation`](#melech-market-validation) | It can shape an open premise into a testable hypothesis before gathering market evidence. |
 | "I have a specific startup hypothesis—is the pain real, who buys, and will they pay?" | [`melech-market-validation`](#melech-market-validation) | Runs desk research, customer discovery, and a behavioral/commercial test through a market decision. |
 | "Should our existing product add this feature?" | [`melech-distill-need`](#melech-distill-need) | Treat the feature as a proposed solution, uncover the outcome, and compare better means before planning it. |
@@ -239,6 +241,29 @@ Use it when:
 - you want musings grounded in the landscape ("that's basically the ___ pattern", "that's what ___ does, where they ___") instead of interrogated or converged
 - you explicitly do **not** want questions (`melech-challenge`/`melech-pre-plan`), an independent panel and a verdict (`melech-consult`), or a decision procedure (`melech-buy-vs-build`)
 - you want it to hand off to a convergent skill only once the thought firms into something buildable
+
+---
+
+### [`melech-make-it-click`](skills/melech-make-it-click)
+
+Recovers when an agent's explanation is technically correct but still does not
+give you a usable mental model.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-make-it-click
+```
+
+Use it when:
+- the agent is being smart, dense, or abstract and you cannot follow the thread
+- saying "explain more simply" would likely produce the same answer with shorter words
+- you want the agent to infer the smallest sticking point from the conversation
+- you want one concrete input traced through the system, a tiny example, or a different explanatory route
+- the confusing concept may be unnecessary and should be removed rather than explained
+
+It does not impose a childish ELI5 voice or restart the whole topic. It replaces
+the failed mental model, explains one idea at a time, and stops once the core
+point is clear. Three grounded recovery examples live in
+[`references/examples.md`](skills/melech-make-it-click/references/examples.md).
 
 ---
 
@@ -635,6 +660,7 @@ Use it for:
 ```text
 skills/
   melech-think-with-me/
+  melech-make-it-click/
   melech-8020/
   melech-diff-minimizer/
   melech-pr-gardener/
