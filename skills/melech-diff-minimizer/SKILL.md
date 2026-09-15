@@ -1,10 +1,10 @@
 ---
-name: melech-minimize
-description: Reduce an existing PR or diff to the smallest safe implementation that preserves its goal.
+name: melech-diff-minimizer
+description: Minimize an existing PR or diff while preserving its required behavior and containing semantic blast radius.
 disable-model-invocation: true
 ---
 
-# Minimize
+# Diff Minimizer
 
 Take an implementation that already exists and make it smaller, more local, and
 safer to review without weakening what it must accomplish.
@@ -33,7 +33,7 @@ the system to regression.
 - **`melech-8020`** may negotiate or narrow the outcome to find a cheaper useful
   path before implementation.
 - **`melech-prune`** proves and removes dead code, zombie paths, and YAGNI residue.
-- **`melech-minimize`** keeps the outcome fixed and may replace a working,
+- **`melech-diff-minimizer`** keeps the outcome fixed and may replace a working,
   necessary implementation with a narrower one.
 
 If the only meaningful reduction requires dropping or changing behavior, stop
