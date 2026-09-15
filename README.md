@@ -107,6 +107,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-verify`](#melech-verify) | Does this claim, conclusion, or approach hold up against the source of truth? | Say "verify" mid-thread when you want an independent second opinion that understands the discussion but does not defend its earlier conclusion. |
+| [`melech-minimize`](#melech-minimize) | Can this existing PR achieve the same goal with a smaller safe diff and blast radius? | The implementation works, but it touches too many files, systems, contracts, or concepts. |
 | [`melech-prune`](#melech-prune) | What dead code, zombie workflows, or YAGNI bloat accumulated during AI coding? | After multi-turn iteration with an AI, when you want to audit uncalled helpers, dead types, and speculative abstractions before opening a PR. |
 | [`melech-prompt-shake`](#melech-prompt-shake) | What prompt bloat crept into these prompts, skills, or instructions? | After editing a prompt/skill/instruction file, when you want to strip over-explanation, duplicate/subset rules, and never-fires branches down to the leanest version that still covers 100%. |
 | [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this local UI end to end? | Run the UI in your existing Chrome tab with temporary probes. Browser control defaults to autopilot; tests and direct calls remain supplemental. |
@@ -143,6 +144,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
 | "Drive the Chrome tab I'm already logged into while we test or debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns probes and evidence; live browser owns safe attach and interaction. |
 | "Hand this session to another agent / find that transcript." | [`melech-handoff`](#melech-handoff) | Lists recent transcripts newest-first, then continues by ID or intent. |
+| "This PR works, but make it touch less without changing the goal." | [`melech-minimize`](#melech-minimize) | Keeps the behavioral contract fixed while reducing semantic blast radius, affected boundaries, concepts, files, and finally changed lines. |
 | "I've been iterating with AI and need to strip dead code and bloat." | [`melech-prune`](#melech-prune) | Evidentiary audit of working diff/branch against 4 proofs before PR. |
 | "My prompt/skill/instructions got bloated — tighten them." | [`melech-prompt-shake`](#melech-prompt-shake) | Tree-shaking for prose: audits the diff against 5 prompt proofs and recommends cuts, keeping edits inside the diff window. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-cr-clone-trainer`](#melech-cr-clone-trainer) | Builds or resyncs one private user-global Clone, named by you, with repo-specific memory. |
@@ -192,10 +194,14 @@ useful implementation.
 ### Shipping
 
 ```text
-melech-prune (after AI iteration) → melech-smart-comments (during implementation) → melech-pr-gardener
+melech-minimize → melech-prune (after AI iteration) → melech-smart-comments (during implementation) → melech-pr-gardener
 ```
 
-Use when the work is decided and the remaining job is cleaning iteration residue, preserving code intent, and driving PRs to merge-ready. End on `melech-pr-gardener` to keep all your open PRs green unattended on a schedule. `melech-visualize` can assist any bundle when structure or flow is unclear.
+Use when the work is decided and the remaining job is reducing its blast radius,
+cleaning iteration residue, preserving code intent, and driving PRs to
+merge-ready. End on `melech-pr-gardener` to keep all your open PRs green
+unattended on a schedule. `melech-visualize` can assist any bundle when structure
+or flow is unclear.
 
 ---
 
@@ -248,6 +254,27 @@ Use it when:
 - you want the least intrusive or smallest-diff path to a goal
 - you say "80/20", "minimal change", or "least diff"
 - you want trade-offs explained before implementation, not a ticket-style build
+
+---
+
+### [`melech-minimize`](skills/melech-minimize)
+
+Reduces an existing PR or diff to the smallest safe implementation that preserves
+its goal.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-minimize
+```
+
+Use it when:
+- the PR already works, but touches more files, systems, contracts, or concepts than necessary
+- you want less diff and lower semantic blast radius without weakening accepted behavior
+- incidental refactors, abstractions, dependencies, or generalized machinery made the implementation broader than the goal
+- you want to prefer a slightly longer local change over a shorter but riskier shared-core change
+
+Unlike `melech-8020`, it keeps the outcome fixed. Unlike `melech-prune`, it can
+replace necessary working code with a narrower implementation rather than only
+removing code that fails a necessity proof.
 
 ---
 
@@ -609,6 +636,7 @@ Use it for:
 skills/
   melech-think-with-me/
   melech-8020/
+  melech-minimize/
   melech-pr-gardener/
   melech-challenge/
   melech-consult/
