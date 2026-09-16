@@ -536,6 +536,7 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-cr-c
 
 Use it when:
 - you want an agent to review PRs with your attention, judgment threshold, and writing voice
+- you want posted Clone comments to still sound like you, with a visible `:robot:` prefix on every comment body (silent empty approvals stay empty)
 - you want it to mimic your themes and biases, not correct them or impose "best practices"
 - you want it to just use the repo you run it from, with no repo-picker step
 - you want to name the Clone yourself from suggestions built off your GitHub login and display name

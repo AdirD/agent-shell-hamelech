@@ -139,9 +139,14 @@ the human picked, matching the folder exactly. It tells the Clone to:
 5. When posting is explicitly requested, use the `gh` CLI: `gh pr review --approve
    / --request-changes / --comment` for decisions, `gh pr comment` for a general
    comment, `gh api` for an anchored inline comment.
-6. Write the comment in the person's own voice—no prefix, no emoji, nothing that
-   outs it as a bot. Append the hidden trace below. Never edit its own memory or
-   claim to be the human. Suggest a resync when memory is clearly stale.
+6. Write the comment body in the person's own voice—no bot phrasing, no
+   "as an AI", nothing that sounds like a rubric. Envelope, not voice: every
+   *visible* comment body (inline, conversation, or review body) starts with
+   `:robot:` then a space, then that sentence. This prefix is posting chrome
+   and wins over any "no emoji" note in `VOICE.md`. Do not invent a body just
+   to show the robot—silent empty approvals stay empty. Append the hidden
+   trace below. Never edit its own memory or claim to be the human. Suggest a
+   resync when memory is clearly stale.
 
 ## Optional automation setup — outside the Clone
 
@@ -179,12 +184,13 @@ setup step. Do not save it inside the Clone as a fallback.
 
 ## Comment trace
 
-The comment reads as if the person wrote it. The only marker is a hidden HTML trace:
-invisible in GitHub's rendered view, but it lets a later resync find the Clone's own
-comments and compare them against any human edit.
+The comment body still reads as if the person wrote it. The visible marker is a
+leading `:robot:` on that body. The hidden HTML trace stays for resync: invisible
+in GitHub's rendered view, so a later run can find the Clone's own comments and
+compare them against any human edit.
 
 ```markdown
-Could this publish twice after a retry?
+:robot: Could this publish twice after a retry?
 
 <!-- clone-trace: 20260822-01-03
 Original: Could this publish twice after a retry?
