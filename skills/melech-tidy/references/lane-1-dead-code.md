@@ -1,16 +1,17 @@
----
-name: melech-prune
-description: Audit and remove dead code, AI residue, and unnecessary complexity after iteration.
-disable-model-invocation: true
----
+# Lane 1 — Dead Code & AI Residue (deep playbook)
 
-# Prune
+> The full handcrafted playbook behind Tidy's **Lane 1** (originally the
+> standalone `melech-prune` skill). Tidy's [`SKILL.md`](../SKILL.md) owns the
+> shared workflow — scope resolution, the unified evidence table, approval via
+> `ask_question`, and verification. This file holds the lane-specific
+> philosophy, proofs, and tier classification. Pull it in when Lane 1 fires and
+> you need the depth behind the compact proof list in the router.
 
 After 5–15 prompts of iterative coding with AI, codebases accrete **AI residue**: orphaned helpers from earlier prompts, dead types, half-migrated state, speculative config keys, and zombie workflows.
 
 The feature works and tests might pass, but the working diff is cluttered with dead pathways and unreferenced scaffolding.
 
-**`melech-prune` acts as an evidentiary garbage collector and architectural reconciler.**
+**Lane 1 acts as an evidentiary garbage collector and architectural reconciler.**
 
 ---
 
@@ -18,7 +19,7 @@ The feature works and tests might pass, but the working diff is cluttered with d
 
 In normal coding, developers assume: *"The AI wrote this, so it's probably needed."*
 
-**`melech-prune` flips this assumption entirely:**
+**Lane 1 flips this assumption entirely:**
 > **Every added or modified function, type, parameter, state hook, wrapper, and export is assumed GUILTY (dead code, accidental residue, or YAGNI bloat) until proven innocent with concrete evidence.**
 
 If a symbol cannot provide proof of reachability and concrete necessity, it is queued for deletion.
@@ -40,33 +41,9 @@ If a symbol looks like a hand-rolled version of a known library or tool rather t
 
 ---
 
-## Workflow
+## Auditing depth
 
-```text
-1. Ask Scope  ──►  2. Build Call Graph  ──►  3. Present Evidence  ──►  4. Ask Approval  ──►  5. Prune & Verify
-  (ask_question)     & Run 4 Proofs             Table to User             (ask_question)       (Tests green)
-```
-
----
-
-### Step 1: Prompt for Scope
-
-Never assume the diff target. Immediately prompt the user using `ask_question` to choose the audit boundary:
-
-* **Question**: "What scope would you like to prune?"
-* **Options**:
-  1. `(Recommended) Uncommitted working tree (staged + unstaged git diff)`
-  2. `Current branch vs base (git diff origin/main...HEAD or main...HEAD)`
-  3. `Last N commits (e.g. HEAD~3..HEAD)`
-  4. `Specific files or directory (custom path)`
-
-If the user passed a specific target in their initial prompt (e.g. `melech-prune HEAD~2..HEAD` or `melech-prune src/auth/`), confirm that target directly.
-
----
-
-### Step 2: Audit the Diff with Evidentiary Proofs
-
-Examine every added or modified file in the chosen scope:
+*(Scope, approval, and verification are handled by the Tidy workflow. This is the lane-specific "how" for the diagnosis step.)*
 
 1. **Extract all new / modified symbols**:
    * Functions, methods, and classes
@@ -87,15 +64,9 @@ Examine every added or modified file in the chosen scope:
    * 🔵 **Tier 4: Accidental Duplications**
      * Custom helpers written during iteration that reinvent existing codebase utilities.
 
----
-
-### Step 3: Present Findings & Notification
-
-Before touching any code, output a clear, structured **Evidence & Pruning Table**:
+Example findings table (feeds the unified Tidy evidence table):
 
 ```markdown
-### 🔍 Prune Audit Results (Scope: uncommitted diff)
-
 | Tier | File | Symbol / Block | Failed Proof & Evidence | Proposed Action |
 |---|---|---|---|---|
 | 🟢 Tier 1 | `src/utils/format.ts:L42-L58` | `formatLegacyDate()` | **Reachability**: 0 call sites across repo. | Delete function |
@@ -104,53 +75,17 @@ Before touching any code, output a clear, structured **Evidence & Pruning Table*
 | 🟠 Tier 3 | `src/services/api.ts:L30` | `options.retryDelay` | **Requirement**: YAGNI; hardcoded to default everywhere, no callers supply custom delay. | Inline & simplify |
 ```
 
----
-
-### Step 4: Request Explicit User Approval
-
-**Never prune without human sign-off.**
-
-Use `ask_question` to request the user's verdict:
-
-* **Question**: "How would you like to proceed with the pruning recommendations?"
-* **Options**:
-  1. `(Recommended) Prune all verified items (Tiers 1, 2, 3, and 4)`
-  2. `Prune only Tier 1 (Zero-risk dead code & unreferenced symbols)`
-  3. `Let me specify which items to keep or prune`
-  4. `Cancel (Keep working tree unchanged)`
-
-If the user picks **Option 3**, ask which specific items from the table they want to preserve before proceeding.
-
----
-
-### Step 5: Surgical Pruning & Verification
-
-Once approved:
-
-1. **Delete Dead Code**: Remove the approved functions, types, branches, and parameters.
-2. **Clean Up Dangling References**: Remove unused imports and unneeded variables left behind by deletions.
-3. **Respect Comments**: Preserve load-bearing landmine/WHY comments, and remove comments only if the code they explain was deleted.
-4. **Run Verification**:
-   * Run the test suite (`npm test`, `pytest`, `cargo test`, `go test`, etc.).
-   * Run type checking (`tsc`, `mypy`, `cargo check`, etc.) or build commands.
-   * If any test fails, inspect whether a test was testing a deleted dead path (update test) or if an unintended dependency was touched (revert & fix).
-5. **Summarize Outcome**:
-   * Lines of code removed
-   * Files cleaned
-   * Final verification/test status (e.g. `All 42 tests passing green`)
+When applying: delete approved dead code, clean up dangling references (unused imports/variables left behind), and **preserve load-bearing landmine/WHY comments** — remove a comment only if the code it explained was deleted.
 
 ---
 
 ## Do / Don't
 
-**Do:** Prompt for the audit scope with `ask_question` before running the analysis.  
-**Don't:** Guess the git diff target without confirming.
-
-**Do:** Provide concrete proof (e.g. *"0 references in repo"*, *"only caller is dead function X"*) for every item flagged.  
+**Do:** Provide concrete proof (e.g. *"0 references in repo"*, *"only caller is dead function X"*) for every item flagged.
 **Don't:** Say *"this looks unnecessary"* without showing the call graph evidence.
 
-**Do:** Require explicit user approval via `ask_question` before deleting files or code blocks.  
+**Do:** Require explicit user approval before deleting files or code blocks.
 **Don't:** Silently delete code behind the scenes.
 
-**Do:** Run tests and type checks immediately after pruning to prove the build remains green.  
+**Do:** Run tests and type checks immediately after pruning to prove the build remains green.
 **Don't:** Leave broken imports or failing test suites after a cleanup.

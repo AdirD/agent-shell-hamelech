@@ -1,10 +1,11 @@
----
-name: melech-prompt-shake
-description: Tree-shaking for prompts — strip bloat from system prompts, skill files, and instruction docs so they cover 100% of needed cases in the fewest lines.
-disable-model-invocation: true
----
+# Lane 3 — Instruction & Prompt Bloat / Prompt Shake (deep playbook)
 
-# Prompt Shake
+> The full handcrafted playbook behind Tidy's **Lane 3** (originally the
+> standalone `melech-prompt-shake` skill). Tidy's [`SKILL.md`](../SKILL.md)
+> owns the shared workflow — scope, the unified evidence table, approval, and
+> verification. This file holds the lane-specific targets, proofs, and
+> guardrails for tree-shaking prompts. Pull it in when Lane 3 fires and you
+> need more than the 5-proof list in the router.
 
 Tree-shaking for prompts. Every line is **guilty until proven load-bearing**. The goal is the leanest prompt that still covers 100% of needed cases — minimal-that-covers beats maximal.
 
@@ -29,13 +30,13 @@ Tree-shaking for prompts. Every line is **guilty until proven load-bearing**. Th
 - **Default-knowledge** — would a competent model do this unprompted? → cut.
 - **Load-bearing** — does output actually change with vs. without this line? If not → cut.
 
-## Workflow
+## Lane-specific method
 
-- Auto-start on the working diff; audit the changed/added lines (no scope question).
-- Read the whole file to catch cross-file issues (a new line duplicating an untouched one), but keep recommendations inside the diff window — target the new line, not the old.
+*(Scope, approval, and verification are handled by the Tidy workflow.)*
+
+- Audit the changed/added lines. Read the whole file to catch cross-file issues (a new line duplicating an untouched one), but keep recommendations **inside the diff window** — target the new line, not the old.
 - Audit line-by-line, tag each survivor with the proof that keeps it alive.
-- Report the audit in a scannable way so the human can understand it and decide next actions — a findings table (line/block → failed proof + evidence → recommended action: cut/collapse/fold/keep). Recommend only; do NOT edit files yet.
-- Apply only if the human approves, and only within the diff window.
+- Report findings so the human can decide (line/block → failed proof + evidence → recommended action: cut/collapse/fold/keep). Recommend only; apply only within the diff window after approval.
 
 ## Guardrails
 
