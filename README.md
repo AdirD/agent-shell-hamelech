@@ -108,7 +108,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | Skill | Question it answers | Reach for it when |
 |---|---|---|
 | [`melech-verify`](#melech-verify) | Does this claim, conclusion, or approach hold up against the source of truth? | Say "verify" mid-thread when you want an independent second opinion that understands the discussion but does not defend its earlier conclusion. |
-| [`melech-roi`](#melech-roi) | Is this change's complexity and blast radius actually worth the benefit it delivers? | A PR, diff, or idea seems to be touching shared systems, adding state, or expanding scope out of proportion to the bug or feature it addresses. |
+| [`melech-roi`](#melech-roi) | Is this change's complexity and blast radius actually worth the benefit it delivers? | Grade a PR, diff, or proposed solution with an itemized ROI receipt showing problem reach, solution reach, value, and permanent cost. |
 | [`melech-tidy`](#melech-tidy) | How can this diff be stripped of dead residue, minimized to safe leaf seams, and cleaned of prompt bloat? | After coding with an AI, when you want to audit and tidy the diff before PR across dead code, architectural blast radius, and prompt bloat. |
 | [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this local UI end to end? | Run the UI in your existing Chrome tab with temporary probes. Browser control defaults to autopilot; tests and direct calls remain supplemental. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
@@ -606,7 +606,7 @@ For multiple independent opinions or a judgment among competing paths, use `mele
 
 ### [`melech-roi`](skills/melech-roi)
 
-Judges whether a change's complexity and blast radius are worth the benefit it delivers — on an existing PR, a local diff, or an idea still being discussed.
+Grades whether a change's complexity and blast radius are worth the benefit it delivers — on an existing PR, a local diff, or an idea still being discussed — and returns an itemized visual receipt.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-roi
@@ -614,13 +614,13 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-roi
 
 Use it when:
 - a bug fix, feature, or refactor seems to be touching shared systems, adding persisted state, or expanding scope out of proportion to what it actually fixes
-- you want the core question asked plainly: are we rerouting the house, or replacing the washer, for this one drip
 - you want it pointed at an existing PR, a staged/unstaged diff, a branch-vs-base diff, or an idea still only discussed in the transcript with no code yet
-- you want the smallest contained alternative identified when the current shape is disproportionate — not a scope cut, the same benefit for less blast radius
-- you want it to say plainly when a shared fix is actually justified, instead of forcing every diff smaller
-- you want a numeric ROI score only when explicitly comparing two named candidate shapes, not as the default output
+- you want a score and grade backed by a receipt showing problem reach versus solution reach, value received, costs charged, and the largest charge
+- you want solutions already raised in the PR or discussion ranked without inventing additional alternatives
+- you want diagnosis of the current solution only — no replacement design or improvement plan
+- you want uncertainty shown explicitly rather than unsupported precision when the idea has not become code yet
 
-For whether the benefit itself is real, use `melech-distill-need` first. To execute the narrowing on an existing diff, hand off to `melech-tidy`. If the plumbing picture doesn't land for whoever you're talking to, four other everyday analogies for the same question live in [`references/analogies.md`](skills/melech-roi/references/analogies.md).
+For whether the benefit itself is real, use `melech-distill-need` first. To design a cheaper shape, use `melech-8020`; to narrow an existing diff, hand off to `melech-tidy`. See the receipt contract in [`references/output-examples.md`](skills/melech-roi/references/output-examples.md). The plumbing model and its alternatives remain available in [`references/analogies.md`](skills/melech-roi/references/analogies.md).
 
 ---
 
