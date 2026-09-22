@@ -453,6 +453,8 @@ Use it when:
 
 Verifies an AI-proposed plan, fix, architecture, or claim against the real artifact, then dispatches a panel of fresh models from different providers that answer independently — no assigned sides.
 
+![melech-consult: problem vs solution](skills/melech-consult/assets/problem-vs-solution.png)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-consult
 ```

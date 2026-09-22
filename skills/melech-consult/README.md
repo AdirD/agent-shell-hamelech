@@ -4,6 +4,8 @@ This skill used to convene Beit Hillel and Beit Shammai: two subagents, each ass
 
 The short version: **assigning sides is the one configuration measured as no better than doing nothing, and the ingredient that actually works — genuinely different models, grounded in real evidence — was the part the old design treated as an implementation detail.**
 
+![melech-consult: problem vs solution](assets/problem-vs-solution.png)
+
 ---
 
 ## 1. What broke
