@@ -269,6 +269,8 @@ point is clear. Three grounded recovery examples live in
 
 Finds the smallest useful path to a product or engineering outcome.
 
+![melech-8020: cathedral vs thin path](skills/melech-8020/assets/melech-8020-tip-diagram.png)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-8020
 ```
