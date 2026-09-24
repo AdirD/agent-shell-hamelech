@@ -610,6 +610,8 @@ For multiple independent opinions or a judgment among competing paths, use `mele
 
 Grades whether a change's complexity and blast radius are worth the benefit it delivers — on an existing PR, a local diff, or an idea still being discussed — and returns an itemized visual receipt.
 
+![melech-roi: washer vs whole house](skills/melech-roi/assets/melech-roi-tip-diagram.png)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-roi
 ```
