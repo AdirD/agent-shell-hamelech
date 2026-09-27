@@ -33,9 +33,9 @@ To survive pruning, every symbol in the audited diff must satisfy these four tes
 | Proof Type | Question Asked | Evidentiary Requirement | If Proof Fails |
 |---|---|---|---|
 | **1. Reachability Proof** | "Can runtime execution actually reach this?" | Trace a direct call chain from an active entrypoint (route, UI component, CLI command, export, or event handler). | **Dead / Zombie Code** → Purge. |
-| **2. Requirement Proof** | "Which explicit user requirement demanded this?" | Identify the exact user story or bugfix requiring this branch or parameter. If the answer is *"in case we need it later"*, it fails. | **YAGNI Bloat** → Strip. |
-| **3. Non-Duplication Proof** | "Did this logic already exist in the codebase?" | Verify whether an existing helper, utility, or standard library method already handles this. | **Accidental Reinvention** → Collapse. |
-| **4. Breakage Proof** | "If we delete this right now, what test or behavior breaks?" | Simulate removal or check test coverage. If nothing fails and no behavior shifts, why does it exist? | **Phantom Scaffolding** → Remove. |
+| **2. Requirement Proof** | "What independent requirement demanded this?" | Trace it to an explicit user decision, a requirement or runtime constraint predating implementation, or independently observable required behavior. Same-diff artifacts cannot prove necessity. | **YAGNI Bloat** → Strip. |
+| **3. Non-Duplication Proof** | "Does an existing repository path already meet the requirement?" | Compare similar features and generic infrastructure; require concrete evidence before retaining a different path. | **Accidental Reinvention** → Delete. |
+| **4. Breakage Proof** | "If we delete this, what independently required behavior breaks?" | Same-diff implementation-coupled tests alone are insufficient; require a behavior or constraint independent of the addition. | **Phantom Scaffolding** → Remove. |
 
 If a symbol looks like a hand-rolled version of a known library or tool rather than of local code, that is an adoption question and not a deletion — note it and flag it for the user.
 

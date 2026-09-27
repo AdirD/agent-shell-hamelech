@@ -282,7 +282,7 @@ Use it when:
 
 ### [`melech-tidy`](skills/melech-tidy)
 
-Adaptive diff reduction — audits and prunes dead code residue, minimizes architectural blast radius, and shakes prompt bloat before opening a PR.
+Adaptive diff reduction — proves additions necessary before routing them, then prunes residue, minimizes architectural blast radius, and shakes prompt bloat before opening a PR.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-tidy
@@ -293,7 +293,7 @@ Use it when:
 - you suspect orphaned helper functions, dead types, or abandoned iterations are lingering in the diff (Lane 1: Dead Residue)
 - the PR works, but touches too many shared systems or files when a local leaf seam suffices (Lane 2: Seam & Blast Radius)
 - you touched prompt, skill, or instruction files and want redundant rules and over-explanation shaken out (Lane 3: Prompt Shake)
-- you want an evidentiary audit where the agent diagnoses which lanes apply and requests approval before modifying code
+- you want an evidentiary audit that rejects circular same-diff evidence before routing findings and requesting cleanup approval
 
 Unlike `melech-8020`, which negotiates or narrows scope before implementation, `melech-tidy` runs after implementation: it preserves 100% of the required outcome while purging residue, narrowing blast radius, and tightening prompt instructions.
 

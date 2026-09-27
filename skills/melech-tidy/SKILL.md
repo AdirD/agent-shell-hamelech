@@ -41,9 +41,9 @@ Every file and symbol in the diff is evaluated against one of three strictly del
 * **Core Philosophy**: **Inverted Burden of Proof**. Every added symbol is assumed guilty (residue/dead code) until proven innocent.
 * **The 4 Evidentiary Proofs**:
   1. **Reachability Proof**: Can runtime execution actually reach this from an active entrypoint (route, UI component, CLI command, export, or event handler)? If not → **Purge**.
-  2. **Requirement Proof**: Which explicit user prompt required this? If the answer is *"in case we need it later"* → **Strip YAGNI**.
-  3. **Non-Duplication Proof**: Does an existing helper or standard library utility already do this? If so → **Collapse**.
-  4. **Breakage Proof**: If deleted right now, does any test or behavior break? If nothing fails and no behavior shifts → **Remove**.
+  2. **Requirement Proof**: Which explicit user decision, pre-existing requirement or runtime constraint, or independently observable behavior requires this? Same-diff artifacts cannot prove necessity; *"in case we need it later"* fails.
+  3. **Non-Duplication Proof**: Does a similar feature or generic repository path already meet the requirement? If so → **Delete the duplicate**.
+  4. **Breakage Proof**: If deleted, what independently required behavior breaks? Same-diff implementation-coupled tests alone are insufficient. If none → **Remove**.
 * **Action**: **Subtraction only** (delete dead functions, types, props, imports, and zombie chains).
 * **Deep playbook**: [`references/lane-1-dead-code.md`](references/lane-1-dead-code.md) — inverted burden of proof, the 4-tier residue classification, and call-graph/zombie-chain tracing.
 
@@ -57,6 +57,7 @@ Every file and symbol in the diff is evaluated against one of three strictly del
   2. Extending a nearby established path.
   3. Adding a small local implementation (local duplication is acceptable if a shared abstraction exposes core systems to regression).
   4. Introducing a shared abstraction *only* when multiple real consumers require it.
+* **Deletion before movement**: If existing code already meets the requirement, route the addition to Lane 1; movement or extraction counts only when it materially reduces total semantic surface or blast radius.
 * **Action**: **Refactor / Re-anchor** (revert changes in central middleware, schemas, or global providers; place logic in a local leaf module).
 * **Deep playbook**: [`references/lane-2-seam-radius.md`](references/lane-2-seam-radius.md) — the must-preserve contract, measuring the surface, and proving behavioral equivalence.
 
@@ -99,6 +100,12 @@ If the target is ambiguous, prompt the user with `ask_question`.
 ---
 
 ### Step 2: Adaptive Diagnosis & Lane Routing
+
+Before assigning a lane, apply these gates to every addition; route any failure and its implementation-coupled chain to Lane 1:
+
+1. **Independent provenance** — Trace it to an explicit user decision, a requirement or runtime constraint that predates the implementation, or independently observable required behavior. Same-diff code, tests, comments, and docs may explain implementation but cannot prove it necessary.
+2. **Counterfactual deletion** — Ask: “If this entire addition had never existed, could the requirement still be met by existing code?” If yes, delete the addition and artifacts created solely for it; do not move, rename, extract, or abstract it.
+3. **Repository parity** — Compare similar features and generic infrastructure before retaining an extra helper, type, wrapper, adapter, factory, logger, metric, test seam, shared change, or defensive branch. Require concrete evidence for a different path.
 
 Inspect the scope and route each changed file/symbol:
 
