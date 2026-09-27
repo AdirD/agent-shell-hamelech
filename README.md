@@ -306,6 +306,8 @@ Each lane keeps its full handcrafted playbook as an on-demand reference, loaded 
 Lists and continues coding-agent transcripts without copying paths or writing
 handoff files into the repo.
 
+![melech-handoff: without vs with](skills/melech-handoff/assets/melech-handoff-tip-diagram.png)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-handoff
 ```
