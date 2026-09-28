@@ -115,6 +115,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
 | [`melech-cr-clone-trainer`](#melech-cr-clone-trainer) | Can an agent review PRs like me and keep learning? | Train or resync a private reviewer Clone from your real PR activity, then optionally configure it in the current agent host's automation/task system. |
 | [`melech-handoff`](#melech-handoff) | Can I find or continue a session from another coding agent? | Bare `/melech-handoff` lists recent transcripts with worktree and session stats. Continue by ID or intent. |
+| [`melech-cost`](#melech-cost) | What did this repo cost me, and which worktree or task burned it? | Bare `/melech-cost` prints per-worktree spend cards for the current repo across Cursor, Claude Code, and Codex; add a worktree name to drill into its sessions. |
 | [`melech-pr-gardener`](#melech-pr-gardener) | Can all my open PRs be kept green unattended on a schedule? | You want a scheduled agent to sweep PRs by an explicit GitHub author, round-robin the least-recently-served one, and reconcile it toward merge-ready — one stateless pass per run. |
 
 ---
@@ -145,6 +146,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Jump into the Confluence tab I already have open and reply to this comment." | [`melech-live-browser`](#melech-live-browser) | Operates the existing logged-in Chrome tab and applies an explicit draft-versus-submit boundary. |
 | "Drive the Chrome tab I'm already logged into while we test or debug." | [`melech-debug-mode`](#melech-debug-mode) + [`melech-live-browser`](#melech-live-browser) | Debug mode owns probes and evidence; live browser owns safe attach and interaction. |
 | "Hand this session to another agent / find that transcript." | [`melech-handoff`](#melech-handoff) | Lists recent transcripts newest-first, then continues by ID or intent. |
+| "How much did this repo / worktree / task cost me in agent usage?" | [`melech-cost`](#melech-cost) | Prices every session of every worktree of the current repo from local history and prints handoff-style cards with dollars and tokens. |
 | "Is this bug fix worth the complexity it's adding? Are we overengineering this?" | [`melech-roi`](#melech-roi) | A PR, diff, or idea might be rerouting the house to fix a dripping tap — check whether the blast radius matches the benefit before or after implementing. |
 | "I just finished coding with AI — tidy and minimize this diff before PR." | [`melech-tidy`](#melech-tidy) | Adaptive diff reduction across 4 MECE lanes: purges dead AI residue, anchors live code to narrow leaf seams, shakes prompt bloat, and restores cosmetic-only churn. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-cr-clone-trainer`](#melech-cr-clone-trainer) | Builds or resyncs one private user-global Clone, named by you, with repo-specific memory. |
@@ -324,6 +326,31 @@ Provider locations come from a single mapping file; database and compressed
 histories are recorded but unsupported. The Python helper performs mechanical
 discovery and lookup only; it does not rank natural-language objectives.
 Requires Python 3.9+.
+
+---
+
+### [`melech-cost`](skills/melech-cost)
+
+Shows what coding-agent sessions cost, per worktree, for the repo you run it in.
+
+```bash
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-cost
+```
+
+Use it when:
+- you say `/melech-cost` (every worktree of the current repo, top 8 cards, plus a full report file)
+- you want one task's damage: `/melech-cost <worktree>` lists that worktree's top 10 sessions with topic, agent, and cost
+- you want a window: `/melech-cost since 2026-09-01`
+
+Scope is the current repo only: the main checkout plus every worktree from
+`git worktree list` wherever it lives, plus removed worktrees whose folder held
+only this repo. Claude Code and Codex costs use their logged token counts.
+Cursor keeps no local billing counters, so its sessions are replayed call by
+call and calibrated against Cursor's own context counter (about ±30–40%).
+Prices live in a dated `references/prices.json`. Numbers are API list-price
+value, not your plan invoice. The script is local Python (no model tokens, no
+network); a run costs only the agent turn around it, about $0.03–0.10 in an
+existing chat. Requires Python 3.9+.
 
 ---
 
@@ -666,6 +693,7 @@ skills/
   melech-distill-need/
   melech-debug-mode/
   melech-handoff/
+  melech-cost/
   melech-live-browser/
   melech-sync-skills/
   melech-market-validation/
