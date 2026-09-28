@@ -132,9 +132,20 @@ The three fronts, in priority order:
    PR itself) and resolve conflicts, keeping both sides' intent. When both intents
    can't coexist — clearing it would mean deciding for the author — abort and
    surface the hunks for the user.
-2. **Review comments** (incl. Bugbot, CodeRabbit). Fetch only unresolved threads;
-   skip any that already carry your own reply. Classify each, and **always leave
-   a visible response** whichever way you go:
+2. **Review comments** (incl. Bugbot, CodeRabbit). Fetch unresolved threads.
+   **Idempotency (hard rules — overlapping wakes race):**
+   - Treat any thread comment whose body starts with `🪴 ` as already handled by
+     the gardener. **Skip** that thread entirely: no second Fix/Dismiss reply,
+     no re-phrased “Handled in …”, no re-resolve dance. One `🪴 ` reply per
+     thread is the hard cap for Fix/Dismiss.
+   - A later “thanks” / ack from the reviewer does **not** reopen work.
+   - Immediately **before** posting a reply, re-fetch that thread’s comments.
+     If any `🪴 ` comment is already present, abort the reply for that thread
+     (another concurrent pass won the race).
+   - Never reply to your own `🪴 ` comments or to echo wakes caused by them.
+
+   Classify each remaining thread, and **always leave a visible response**
+   whichever way you go (first reply only):
 
    | Verdict | When | Do |
    |---|---|---|
