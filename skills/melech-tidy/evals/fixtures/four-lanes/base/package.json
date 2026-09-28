@@ -1,0 +1,11 @@
+{
+  "name": "admin-app",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}
