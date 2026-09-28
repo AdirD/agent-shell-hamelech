@@ -1,0 +1,36 @@
+Requirement: fix the checkout crash when `cart.discount` is undefined in
+`calculateTotal`. Nothing else was requested.
+
+Repository facts:
+- The base style in `src/checkout/` is 4-space indentation, single quotes, and
+  no semicolons.
+- CI runs `eslint` and `npm test` only. There is no formatter check.
+
+Treat this patch as the uncommitted working tree.
+
+diff --git a/src/checkout/total.ts b/src/checkout/total.ts
+index 3f2a1c4..8b7d9e2 100644
+--- a/src/checkout/total.ts
++++ b/src/checkout/total.ts
+@@ -1,15 +1,15 @@
+-import { Cart, LineItem } from './types'
+-import { roundCurrency } from './money'
++import { Cart, LineItem } from "./types";
++import { roundCurrency } from "./money";
+ 
+ export function lineTotal(item: LineItem): number {
+-    return item.unitPrice * item.quantity
++  return item.unitPrice * item.quantity;
+ }
+ 
+ export function subtotal(cart: Cart): number {
+-    return cart.items.reduce((sum, item) => sum + lineTotal(item), 0)
++  return cart.items.reduce((sum, item) => sum + lineTotal(item), 0);
+ }
+ 
+ export function calculateTotal(cart: Cart): number {
+-    const discount = cart.discount.amount
+-    return roundCurrency(subtotal(cart) - discount)
++  const discount = cart.discount?.amount ?? 0;
++  return roundCurrency(subtotal(cart) - discount);
+ }
