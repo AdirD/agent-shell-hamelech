@@ -1,0 +1,25 @@
+Requirement: fix `ReferenceError: Cannot access 'config' before initialization`
+thrown when the app starts. Nothing else was requested.
+
+Repository facts:
+- `./polyfills` installs a `globalThis.fetch` implementation for older runtimes.
+- `./api-client` reads `globalThis.fetch` once, at module import time.
+
+Treat this patch as the uncommitted working tree.
+
+diff --git a/src/app/start.ts b/src/app/start.ts
+index 5c1e0a2..a94d7f3 100644
+--- a/src/app/start.ts
++++ b/src/app/start.ts
+@@ -1,9 +1,9 @@
+-import './polyfills'
+ import { createClient } from './api-client'
++import './polyfills'
+ import { loadSettings } from './settings'
+ 
+ export function start() {
+-    const client = createClient(config.apiUrl)
+     const config = loadSettings()
++    const client = createClient(config.apiUrl)
+     return client
+ }
