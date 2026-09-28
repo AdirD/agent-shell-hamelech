@@ -18,6 +18,17 @@ Tree-shaking for prompts. Every line is **guilty until proven load-bearing**. Th
 - Strip bloat from system prompts, skill files, and instruction docs so they cover 100% of needed cases in the fewest lines.
 - Subtraction, not redesign.
 
+## Boundary with Diff noise
+
+**Prompt bloat** removes semantic instruction content that fails a prompt proof.
+**Diff noise** restores standalone representation-only changes, such as a
+paragraph rewrap, only when both instruction text and Markdown structure are
+canonically unchanged.
+
+Whitespace can carry meaning in Markdown, YAML, code fences, and examples. If
+equivalence is uncertain—or if words, rules, or coverage changed—keep the
+finding out of **Diff noise** and evaluate the semantic content here.
+
 ## Targets it hunts
 
 - Over-explanation the model already knows by default
