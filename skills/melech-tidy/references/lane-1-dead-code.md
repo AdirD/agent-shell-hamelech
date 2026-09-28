@@ -17,6 +17,16 @@ The feature works and tests might pass, but the working diff is cluttered with d
 
 **Lane 1 acts as an evidentiary garbage collector and architectural reconciler.**
 
+## Boundary with Diff noise
+
+**Dead code** removes semantic constructs that fail reachability, requirement,
+non-duplication, or breakage proofs. **Diff noise** restores standalone
+representation-only changes whose canonical artifact is unchanged.
+
+An unused import belongs here. Formatting or moving an otherwise unchanged
+import belongs to **Diff noise** only when order and side effects are proven
+irrelevant; appearance alone is not evidence.
+
 ---
 
 ## The Core Philosophy: Inverted Burden of Proof
