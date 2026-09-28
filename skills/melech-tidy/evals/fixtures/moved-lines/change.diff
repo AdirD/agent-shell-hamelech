@@ -1,0 +1,16 @@
+diff --git a/src/app/start.ts b/src/app/start.ts
+index 5c1e0a2..a94d7f3 100644
+--- a/src/app/start.ts
++++ b/src/app/start.ts
+@@ -1,9 +1,9 @@
+-import './polyfills'
+ import { createClient } from './api-client'
++import './polyfills'
+ import { loadSettings } from './settings'
+ 
+ export function start() {
+-    const client = createClient(config.apiUrl)
+     const config = loadSettings()
++    const client = createClient(config.apiUrl)
+     return client
+ }
