@@ -24,13 +24,14 @@ Optimize in this order:
 1. Preserve required behavior, compatibility, and correctness.
 2. Avoid touching shared systems, public contracts, schemas, persisted data, dependencies, and cross-cutting state.
 3. Reduce affected subsystems, files, call sites, concepts, and code paths.
-4. Reduce changed lines.
+4. Reduce changed lines as a consequence of semantic seam narrowing, not as an independent cosmetic cleanup target.
 
 Local duplication is acceptable when a shared abstraction would expose more of the system to regression.
 
 ## Boundary with adjacent work
 
 - **Dead code** proves and removes dead code, zombie paths, and YAGNI residue. **Blast radius** keeps the outcome fixed and may replace a working, necessary implementation with a narrower one.
+- **Diff noise** restores standalone representation-only findings whose canonical artifact is unchanged. **Blast radius** owns meaning-preserving semantic rewrites—renames, refactors, reordered logic, and seam changes—not formatter or whitespace restoration.
 - **`melech-8020`** may negotiate or narrow the *outcome* to find a cheaper useful path before implementation.
 
 If the only meaningful reduction requires dropping or changing behavior, stop and hand that product trade-off to the user or `melech-8020`. Do not call a weaker result equivalent.
@@ -60,7 +61,7 @@ Inspect the whole diff and its integration points. Record the baseline:
 - call sites and shared paths affected,
 - relevant diff size.
 
-Flag broad refactors, generalized machinery, parallel implementations, incidental cleanup, and changes made only to accommodate the chosen design.
+Flag broad refactors, generalized machinery, parallel implementations, incidental **semantic** cleanup, and changes made only to accommodate the chosen design. Standalone cosmetic churn belongs to **Diff noise**.
 
 ### 3. Find the narrowest safe seam
 
@@ -75,7 +76,7 @@ Judge candidates by semantic exposure, not aesthetics or DRYness. Reject a small
 
 ### 4. Rewrite the implementation
 
-Remove incidental refactors and machinery that the narrower design no longer needs. Keep edits inside the selected contract. Preserve load-bearing comments and add no speculative flexibility.
+Remove incidental semantic refactors and machinery that the narrower design no longer needs. Keep edits inside the selected contract. Preserve load-bearing comments and add no speculative flexibility.
 
 When two implementations are behaviorally equivalent, choose the one with fewer boundaries, assumptions, and future obligations.
 
