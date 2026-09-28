@@ -1,11 +1,15 @@
 # Lane 3 — Instruction & Prompt Bloat / Prompt Shake (deep playbook)
 
-> The full handcrafted playbook behind Tidy's **Lane 3** (originally the
-> standalone `melech-prompt-shake` skill). Tidy's [`SKILL.md`](../SKILL.md)
-> owns the shared workflow — scope, the unified evidence table, approval, and
-> verification. This file holds the lane-specific targets, proofs, and
-> guardrails for tree-shaking prompts. Pull it in when Lane 3 fires and you
-> need more than the 5-proof list in the router.
+> The full handcrafted playbook behind Tidy's **Prompt bloat** lane (internal
+> anchor: Lane 3; originally the standalone `melech-prompt-shake` skill).
+> Tidy's [`SKILL.md`](../SKILL.md) owns the shared workflow — scope, the
+> unified evidence table, approval, and verification. This file holds the
+> lane-specific targets, proofs, and guardrails for tree-shaking prompts.
+> Pull it in when **Prompt bloat** fires and you need more than the 5-proof
+> list in the router.
+>
+> User-facing short label in the evidence table / approval / summary:
+> **Prompt bloat** — never print "Lane 3".
 
 Tree-shaking for prompts. Every line is **guilty until proven load-bearing**. The goal is the leanest prompt that still covers 100% of needed cases — minimal-that-covers beats maximal.
 

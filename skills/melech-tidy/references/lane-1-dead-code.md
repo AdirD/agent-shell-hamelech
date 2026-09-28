@@ -1,11 +1,15 @@
 # Lane 1 — Dead Code & AI Residue (deep playbook)
 
-> The full handcrafted playbook behind Tidy's **Lane 1** (originally the
-> standalone `melech-prune` skill). Tidy's [`SKILL.md`](../SKILL.md) owns the
-> shared workflow — scope resolution, the unified evidence table, approval via
-> `ask_question`, and verification. This file holds the lane-specific
-> philosophy, proofs, and tier classification. Pull it in when Lane 1 fires and
-> you need the depth behind the compact proof list in the router.
+> The full handcrafted playbook behind Tidy's **Dead code** lane (internal
+> anchor: Lane 1; originally the standalone `melech-prune` skill). Tidy's
+> [`SKILL.md`](../SKILL.md) owns the shared workflow — scope resolution, the
+> unified evidence table, approval via `ask_question`, and verification. This
+> file holds the lane-specific philosophy, proofs, and tier classification.
+> Pull it in when **Dead code** fires and you need the depth behind the
+> compact proof list in the router.
+>
+> User-facing short label in the evidence table / approval / summary:
+> **Dead code** — never print "Lane 1".
 
 After 5–15 prompts of iterative coding with AI, codebases accrete **AI residue**: orphaned helpers from earlier prompts, dead types, half-migrated state, speculative config keys, and zombie workflows.
 

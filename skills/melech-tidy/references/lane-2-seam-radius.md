@@ -1,11 +1,15 @@
 # Lane 2 — Architectural Seams & Blast Radius (deep playbook)
 
-> The full handcrafted playbook behind Tidy's **Lane 2** (originally the
-> standalone `melech-diff-minimizer` skill). Tidy's [`SKILL.md`](../SKILL.md)
-> owns the shared workflow — scope resolution, the unified evidence table,
-> approval, and verification. This file holds the lane-specific reasoning for
-> narrowing a live, working, necessary change to its safest seam. Pull it in
-> when Lane 2 fires and the seam hierarchy in the router isn't enough.
+> The full handcrafted playbook behind Tidy's **Blast radius** lane (internal
+> anchor: Lane 2; originally the standalone `melech-diff-minimizer` skill).
+> Tidy's [`SKILL.md`](../SKILL.md) owns the shared workflow — scope
+> resolution, the unified evidence table, approval, and verification. This
+> file holds the lane-specific reasoning for narrowing a live, working,
+> necessary change to its safest seam. Pull it in when **Blast radius** fires
+> and the seam hierarchy in the router isn't enough.
+>
+> User-facing short label in the evidence table / approval / summary:
+> **Blast radius** — never print "Lane 2".
 
 Take an implementation that already exists and make it smaller, more local, and safer to review without weakening what it must accomplish.
 
@@ -26,7 +30,7 @@ Local duplication is acceptable when a shared abstraction would expose more of t
 
 ## Boundary with adjacent work
 
-- **Lane 1 (dead code)** proves and removes dead code, zombie paths, and YAGNI residue. Lane 2 keeps the outcome fixed and may replace a working, necessary implementation with a narrower one.
+- **Dead code** proves and removes dead code, zombie paths, and YAGNI residue. **Blast radius** keeps the outcome fixed and may replace a working, necessary implementation with a narrower one.
 - **`melech-8020`** may negotiate or narrow the *outcome* to find a cheaper useful path before implementation.
 
 If the only meaningful reduction requires dropping or changing behavior, stop and hand that product trade-off to the user or `melech-8020`. Do not call a weaker result equivalent.
