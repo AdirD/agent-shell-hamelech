@@ -381,6 +381,10 @@ The gardener assumes it's already inside a scheduled tick in the repo it should 
 Operates the user's already-open, logged-in Chrome tabs through Chrome DevTools
 MCP without turning ordinary browser work into a debugging session.
 
+![melech debug + live browser: parent autonomy before/after](skills/melech-live-browser/assets/melech-auto-before-after.png)
+
+![melech-live-browser: the hands](skills/melech-live-browser/assets/melech-what-live-browser.png)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-live-browser
 ```
@@ -402,6 +406,10 @@ on the machine.
 
 Runs a local UI workflow end to end in the user's existing Chrome tab with
 temporary runtime probes and captured evidence.
+
+![melech-debug-mode: the eyes](skills/melech-debug-mode/assets/melech-what-debug-mode.png)
+
+![melech-debug-mode: behind the scenes](skills/melech-debug-mode/assets/melech-behind-scenes-debug.png)
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-debug-mode
