@@ -38,7 +38,8 @@ If the WHY is obvious from the name of the function and its arguments, the comme
 - **Short.** Lead with the constraint or the warning. No wind-up.
 - **Imperative where it matters.** Prefer "Do not reorder — must run before X" over "This runs before X."
 - **Name the cost.** "Removing this early-return reopens the N+1 we fixed" beats "important early return."
-- **If a comment needs more than about three lines**, the code itself is probably wrong. Fix the code, not the comment.
+- **Make the failure concrete when context is missing.** If an unfamiliar reader cannot infer the harm from "security issue," "race," or "data leak," give the shortest causal example or data flow that lets them replay it in their head. Use obviously fake data; never include real secrets, current-task context, or a lengthy exploit recipe.
+- **Stay near three lines, not at their expense.** Use the shortest comment that preserves the needed causal chain. If it needs substantially more, the code itself probably needs improvement.
 
 ## Respecting Existing Comments
 
@@ -85,6 +86,20 @@ Good — encodes a hidden contract:
 ```go
 // Caller must hold s.mu. Returns the unwrapped value; safe only until the next Set().
 func (s *state) peek() T { ... }
+```
+
+Bad — names a risk without showing how it happens:
+```ts
+// Agent-authored markdown must never trigger an image request; remote images are a security issue.
+const markdownComponents = { img: () => null };
+```
+
+Good — gives the minimum causal chain:
+```ts
+// Do not render agent-authored images: an agent could put a secret in
+// https://example.invalid/pixel?key=NOT_A_REAL_SECRET; rendering automatically
+// requests that URL, sending the query value to the remote host.
+const markdownComponents = { img: () => null };
 ```
 
 ## Summary
