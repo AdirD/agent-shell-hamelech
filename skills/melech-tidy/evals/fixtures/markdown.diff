@@ -1,0 +1,28 @@
+Requirement: rename the "Before approving" heading in the review skill to
+"Before you approve". Nothing else was requested.
+
+Repository facts:
+- The agent's editor rewraps Markdown on save.
+
+Treat this patch as the uncommitted working tree.
+
+diff --git a/skills/review/SKILL.md b/skills/review/SKILL.md
+index 4d5e6f7..8a9b0c1 100644
+--- a/skills/review/SKILL.md
++++ b/skills/review/SKILL.md
+@@ -1,11 +1,9 @@
+ # Review
+ 
+-## Before approving
++## Before you approve
+ 
+-Read the linked issue and the full diff before leaving
+-any comment, so feedback addresses the actual change
+-rather than a guess about it.
++Read the linked issue and the full diff before leaving any comment, so
++feedback addresses the actual change rather than a guess about it.
+ 
+ Block the review if either check fails:
+-- Tests pass
+-- Types check
++- Tests pass - Types check

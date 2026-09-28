@@ -1,0 +1,66 @@
+Requirement: only users with the `analyst` role may open the admin reports
+page. Nothing else was requested.
+
+Repository facts:
+- `src/middleware/auth.ts` runs on every request in the app.
+- `src/routes/admin-reports.ts` already exposes a per-route `guards` array,
+  and other admin routes put role checks there.
+- A repo-wide search finds no references to `formatReportDate` outside its
+  own definition.
+- `skills/release/SKILL.md` already says, earlier in the file: "Run the full
+  test suite before tagging a release."
+- CI runs `eslint` and `npm test`. There is no formatter check.
+
+Treat this patch as the uncommitted working tree.
+
+diff --git a/src/middleware/auth.ts b/src/middleware/auth.ts
+index 1a2b3c4..5d6e7f8 100644
+--- a/src/middleware/auth.ts
++++ b/src/middleware/auth.ts
+@@ -8,5 +8,8 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) {
+     if (!req.user) {
+         return res.status(401).end()
+     }
++    if (req.path.startsWith('/admin/reports') && !req.user.roles.includes('analyst')) {
++        return res.status(403).end()
++    }
+     next()
+ }
+diff --git a/src/lib/dates.ts b/src/lib/dates.ts
+index 9e8d7c6..b5a4f3e 100644
+--- a/src/lib/dates.ts
++++ b/src/lib/dates.ts
+@@ -12,2 +12,6 @@ export function formatDate(date: Date): string {
+     return date.toISOString().slice(0, 10)
+ }
++
++export function formatReportDate(date: Date): string {
++    return `${formatDate(date)} (UTC)`
++}
+diff --git a/src/routes/users.ts b/src/routes/users.ts
+index 0f1e2d3..c4b5a69 100644
+--- a/src/routes/users.ts
++++ b/src/routes/users.ts
+@@ -3,8 +3,7 @@ import { listUsers } from '../services/users'
+ 
+ export const usersRoute = {
+-    path: '/users',
+-    guards: [],
++  path: '/users',
++  guards: [],
+ 
+-
+-    handler: async () => listUsers(),
++  handler: async () => listUsers(),
+ }
+diff --git a/skills/release/SKILL.md b/skills/release/SKILL.md
+index 7a8b9c0..d1e2f34 100644
+--- a/skills/release/SKILL.md
++++ b/skills/release/SKILL.md
+@@ -14,4 +14,6 @@ Run the full test suite before tagging a release.
+ 
+ ## Tagging
+ 
+ Create an annotated tag named `vMAJOR.MINOR.PATCH`.
++Always run all the tests before you tag a release.
++Remember that `git commit` records staged changes in the repository history.

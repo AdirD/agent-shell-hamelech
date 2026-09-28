@@ -1,0 +1,72 @@
+{
+  "skill_name": "melech-tidy",
+  "evals": [
+    {
+      "id": 1,
+      "name": "formatter-noise-around-a-fix",
+      "prompt": "/melech-tidy evals/fixtures/formatter-sweep.diff",
+      "expected_output": "Separates the editor's formatting churn from the required discount fix: the formatting-only changes are Diff noise, backed by structural-equivalence evidence, and the fix is kept intact.",
+      "files": ["evals/fixtures/formatter-sweep.diff"],
+      "expectations": [
+        "Reports the quote, semicolon, and indentation changes outside calculateTotal (imports, lineTotal, subtotal) as **Diff noise**",
+        "Backs the Diff noise finding with structural-equivalence evidence (same parsed structure or tokens), not just 'looks cosmetic'",
+        "Does not classify, restore, or split the `cart.discount?.amount ?? 0` fix as Diff noise"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "moved-lines-are-not-noise",
+      "prompt": "/melech-tidy evals/fixtures/moved-lines.diff",
+      "expected_output": "Judges moved lines by meaning, not movement: the moved config declaration is the required fix, and the polyfill import reorder changes runtime behavior because api-client captures globalThis.fetch at import time. Neither is Diff noise; the import order should be restored.",
+      "files": ["evals/fixtures/moved-lines.diff"],
+      "expectations": [
+        "Does not classify the moved `const config = loadSettings()` line as Diff noise",
+        "Does not classify the './polyfills' import move as Diff noise",
+        "Explains that api-client now captures globalThis.fetch before the polyfill runs",
+        "Recommends restoring the original import order"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "one-lane-per-finding",
+      "prompt": "/melech-tidy evals/fixtures/four-lanes.diff",
+      "expected_output": "Routes each reducible finding to exactly one lane: the global middleware change is Blast radius, the unreferenced formatReportDate is Dead code, the added release-skill lines are Prompt bloat, and the users.ts reindent is Diff noise. Presents one evidence table with short labels and asks for approval before editing.",
+      "files": ["evals/fixtures/four-lanes.diff"],
+      "expectations": [
+        "Classifies the src/middleware/auth.ts change as **Blast radius** and proposes moving the role check into the admin-reports route guards",
+        "Classifies formatReportDate as **Dead code**, citing the zero-references search",
+        "Classifies the added skills/release/SKILL.md lines as **Prompt bloat**",
+        "Classifies the src/routes/users.ts reindent and blank-line collapse as **Diff noise**",
+        "Reports no file or line under two lanes",
+        "Uses short lane labels and never prints lane numbers",
+        "Asks for approval with options that include all four lanes and a low-risk set containing Diff noise, and edits nothing before approval"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "lockfile-reorder-vs-bump",
+      "prompt": "/melech-tidy evals/fixtures/lockfile.diff",
+      "expected_output": "Treats the tiny-queue key reorder as Diff noise (same parsed value) but the tiny-emitter version and integrity change as an unrequested dependency change. Restores the lockfile with git or npm, never by hand-editing, and keeps the retry.",
+      "files": ["evals/fixtures/lockfile.diff"],
+      "expectations": [
+        "Classifies the tiny-queue key reorder as **Diff noise**, noting the parsed values are identical",
+        "Does not classify the tiny-emitter 2.1.0 to 2.1.1 change as Diff noise and flags it as an unrequested dependency change",
+        "Recommends restoring package-lock.json via git or npm rather than hand-editing it",
+        "Keeps the upload retry change"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "markdown-rewrap-vs-structure",
+      "prompt": "/melech-tidy evals/fixtures/markdown.diff",
+      "expected_output": "Keeps the heading rename, reports the rewrapped paragraph as Diff noise (identical text and Markdown structure), and does not treat the collapsed checklist as noise because two list items became one.",
+      "files": ["evals/fixtures/markdown.diff"],
+      "expectations": [
+        "Classifies the rewrapped 'Read the linked issue' paragraph as **Diff noise**, noting identical text and structure",
+        "Does not classify the 'Tests pass - Types check' line as Diff noise and notes the list structure changed from two items to one",
+        "Recommends restoring the two-item checklist",
+        "Keeps the heading rename"
+      ]
+    }
+  ]
+}
