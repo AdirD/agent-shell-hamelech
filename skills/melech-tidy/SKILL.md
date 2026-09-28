@@ -26,13 +26,23 @@ Every file and symbol in the diff is evaluated against one of three strictly del
                    [Code Files]                       [Prompt / Rule Files]
                         │                                     │
            ┌────────────┴────────────┐                        ▼
-           ▼                         ▼                     Lane 3:
-        Lane 1:                   Lane 2:               Prompt Shake
+           ▼                         ▼                   Prompt bloat:
+        Dead code:              Blast radius:           Prompt Shake
       Dead Residue             Seam / Radius            (Over-explanation,
     (Zero callers,           (Live working code,        redundant rules,
      zombie chains,           over-engineered,          never-fires branches)
      YAGNI bloat)             touches shared core)
 ```
+
+User-facing labels (always lead with these — never "Lane 1/2/3" in reports, approval options, or summaries):
+
+| Short label | Full name |
+|---|---|
+| **Dead code** | Dead Code & AI Residue |
+| **Blast radius** | Architectural Seams & Blast Radius |
+| **Prompt bloat** | Instruction & Prompt Bloat |
+
+Lane numbers below are internal section anchors only.
 
 ---
 
@@ -80,7 +90,7 @@ Every file and symbol in the diff is evaluated against one of three strictly del
 
 ```text
 1. Resolve Scope  ──►  2. Adaptive Diagnosis  ──►  3. Present Evidence  ──►  4. Ask Approval  ──►  5. Tidy & Verify
-  (Prompt or Flag)      (Route to Lanes 1, 2, 3)     Unified Table             (ask_question)       (Tests green)
+  (Prompt or Flag)      (Route by lane name)        Unified Table             (ask_question)       (Tests green)
 ```
 
 ---
@@ -103,26 +113,26 @@ If the target is ambiguous, prompt the user with `ask_question`.
 Inspect the scope and route each changed file/symbol:
 
 1. **For Code Files (`.ts`, `.py`, `.go`, `.rs`, etc.)**:
-   - Trace the call graph upwards to find callers. Flag unreferenced symbols and zombie chains under **Lane 1**.
-   - Check if changes touch shared systems, global state, public contracts, or broad dependencies when a leaf change could suffice. Flag overreach under **Lane 2**.
+   - Trace the call graph upwards to find callers. Flag unreferenced symbols and zombie chains under **Dead code**.
+   - Check if changes touch shared systems, global state, public contracts, or broad dependencies when a leaf change could suffice. Flag overreach under **Blast radius**.
 2. **For Prompt / Instruction Files (`.md`, `.prompt`, `.cursorrules`, etc.)**:
-   - Audit changed lines against the 5 prompt proofs under **Lane 3**.
+   - Audit changed lines against the 5 prompt proofs under **Prompt bloat**.
 
 ---
 
 ### Step 3: Present Unified Evidence & Diagnosis Table
 
-Output a clean, scannable table grouped by lane before modifying any code:
+Output a clean, scannable table grouped by lane before modifying any code. In the Lane column, use the short labels (**Dead code**, **Blast radius**, **Prompt bloat**) — never "Lane 1", "Lane 2", or "Lane 3".
 
 ```markdown
 ### 🧹 Tidy Audit Results (Scope: uncommitted diff)
 
 | Lane | Target | Issue / Evidence | Proposed Action | Risk |
 |---|---|---|---|---|
-| **Lane 1: Residue** | `src/utils/date.ts:L40` (`formatDateV2`) | **Reachability**: 0 callers across repo. | Delete dead helper | Low |
-| **Lane 1: Residue** | `src/types/user.ts:L15` (`DraftRole`) | **Breakage**: Unreferenced enum variant. | Delete variant | Low |
-| **Lane 2: Seam** | `src/middleware/auth.ts` | **Blast Radius**: Modified global auth middleware for a single route's needs. | Revert middleware; check role locally in `src/routes/admin.ts`. | Medium |
-| **Lane 3: Prompt** | `skills/deploy/SKILL.md:L18` | **Default Knowledge**: Explains how git commit works to the model. | Cut line | Low |
+| **Dead code** | `src/utils/date.ts:L40` (`formatDateV2`) | **Reachability**: 0 callers across repo. | Delete dead helper | Low |
+| **Dead code** | `src/types/user.ts:L15` (`DraftRole`) | **Breakage**: Unreferenced enum variant. | Delete variant | Low |
+| **Blast radius** | `src/middleware/auth.ts` | **Blast Radius**: Modified global auth middleware for a single route's needs. | Revert middleware; check role locally in `src/routes/admin.ts`. | Medium |
+| **Prompt bloat** | `skills/deploy/SKILL.md:L18` | **Default Knowledge**: Explains how git commit works to the model. | Cut line | Low |
 ```
 
 ---
@@ -134,8 +144,8 @@ Output a clean, scannable table grouped by lane before modifying any code:
 Prompt the user using `ask_question`:
 * **Question**: "How would you like to proceed with the tidy recommendations?"
 * **Options**:
-  1. `(Recommended) Apply all recommendations (Lanes 1, 2, and 3)`
-  2. `Apply only Low-Risk cleanup (Lane 1 dead code + Lane 3 prompt shake)`
+  1. `(Recommended) Apply all recommendations (dead code, blast radius, and prompt bloat)`
+  2. `Apply only low-risk cleanup (dead code + prompt bloat)`
   3. `Let me select specific items from the table`
   4. `Cancel (Keep working tree unchanged)`
 
@@ -144,15 +154,16 @@ Prompt the user using `ask_question`:
 ### Step 5: Surgical Tidy & Verification
 
 Once approved:
-1. **Apply Lane 1**: Delete dead functions, types, and unreferenced imports.
-2. **Apply Lane 2**: Refactor to the narrowest leaf seam while preserving 100% of required behavior.
-3. **Apply Lane 3**: Strip bloat from prompt/instruction docs within the diff window.
+1. **Apply dead code**: Delete dead functions, types, and unreferenced imports.
+2. **Apply blast radius**: Refactor to the narrowest leaf seam while preserving 100% of required behavior.
+3. **Apply prompt bloat**: Strip bloat from prompt/instruction docs within the diff window.
 4. **Preserve Load-Bearing Context**: Keep load-bearing comments and intent notes intact.
 5. **Run Verification**:
    - Run tests (`npm test`, `pytest`, `cargo test`, `go test`).
    - Run type checks / builds (`tsc`, `mypy`, `cargo check`).
    - If tests fail, fix immediately or revert the offending change.
-6. **Report Summary**:
+6. **Report Summary** (lead with lane names, not numbers):
+   - What changed under **Dead code**, **Blast radius**, and **Prompt bloat**
    - Lines removed / added
    - Files cleaned or reverted to clean state
    - Verification status (e.g. `All 36 tests passing green`)
@@ -161,7 +172,7 @@ Once approved:
 
 ## Do / Don't
 
-- **Do** treat dead-code deletion (Lane 1), architectural narrowing (Lane 2), and prompt shaking (Lane 3) as distinct, mutually exclusive disciplines.
+- **Do** treat dead-code deletion (**Dead code**), architectural narrowing (**Blast radius**), and prompt shaking (**Prompt bloat**) as distinct, mutually exclusive disciplines.
 - **Don't** rewrite a working architecture when the user only asked to delete dead residue.
 - **Do** prove reachability with a concrete call graph before claiming code is dead.
 - **Don't** say "this looks unneeded" without citing callers and requirements.
