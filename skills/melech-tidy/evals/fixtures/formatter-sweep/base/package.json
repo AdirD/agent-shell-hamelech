@@ -1,8 +1,0 @@
-{
-  "name": "checkout",
-  "private": true,
-  "scripts": {
-    "lint": "eslint src",
-    "test": "vitest run"
-  }
-}
