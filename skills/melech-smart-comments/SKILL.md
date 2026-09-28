@@ -38,7 +38,8 @@ If the WHY is obvious from the name of the function and its arguments, the comme
 - **Short.** Lead with the constraint or the warning. No wind-up.
 - **Imperative where it matters.** Prefer "Do not reorder — must run before X" over "This runs before X."
 - **Name the cost.** "Removing this early-return reopens the N+1 we fixed" beats "important early return."
-- **If a comment needs more than about three lines**, the code itself is probably wrong. Fix the code, not the comment.
+- **Close the reasoning gap.** Give enough of the causal chain for an unfamiliar reader to answer: what change would violate this, and what would break? Labels such as "race," "security issue," or "data leak" are not explanations by themselves.
+- **Stay near three lines, not at their expense.** Use the shortest comment that preserves the reason. If that takes substantially more, make the code express more of the constraint.
 
 ## Respecting Existing Comments
 
@@ -85,6 +86,20 @@ Good — encodes a hidden contract:
 ```go
 // Caller must hold s.mu. Returns the unwrapped value; safe only until the next Set().
 func (s *state) peek() T { ... }
+```
+
+Bad — labels the failure without explaining it:
+```ts
+// Keep this order to avoid a race.
+await save(job);
+await publish(job);
+```
+
+Good — gives the minimum reason needed to preserve the order:
+```ts
+// Persist before publishing: a worker may consume immediately and must find the job.
+await save(job);
+await publish(job);
 ```
 
 ## Summary

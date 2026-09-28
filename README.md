@@ -589,6 +589,7 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-smar
 
 Use it when:
 - you want agents to leave landmines, WHYs, and workarounds behind — not narrate WHAT the code does
+- you want warnings to explain what change violates a constraint and what would break
 - you've been burned by an agent "cleaning up" a comment that was the only trace of a past incident
 - you want one consistent comment policy across Cursor, Claude Code, Codex, and anything else reading `.agents/skills/`
 
