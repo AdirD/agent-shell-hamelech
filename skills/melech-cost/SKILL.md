@@ -12,6 +12,7 @@ relays the result.
 
 ```text
 /melech-cost                      # every worktree of this repo, top 8 cards
+/melech-cost last 10              # 10 most recent sessions across all worktrees
 /melech-cost <worktree>           # one worktree, its top 10 sessions
 /melech-cost since 2026-09-01     # only sessions active since a date
 ```
@@ -22,6 +23,7 @@ Set `COST_SCRIPT` to `scripts/cost.py` beside this file (Python 3.9+):
 
 ```bash
 python3 "$COST_SCRIPT" --cwd "$PWD"                        # default view
+python3 "$COST_SCRIPT" --cwd "$PWD" --latest 10            # latest 10 sessions across all worktrees
 python3 "$COST_SCRIPT" --cwd "$PWD" --worktree feature-a   # focus one worktree
 python3 "$COST_SCRIPT" --cwd "$PWD" --since 2026-09-01     # date filter
 python3 "$COST_SCRIPT" --cwd "$PWD" --cards 20             # more cards
@@ -39,8 +41,10 @@ Card shape:
 26d ago · 22 sessions + 36 subagents · cursor, claude · mostly `gpt-5.6-sol` (79%)
 ~394.1M tokens read (98% cached) · ~717k written
 
-1. `c747b3dc` · cursor · Users locked out after the SSO change… — ~$187
-2. `bf32eff9` · claude · Fix mode keeps editing the wrong file… — ~$51
+| Age | Cost | Read / Write Tokens | Model | Agent | Session | Topic |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1.4d ago | **~$187** | ~250.0M / ~400k | `gpt-5.6-sol` | cursor (+20) | `c747b3dc` | Users locked out after the SSO change… |
+| 2d ago | **~$51** | ~80.0M / ~150k | `claude-opus-5-5` | claude | `bf32eff9` | Fix mode keeps editing the wrong file… |
 ```
 
 `(removed)` marks a worktree that no longer exists on disk but still has
