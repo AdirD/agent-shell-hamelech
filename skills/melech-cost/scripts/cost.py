@@ -215,8 +215,14 @@ def age_label(seconds: float) -> str:
     s = max(0, int(seconds))
     if s < 3600:
         return f"{s // 60}m ago"
-    if s < 48 * 3600:
+    if s < 86400:
         return f"{s // 3600}h ago"
+    days = s / 86400
+    if days < 10:
+        d = f"{days:.1f}"
+        if d.endswith(".0"):
+            d = d[:-2]
+        return f"{d}d ago"
     return f"{s // 86400}d ago"
 
 
@@ -679,19 +685,61 @@ def root_session(s: dict[str, Any], by_key: dict[tuple[str, str], dict[str, Any]
     return s
 
 
+def session_table(root_keys: list[tuple[str, str]], root_stats: dict[tuple[str, str], dict[str, Any]],
+                  by_key: dict[tuple[str, str], dict[str, Any]], now: float) -> list[str]:
+    lines = [
+        "| Age | Cost | Read / Write Tokens | Model | Agent | Session | Topic |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+    ]
+    for rk in root_keys:
+        s = by_key[rk]
+        rs = root_stats[rk]
+        age = age_label(now - (rs["last"] or s["last"]))
+        cost = rs["cost"]
+        cost_str = f"**~{money(cost)}**"
+        read = rs["cached"] + rs["new"]
+        out = rs["out"]
+        tokens_str = f"~{tokens(read)} / ~{tokens(out)}"
+        model = rs["models"].most_common(1)[0][0] if rs["models"] else (s.get("model") or "unknown")
+        subs = rs["subs"]
+        agent = f"{s['provider']} (+{subs})" if subs else s["provider"]
+        sid = f"`{s['sid'][:8]}`"
+        raw_topic = s["topic"] or "(no user message)"
+        topic = shorten(raw_topic.replace("|", "/").replace("\n", " ").replace("\r", " "), TOPIC_MAX_CHARS)
+        lines.append(f"| {age} | {cost_str} | {tokens_str} | `{model}` | {agent} | {sid} | {topic} |")
+    return lines
+
+
 def build_report(scope: Scope, sessions: list[dict[str, Any]], cards: int, focus: Optional[str],
-                 now: float) -> tuple[str, str]:
+                 now: float, latest: Optional[int] = None) -> tuple[str, str]:
     by_key = {(s["provider"], s["sid"]): s for s in sessions}
     groups: dict[str, dict[str, Any]] = collections.defaultdict(lambda: {
         "cost": 0.0, "sessions": set(), "subs": 0, "models": collections.Counter(),
         "providers": collections.Counter(), "cached": 0.0, "new": 0.0, "out": 0.0, "last": 0.0,
         "top": collections.defaultdict(float),
     })
+    root_stats: dict[tuple[str, str], dict[str, Any]] = collections.defaultdict(lambda: {
+        "cost": 0.0, "cached": 0.0, "new": 0.0, "out": 0.0, "subs": 0,
+        "models": collections.Counter(), "last": 0.0, "worktree": "",
+    })
     months: collections.Counter[str] = collections.Counter()
     providers: collections.Counter[str] = collections.Counter()
     assumed = 0.0
     for s in sessions:
         root = root_session(s, by_key)
+        rk = (root["provider"], root["sid"])
+        rs = root_stats[rk]
+        rs["cost"] += s["cost"]
+        rs["cached"] += s["input_cached"]
+        rs["new"] += s["input_new"]
+        rs["out"] += s["output"]
+        rs["last"] = max(rs["last"], s["last"])
+        rs["worktree"] = root["worktree"]
+        if s.get("model"):
+            rs["models"][s["model"]] += s["cost"]
+        if s is not root:
+            rs["subs"] += 1
+
         g = groups[root["worktree"]]
         g["cost"] += s["cost"]
         g["cached"] += s["input_cached"]
@@ -700,15 +748,36 @@ def build_report(scope: Scope, sessions: list[dict[str, Any]], cards: int, focus
         g["models"][s["model"] or "unknown"] += s["cost"]
         g["providers"][s["provider"]] += s["cost"]
         g["last"] = max(g["last"], s["last"])
-        g["top"][(root["provider"], root["sid"])] += s["cost"]
+        g["top"][rk] += s["cost"]
         if s is root:
-            g["sessions"].add((s["provider"], s["sid"]))
+            g["sessions"].add(rk)
         else:
             g["subs"] += 1
         months[time.strftime("%Y-%m", time.localtime(s["first"] or s["last"]))] += s["cost"]
         providers[s["provider"]] += s["cost"]
         if price(s["model"])["pool"] == "assumed":
             assumed += s["cost"]
+
+    foot = ["_API list-price value from local history; Cursor rows are replay estimates (±30–40%), "
+            "Claude Code and Codex rows use logged token counts. Plan-included usage may cover part of it._"]
+    if assumed >= 0.01:
+        foot.append(f"_~{money(assumed)} is from sessions with an unknown model (e.g. Auto), priced at fallback rates._")
+
+    if latest is not None:
+        eligible_keys = list(root_stats.keys())
+        if focus:
+            eligible_keys = [rk for rk in eligible_keys if root_stats[rk]["worktree"] == focus or root_stats[rk]["worktree"].startswith(focus)]
+        ordered_keys = sorted(eligible_keys, key=lambda rk: -root_stats[rk]["last"])[:max(1, latest)]
+        n_sess = len(ordered_keys)
+        n_worktrees = len({root_stats[rk]["worktree"] for rk in root_stats})
+        head = [
+            f"## `{scope.repo}` · latest {n_sess} session{'s' if n_sess != 1 else ''}",
+            f"{len(sessions):,} sessions across {n_worktrees} worktree{'s' if n_worktrees != 1 else ''} · newest activity first · subagent spend rolled into parent",
+            "",
+        ]
+        table_lines = session_table(ordered_keys, root_stats, by_key, now)
+        report_text = "\n".join(head + table_lines + [""] + foot)
+        return report_text, report_text
 
     total = sum(g["cost"] for g in groups.values())
     ordered = sorted(groups.items(), key=lambda kv: -kv[1]["cost"])
@@ -736,17 +805,11 @@ def build_report(scope: Scope, sessions: list[dict[str, Any]], cards: int, focus
                  f"{age_label(now - g['last'])} · {n} session{'s' if n != 1 else ''}{subs} · {mix} · "
                  f"mostly `{model}` ({share:.0f}%)",
                  f"~{tokens(read)} tokens read ({cached_pct:.0f}% cached) · ~{tokens(g['out'])} written", ""]
-        for i, (key, cost) in enumerate(sorted(g["top"].items(), key=lambda kv: -kv[1])[:top_n], 1):
-            s = by_key[key]
-            topic = shorten(s["topic"] or "(no user message)", TOPIC_MAX_CHARS)
-            lines.append(f"{i}. `{s['sid'][:8]}` · {s['provider']} · {topic} — ~{money(cost)}")
+        top_keys = [k for k, _ in sorted(g["top"].items(), key=lambda kv: -kv[1])[:top_n]]
+        if top_keys:
+            lines += session_table(top_keys, root_stats, by_key, now)
         lines.append("")
         return lines
-
-    foot = ["_API list-price value from local history; Cursor rows are replay estimates (±30–40%), "
-            "Claude Code and Codex rows use logged token counts. Plan-included usage may cover part of it._"]
-    if assumed >= 0.01:
-        foot.append(f"_~{money(assumed)} is from sessions with an unknown model (e.g. Auto), priced at fallback rates._")
 
     top_n = FOCUS_SESSIONS if focus else TOP_SESSIONS
     shown = []
@@ -777,6 +840,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--home", default=None, help="Override home directory (tests)")
     ap.add_argument("--cards", type=int, default=DEFAULT_CARDS, help="Worktree cards to print")
     ap.add_argument("--worktree", default=None, help="Focus one worktree (name or prefix)")
+    ap.add_argument("--latest", "--last", type=int, default=None, metavar="N",
+                    help="Show the N latest sessions (newest first) as a table")
     ap.add_argument("--since", default=None, help="Only sessions active on/after YYYY-MM-DD")
     ap.add_argument("--report", default=None, help="Where to write the full Markdown report")
     ap.add_argument("--json", action="store_true", help="Print per-session JSON instead of Markdown")
@@ -795,7 +860,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     if not sessions:
         print(f"No priced agent sessions found for `{scope.repo}` worktrees.")
         return 0
-    short, full = build_report(scope, sessions, args.cards, args.worktree, time.time())
+    short, full = build_report(scope, sessions, args.cards, args.worktree, time.time(), args.latest)
     report = Path(args.report) if args.report else Path(tempfile.gettempdir()) / f"melech-cost-{scope.repo}.md"
     report.write_text(full + "\n", encoding="utf-8")
     print(short)

@@ -144,8 +144,33 @@ class CostTests(unittest.TestCase):
         out = buf.getvalue()
         self.assertIn("## `acme` agent spend", out)
         self.assertIn("### `feature-a` ·", out)
-        self.assertIn("`s-feat` · cursor · build feature a", out)
+        self.assertIn("| Age | Cost | Read / Write Tokens | Model | Agent | Session | Topic |", out)
+        self.assertIn("`s-feat`", out)
+        self.assertIn("build feature a", out)
         self.assertTrue(report.read_text().startswith("## `acme`"))
+
+    def test_age_label_formats_hours_and_decimal_days(self) -> None:
+        self.assertEqual(cost.age_label(120), "2m ago")
+        self.assertEqual(cost.age_label(3600), "1h ago")
+        self.assertEqual(cost.age_label(23 * 3600), "23h ago")
+        self.assertEqual(cost.age_label(24 * 3600), "1d ago")
+        self.assertEqual(cost.age_label(34 * 3600), "1.4d ago")
+        self.assertEqual(cost.age_label(36 * 3600), "1.5d ago")
+        self.assertEqual(cost.age_label(48 * 3600), "2d ago")
+        self.assertEqual(cost.age_label(60 * 3600), "2.5d ago")
+        self.assertEqual(cost.age_label(26 * 86400), "26d ago")
+
+    def test_cli_prints_latest_table(self) -> None:
+        self.cursor_transcript(self.feature, "s-feat", "build feature a")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            code = cost.main(["--cwd", str(self.main), "--home", str(self.home), "--latest", "5"])
+        self.assertEqual(code, 0)
+        out = buf.getvalue()
+        self.assertIn("latest 1 session", out)
+        self.assertIn("| Age | Cost | Read / Write Tokens | Model | Agent | Session | Topic |", out)
+        self.assertIn("`s-feat`", out)
+        self.assertIn("build feature a", out)
 
 
 if __name__ == "__main__":

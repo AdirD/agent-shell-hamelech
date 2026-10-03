@@ -339,6 +339,7 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-cost
 
 Use it when:
 - you say `/melech-cost` (every worktree of the current repo, top 8 cards, plus a full report file)
+- you want recent sessions: `/melech-cost last 10` lists the 10 most recently updated sessions as a table
 - you want one task's damage: `/melech-cost <worktree>` lists that worktree's top 10 sessions with topic, agent, and cost
 - you want a window: `/melech-cost since 2026-09-01`
 
