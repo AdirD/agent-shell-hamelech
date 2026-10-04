@@ -102,7 +102,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | [`melech-8020`](#melech-8020) | What is the smallest useful path to the outcome? | "least diff", "minimal change", "80/20", "least intrusive". |
 | [`melech-challenge`](#melech-challenge) | What is weak or risky about this direction? | You already have a direction and want holes poked before building. |
 | [`melech-visualize`](#melech-visualize) | Can this structure, flow, or trade-off be easier to see? | Prose is hiding architecture, sequence, boundaries, layout, or ambiguity. |
-| [`melech-foresee`](#melech-foresee) | What would the PR look like before I approve it? | The plan is settled and you want a changes-tab sketch with red and green pseudo-diffs, not an implementation. |
+| [`melech-plan-diff`](#melech-plan-diff) | What would the PR look like before I approve it? | The plan is settled and you want a changes-tab sketch with red and green pseudo-diffs, not an implementation. |
 
 ### Implement and ship safely
 
@@ -152,7 +152,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "I just finished coding with AI — tidy and minimize this diff before PR." | [`melech-tidy`](#melech-tidy) | Adaptive diff reduction across 4 MECE lanes: purges dead AI residue, anchors live code to narrow leaf seams, shakes prompt bloat, and restores cosmetic-only churn. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-cr-clone-trainer`](#melech-cr-clone-trainer) | Builds or resyncs one private user-global Clone, named by you, with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
-| "Show me the PR before I approve it." | [`melech-foresee`](#melech-foresee) | The concept is locked; you want the file tree and a fake diff a product reader can approve. |
+| "Show me the PR before I approve it." | [`melech-plan-diff`](#melech-plan-diff) | The concept is locked; you want the file tree and a fake diff a product reader can approve. |
 | "Research competitors to help choose our product or market direction." | [`melech-market-validation`](#melech-market-validation) | Competitor and substitute evidence should reshape the premise and the test that follows. |
 | "Produce a sourced comparison of these competitors." | No dedicated skill yet | Competitor intelligence is the deliverable; extract a skill only if this becomes recurring work. |
 | "Keep all my open PRs green on a schedule while I'm away." | [`melech-pr-gardener`](#melech-pr-gardener) | A single-pass playbook a scheduled agent runs for an explicit `GARDENER_AUTHOR`: round-robins the least-recently-served PR, works it in an isolated git worktree, and keeps a readable per-run audit log on the PR itself — reconstructing its state from the PR each run, so it needs no runtime memory. |
@@ -180,7 +180,7 @@ hold, or stop wins.
 ### Better engineering
 
 ```text
-melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional independent check) → melech-8020 → melech-challenge (optional) → melech-foresee (optional: changes-tab sketch before approval)
+melech-buy-vs-build (adopt vs build?) → melech-distill-need → melech-pre-plan → melech-consult (optional independent check) → melech-8020 → melech-challenge (optional) → melech-plan-diff (optional: changes-tab sketch before approval)
 ```
 
 Use when someone requested a feature or change and you want to avoid building
@@ -189,7 +189,7 @@ the wrong thing, aligning it poorly, or overbuilding the solution.
 ### Existing-plan review
 
 ```text
-melech-challenge → melech-8020 → melech-foresee (optional)
+melech-challenge → melech-8020 → melech-plan-diff (optional)
 ```
 
 Use when the direction already exists: pressure-test it, find the smallest
@@ -492,12 +492,12 @@ Use it when:
 
 ---
 
-### [`melech-foresee`](skills/melech-foresee)
+### [`melech-plan-diff`](skills/melech-plan-diff)
 
 Shows a settled plan as a changes-tab forecast: a file tree with red and green pseudo-diffs, for approval before implementation.
 
 ```bash
-npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-foresee
+npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-plan-diff
 ```
 
 Use it when:
@@ -505,7 +505,7 @@ Use it when:
 - you want a file tree with red and green lines, and the lines should be behavior rather than real code
 - a product reader needs to review the shape without a code deep dive
 
-The page shell lives in [`skills/melech-foresee/template.html`](skills/melech-foresee/template.html). If the concept is still open, use `melech-pre-plan` first.
+The page shell lives in [`skills/melech-plan-diff/template.html`](skills/melech-plan-diff/template.html).
 
 ---
 
@@ -726,7 +726,7 @@ skills/
   melech-sync-skills/
   melech-market-validation/
   melech-pre-plan/
-  melech-foresee/
+  melech-plan-diff/
   melech-verify/
   melech-roi/
   melech-cr-clone-trainer/

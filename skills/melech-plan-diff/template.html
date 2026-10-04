@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Files changed — forecast</title>
+<title>Files changed — {{PLAN_NAME}}</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -132,10 +132,12 @@
 <body>
 <header>
   <h1>Files changed</h1>
-  <p class="sub">Forecast of the implementation PR. Nothing here is merged code. Open a file to read the behavior in fake diff form.</p>
+  <p class="sub">{{PLAN_ONE_LINER}} Nothing here is merged code. Open a file to read the behavior in fake diff form.</p>
   <p class="stats"><span id="stats"></span></p>
   <div class="chips">
-    <span class="chip">Replace these chips with what the diff deliberately leaves out</span>
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
   </div>
 </header>
 <div class="layout">
@@ -153,7 +155,27 @@
   </main>
 </div>
 <script>
-const files = [/* FORESEE_FILES */];
+// Fill every {{TOKEN}}. Copy the object once per file. Delete this comment.
+// status is A, M, or D. add and del are numbers.
+// A hunk is a blue @@ section @@. Indent like a diff.
+// A line is a sentence, or a short code line when that is easier to read.
+const files = [
+  {
+    folder: "{{REAL_FOLDER}}",
+    name: "{{REAL_FILENAME}}",
+    status: "{{A_M_OR_D}}",
+    add: {{ROUGH_ADD}},
+    del: {{ROUGH_DEL}},
+    why: "{{WHY_FOR_A_PRODUCT_READER}}",
+    lines: [
+      { t: "hunk", text: "@@ {{SECTION}} @@" },
+      { t: "ctx", text: "{{LINE_THAT_STAYS}}" },
+      { t: "del", text: "{{LINE_THAT_STOPS}}" },
+      { t: "add", text: "{{NEW_LINE}}" },
+      { t: "add", text: "  {{INDENTED_LINE}}" },
+    ],
+  },
+];
 
 const stats = document.getElementById("stats");
 const added = files.reduce((sum, file) => sum + (file.add || 0), 0);
