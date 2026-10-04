@@ -496,6 +496,8 @@ Use it when:
 
 Shows a settled plan as a GitHub-style changes tab you review before implementation: a file tree with red and green pseudo-diffs, inline comments, and an Approve, Commented, or Rejected verdict.
 
+![melech-plan-review: files-changed review page](skills/melech-plan-review/assets/melech-plan-review-tip-diagram.jpg)
+
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-plan-review
 ```
