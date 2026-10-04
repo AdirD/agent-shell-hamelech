@@ -1,0 +1,47 @@
+{
+  "summary": "Looks right, one question on the migration.",
+  "comments": [
+    {
+      "id": "c1",
+      "body": "These two should ship together: the reminder must record remindedAt, or we email twice.",
+      "places": [
+        {
+          "file": "apps/api/src/billing/invoice-reminder.ts",
+          "from": 2,
+          "to": 4,
+          "lines": [
+            "for each invoice:",
+            "  skip it if it is paid",
+            "  email the account owner once"
+          ],
+          "quote": "for each invoice: skip it if it is paid email the account owner once"
+        },
+        {
+          "file": "apps/api/src/billing/invoices.ts",
+          "from": 2,
+          "to": 3,
+          "lines": [
+            "nothing records reminders",
+            "remindedAt: Date | null"
+          ],
+          "quote": "nothing records reminders remindedAt: Date | null"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "body": "Are we sure? remindedAt sounds like a new column.",
+      "places": [
+        {
+          "file": null,
+          "from": null,
+          "to": null,
+          "lines": [],
+          "quote": "No migration"
+        }
+      ]
+    }
+  ],
+  "page": "Files changed — Invoice reminders",
+  "updated": "2026-10-04T12:18:15.227Z"
+}

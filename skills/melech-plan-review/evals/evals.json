@@ -1,0 +1,43 @@
+{
+  "skill_name": "melech-plan-review",
+  "evals": [
+    {
+      "id": 1,
+      "name": "foresee-the-changes-tab",
+      "prompt": "/melech-plan-review ok now lets foresee this solution before i approve it, so what would be the changes based on that? what should we expect, show me in a filetree gitlike changes, red green, as if the PR is ready, and im looking at the changes tab, where the code changed inside each file is only pseudo code, not real code, something ready for product personnel or me reviewing before approving (im not looking to deep dive the code). The solution is evals/fixtures/invoice-reminders/PLAN.md and the repo files next to it.",
+      "expected_output": "One changes-tab page for the locked invoice-reminder solution, served by the review server, then one question: Approve, Commented, or Rejected. File tree, red and green, pseudo-code only. The two billing files from the plan are there. The real markPaid function is not copied in. Settings, a migration, and a banner are not part of the change.",
+      "files": [
+        "evals/fixtures/invoice-reminders/PLAN.md",
+        "evals/fixtures/invoice-reminders/apps/api/src/billing/invoices.ts"
+      ],
+      "expectations": [
+        "Writes one HTML page from the template, named <plan-name>-plan-review.html, and does not leave any {{ token in it",
+        "The page has a file tree and red and green diff lines",
+        "Lists apps/api/src/billing/invoices.ts and apps/api/src/billing/invoice-reminder.ts",
+        "Uses @@ section @@ headers, and lines are a sentence or a short code line a product reader can follow, indented like a diff",
+        "Does not copy MARK_PAID_SENTINEL or `export function markPaid` into the page",
+        "Does not include a settings screen, a database migration, or an in-app banner as files in the change",
+        "Starts scripts/review_server.py on the page in the background",
+        "Ends by asking one question whose options are Approve, Commented, and Rejected, and does not start implementing"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "commented-reads-the-review",
+      "prompt": "Commented",
+      "expected_output": "The agent reads the review JSON next to the page, answers the cross-file comment and the header comment, changes the plan where asked, rewrites the page, renames the old review file, and asks the same three-option question again.",
+      "files": [
+        "evals/fixtures/invoice-reminders/PLAN.md",
+        "evals/fixtures/invoice-reminders/invoice-reminders-plan-review.json"
+      ],
+      "setup": "Continue after eval 1. Copy evals/fixtures/invoice-reminders/invoice-reminders-plan-review.json next to the page eval 1 wrote, then answer the question with Commented.",
+      "expectations": [
+        "Reads the review JSON file instead of asking the user to repeat their comments",
+        "Answers the comment that points at both invoice-reminder.ts and invoices.ts as one comment",
+        "Answers the page header comment about the migration",
+        "Rewrites the page and renames the old review file to <plan-name>-plan-review-<round>.json",
+        "Asks Approve, Commented, or Rejected again and does not start implementing"
+      ]
+    }
+  ]
+}

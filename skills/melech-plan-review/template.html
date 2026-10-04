@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Files changed — {{PLAN_NAME}}</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --page: #f6f8fa;
+    --line: #d0d7de;
+    --text: #1f2328;
+    --muted: #656d76;
+    --add: #1a7f37;
+    --add-bg: #e6ffec;
+    --add-num: #ccffd8;
+    --del: #cf222e;
+    --del-bg: #ffebe9;
+    --del-num: #ffd7d5;
+    --hunk: #656d76;
+    --hunk-bg: #ddf4ff;
+    --select: #fff8c5;
+    --note: #d4a72c;
+    --link: #0969da;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--text);
+    background: var(--page);
+    font: 14px/1.45 var(--sans);
+  }
+  header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 28px 16px;
+  }
+  h1 { margin: 0 0 4px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .sub { margin: 0; color: var(--muted); max-width: 760px; }
+  .stats { margin: 10px 0 0; font-weight: 600; }
+  .add { color: var(--add); }
+  .del { color: var(--del); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip {
+    border: 1px solid var(--line);
+    background: var(--page);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 12px;
+  }
+  .review-box { margin-top: 14px; max-width: 760px; }
+  .hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 132px); }
+  aside {
+    background: var(--bg);
+    border-right: 1px solid var(--line);
+    overflow: auto;
+  }
+  .tree-label {
+    margin: 0;
+    padding: 14px 16px 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .folder {
+    padding: 10px 16px 2px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  button.file {
+    display: grid;
+    grid-template-columns: 18px 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-top: 1px solid transparent;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 7px 16px 7px 28px;
+    cursor: pointer;
+  }
+  button.file:hover { background: #f6f8fa; }
+  button.file[aria-current="true"] { background: var(--select); }
+  .mark { font-weight: 700; font-size: 13px; }
+  .mark.m { color: #9a6700; }
+  .mark.a { color: var(--add); }
+  .mark.d { color: var(--del); }
+  .fname { font-family: var(--mono); font-size: 13px; }
+  .count { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .badge {
+    background: var(--select);
+    border: 1px solid var(--note);
+    border-radius: 999px;
+    padding: 0 7px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  main { overflow: auto; background: var(--bg); }
+  .diff-head {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 20px 12px;
+    z-index: 1;
+  }
+  .diff-head h2 {
+    margin: 0;
+    font-size: 14px;
+    font-family: var(--mono);
+    font-weight: 600;
+  }
+  .why { margin: 6px 0 0; color: var(--muted); }
+  .sketch {
+    margin: 8px 0 0;
+    color: var(--link);
+    font-size: 12px;
+  }
+  .diff { font-family: var(--mono); font-size: 12.5px; line-height: 1.55; }
+  .row { display: grid; grid-template-columns: 48px 20px 1fr; }
+  .row span { padding: 0 8px; white-space: pre-wrap; }
+  .row .gutter { text-align: right; color: #8c959f; user-select: none; cursor: pointer; }
+  .row .gutter:hover { color: var(--link); }
+  .row.add { background: var(--add-bg); }
+  .row.add .gutter { background: var(--add-num); color: var(--add); }
+  .row.del { background: var(--del-bg); }
+  .row.del .gutter { background: var(--del-num); color: var(--del); }
+  .row.hunk { background: var(--hunk-bg); color: var(--hunk); }
+  .row.hunk span { grid-column: 1 / -1; padding: 6px 12px; }
+  .row.noted > :first-child { box-shadow: inset 3px 0 0 var(--note); }
+  .sign { user-select: none; color: inherit; font-weight: 700; }
+  .note {
+    margin: 6px 16px 10px 68px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--note);
+    border-radius: 6px;
+    background: var(--bg);
+    font: 13px/1.45 var(--sans);
+  }
+  header .note { margin: 10px 0 0; max-width: 760px; }
+  .note-body { margin: 0; white-space: pre-wrap; }
+  .note-quote { margin: 0 0 4px; color: var(--muted); font: 12px/1.45 var(--mono); }
+  .note-meta { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  button.link { border: 0; background: none; color: var(--link); cursor: pointer; padding: 0; font: inherit; }
+  textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font: 13px/1.45 var(--sans);
+    resize: vertical;
+  }
+  button.primary, button.plain {
+    border: 1px solid rgba(31, 35, 40, 0.15);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font: 600 13px/1.6 var(--sans);
+    cursor: pointer;
+  }
+  button.primary { background: #1f883d; color: #ffffff; }
+  button.primary:disabled { opacity: 0.5; cursor: default; }
+  button.plain { background: var(--page); color: var(--text); }
+  #offer { position: fixed; z-index: 10; box-shadow: 0 4px 12px rgba(31, 35, 40, 0.2); }
+  .draft {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9;
+    width: 380px;
+    max-height: 70vh;
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    box-shadow: 0 8px 24px rgba(31, 35, 40, 0.18);
+  }
+  .draft-title { margin: 0 0 6px; font-weight: 600; }
+  .places { list-style: none; margin: 0 0 8px; padding: 0; }
+  .places li { padding: 6px 8px; margin-bottom: 4px; border-left: 3px solid var(--note); background: var(--page); font-size: 12px; }
+  .places q { display: block; color: var(--muted); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+<header data-zone="page">
+  <h1>Files changed</h1>
+  <p class="sub">{{PLAN_ONE_LINER}} Nothing here is merged code. Open a file to read the behavior in fake diff form.</p>
+  <p class="stats"><span id="stats"></span></p>
+  <div class="chips">
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
+    <span class="chip">{{NOT_IN_THIS_DIFF}}</span>
+  </div>
+  <div id="page-notes"></div>
+  <div class="review-box">
+    <textarea id="summary" rows="2" placeholder="Overall comment (optional)"></textarea>
+    <p class="hint">
+      Select any text to comment on it. Drag across lines, or click a line number and shift-click another, for a range.
+      While a comment is open, select text in another file to add that place too.
+    </p>
+    <p class="hint"><span id="status"></span> <button type="button" class="link" id="copy" hidden>Copy review</button></p>
+    <p class="hint">When you are done, go back to the agent and answer Approve, Commented, or Rejected.</p>
+  </div>
+</header>
+<div class="layout">
+  <aside>
+    <p class="tree-label">FILE TREE</p>
+    <div id="tree"></div>
+  </aside>
+  <main data-zone="file">
+    <div class="diff-head">
+      <h2 id="path"></h2>
+      <p class="why" id="why"></p>
+      <p class="sketch">Sketch of the real diff. Green is new behavior. Red is behavior we stop doing.</p>
+    </div>
+    <div class="diff" id="diff"></div>
+  </main>
+</div>
+<button type="button" class="primary" id="offer" hidden>Comment</button>
+<div class="draft" id="draft" hidden>
+  <p class="draft-title">New comment</p>
+  <ul class="places" id="places"></ul>
+  <textarea id="body" rows="4" placeholder="Leave a comment"></textarea>
+  <div class="actions">
+    <button type="button" class="plain" id="cancel">Cancel</button>
+    <button type="button" class="primary" id="save">Comment</button>
+  </div>
+</div>
+<script>
+// Fill every {{TOKEN}}. Copy the object once per file. Delete this comment.
+// status is A, M, or D. add and del are numbers.
+// A hunk is a blue @@ section @@. Indent like a diff.
+// A line is a sentence, or a short code line when that is easier to read.
+const files = [
+  {
+    folder: "{{REAL_FOLDER}}",
+    name: "{{REAL_FILENAME}}",
+    status: "{{A_M_OR_D}}",
+    add: {{ROUGH_ADD}},
+    del: {{ROUGH_DEL}},
+    why: "{{WHY_FOR_A_PRODUCT_READER}}",
+    lines: [
+      { t: "hunk", text: "@@ {{SECTION}} @@" },
+      { t: "ctx", text: "{{LINE_THAT_STAYS}}" },
+      { t: "del", text: "{{LINE_THAT_STOPS}}" },
+      { t: "add", text: "{{NEW_LINE}}" },
+      { t: "add", text: "  {{INDENTED_LINE}}" },
+    ],
+  },
+];
+
+const $ = (id) => document.getElementById(id);
+const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const keyOf = (file) => file.folder + "/" + file.name;
+const elementOf = (node) => (node.nodeType === 1 ? node : node.parentElement);
+const live = location.protocol.startsWith("http");
+const storeKey = "plan-review:" + location.pathname;
+
+const tree = $("tree");
+const diff = $("diff");
+const offer = $("offer");
+let review = { summary: "", comments: [] };
+let draft = null;
+let pending = null;
+let startRow = null;
+let failed = false;
+
+const added = files.reduce((sum, file) => sum + (file.add || 0), 0);
+const removed = files.reduce((sum, file) => sum + (file.del || 0), 0);
+$("stats").innerHTML = files.length + ' files changed <span class="add">+' + added + '</span> <span class="del">−' + removed + "</span>";
+
+let folders = [];
+let selected = files.reduce((best, file, index) => (file.add || 0) > (files[best].add || 0) ? index : best, 0);
+
+function count(file) {
+  const bits = [];
+  if (file.add) bits.push('<span class="add">+' + file.add + "</span>");
+  if (file.del) bits.push('<span class="del">−' + file.del + "</span>");
+  return bits.join(" ");
+}
+
+files.forEach((file, index) => {
+  if (!folders.length || folders[folders.length - 1].name !== file.folder) {
+    const block = document.createElement("div");
+    const label = document.createElement("div");
+    label.className = "folder";
+    label.textContent = file.folder;
+    block.appendChild(label);
+    tree.appendChild(block);
+    folders.push({ name: file.folder, block });
+  }
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "file";
+  button.innerHTML =
+    '<span class="mark ' + file.status.toLowerCase() + '">' + file.status + "</span>" +
+    '<span class="fname">' + esc(file.name) + "</span>" +
+    '<span class="count">' + count(file) + "</span>" +
+    '<span class="badge" hidden></span>';
+  button.addEventListener("click", () => show(index));
+  folders[folders.length - 1].block.appendChild(button);
+  file.button = button;
+  file.badge = button.querySelector(".badge");
+});
+
+function show(index) {
+  selected = index;
+  startRow = null;
+  const file = files[index];
+  files.forEach((item) => item.button.setAttribute("aria-current", item === file ? "true" : "false"));
+  $("path").textContent = keyOf(file);
+  $("why").textContent = file.why;
+  diff.replaceChildren();
+  let n = 1;
+  file.lines.forEach((line, i) => {
+    const row = document.createElement("div");
+    row.className = "row " + line.t;
+    row.dataset.line = i;
+    if (line.t === "hunk") {
+      row.innerHTML = '<span class="text">' + esc(line.text) + "</span>";
+    } else {
+      const sign = line.t === "add" ? "+" : line.t === "del" ? "−" : " ";
+      row.innerHTML =
+        '<span class="gutter">' + (line.t === "del" ? "" : n++) + "</span>" +
+        '<span class="sign">' + sign + "</span>" +
+        '<span class="text">' + esc(line.text) + "</span>";
+    }
+    diff.appendChild(row);
+  });
+  paintNotes();
+}
+
+function label(place) {
+  if (place.file === null) return "the page header";
+  const name = place.file.split("/").pop();
+  if (place.from === null) return name;
+  const size = place.to - place.from + 1;
+  return name + " · " + size + (size === 1 ? " line" : " lines");
+}
+
+function card(comment, here) {
+  const box = document.createElement("div");
+  box.className = "note";
+  const body = document.createElement("p");
+  body.className = "note-body";
+  body.textContent = comment.body;
+  const meta = document.createElement("p");
+  meta.className = "note-meta";
+  const others = comment.places.filter((place) => place !== here);
+  if (others.length) {
+    meta.append("Also on ");
+    others.forEach((place, i) => {
+      if (i) meta.append(", ");
+      const go = document.createElement("button");
+      go.type = "button";
+      go.className = "link";
+      go.textContent = label(place);
+      go.addEventListener("click", () => {
+        const index = files.findIndex((file) => keyOf(file) === place.file);
+        if (index >= 0) show(index);
+        else window.scrollTo(0, 0);
+      });
+      meta.append(go);
+    });
+    meta.append(" · ");
+  }
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "link";
+  remove.textContent = "Delete";
+  remove.addEventListener("click", () => {
+    review.comments = review.comments.filter((item) => item !== comment);
+    paintNotes();
+    save();
+  });
+  meta.append(remove);
+  if (here.from === null) {
+    const quote = document.createElement("p");
+    quote.className = "note-quote";
+    quote.textContent = "“" + here.quote + "”";
+    box.append(quote);
+  }
+  box.append(body, meta);
+  return box;
+}
+
+function paintNotes() {
+  document.querySelectorAll(".note").forEach((note) => note.remove());
+  diff.querySelectorAll(".noted").forEach((row) => row.classList.remove("noted"));
+  const file = files[selected];
+  const rows = diff.querySelectorAll(".row");
+  review.comments.forEach((comment) => {
+    comment.places.forEach((place) => {
+      if (place.file === null) return $("page-notes").appendChild(card(comment, place));
+      if (!file || place.file !== keyOf(file)) return;
+      if (place.from === null) return diff.prepend(card(comment, place));
+      for (let i = place.from; i <= place.to; i++) rows[i] && rows[i].classList.add("noted");
+      if (rows[place.to]) rows[place.to].after(card(comment, place));
+    });
+  });
+  files.forEach((item) => {
+    const total = review.comments.filter((comment) => comment.places.some((place) => place.file === keyOf(item))).length;
+    item.badge.hidden = !total;
+    item.badge.textContent = total;
+  });
+  paintStatus();
+}
+
+function paintStatus() {
+  const total = review.comments.length;
+  const saved = live && !failed;
+  $("status").textContent =
+    total + (total === 1 ? " comment" : " comments") +
+    (saved ? " · saved for the agent." : " · not reaching the agent. Copy the review and paste it in chat.");
+  $("copy").hidden = saved;
+}
+
+function save() {
+  review.page = document.title;
+  review.summary = $("summary").value.trim();
+  review.updated = new Date().toISOString();
+  if (!live) {
+    localStorage.setItem(storeKey, JSON.stringify(review));
+    return paintStatus();
+  }
+  fetch("/review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(review) })
+    .then((res) => { failed = !res.ok; })
+    .catch(() => { failed = true; })
+    .finally(paintStatus);
+}
+
+function placeFromSelection() {
+  const selection = getSelection();
+  if (!selection.rangeCount || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const common = elementOf(range.commonAncestorContainer);
+  if (!common || common.closest(".note, .draft, .review-box")) return null;
+  const zone = common.closest("[data-zone]");
+  const quote = selection.toString().replace(/\s+/g, " ").trim().slice(0, 400);
+  if (!zone || !quote) return null;
+  if (zone.dataset.zone === "page") return { file: null, from: null, to: null, lines: [], quote };
+  const file = files[selected];
+  const start = elementOf(range.startContainer).closest(".row");
+  const end = elementOf(range.endContainer).closest(".row");
+  const from = start ? +start.dataset.line : end ? 0 : null;
+  let to = end ? +end.dataset.line : start ? file.lines.length - 1 : null;
+  if (end && range.endOffset === 0 && to > from) to -= 1;
+  const lines = from === null ? [] : file.lines.slice(from, to + 1).map((line) => line.text);
+  return { file: keyOf(file), from, to, lines, quote };
+}
+
+function offerComment() {
+  pending = placeFromSelection();
+  if (!pending) return (offer.hidden = true);
+  const rect = getSelection().getRangeAt(0).getBoundingClientRect();
+  offer.textContent = draft ? "Add to comment" : "Comment";
+  offer.style.top = Math.max(8, rect.top - 40) + "px";
+  offer.style.left = Math.min(innerWidth - 150, Math.max(8, rect.right - 60)) + "px";
+  offer.hidden = false;
+}
+
+function paintDraft() {
+  $("draft").hidden = !draft;
+  if (!draft) return;
+  const list = $("places");
+  list.replaceChildren();
+  draft.places.forEach((place, i) => {
+    const item = document.createElement("li");
+    const quote = document.createElement("q");
+    quote.textContent = place.quote;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "link";
+    remove.textContent = "remove";
+    remove.addEventListener("click", () => {
+      draft.places.splice(i, 1);
+      paintDraft();
+    });
+    item.append(label(place) + " · ", remove, quote);
+    list.appendChild(item);
+  });
+  $("save").disabled = !draft.places.length;
+}
+
+function closeDraft() {
+  draft = null;
+  $("body").value = "";
+  paintDraft();
+}
+
+offer.addEventListener("mousedown", (event) => event.preventDefault());
+offer.addEventListener("click", () => {
+  if (!pending) return;
+  draft = draft || { places: [] };
+  draft.places.push(pending);
+  pending = null;
+  offer.hidden = true;
+  getSelection().removeAllRanges();
+  paintDraft();
+  $("body").focus();
+});
+
+diff.addEventListener("click", (event) => {
+  const gutter = event.target.closest(".gutter");
+  if (!gutter) return;
+  const rows = diff.querySelectorAll(".row");
+  const i = +gutter.parentElement.dataset.line;
+  const extend = event.shiftKey && startRow !== null;
+  if (!extend) startRow = i;
+  const range = document.createRange();
+  range.setStartBefore(rows[Math.min(startRow, i)].querySelector(".text"));
+  range.setEndAfter(rows[Math.max(startRow, i)].querySelector(".text"));
+  getSelection().removeAllRanges();
+  getSelection().addRange(range);
+  offerComment();
+});
+
+document.addEventListener("mouseup", (event) => {
+  if (event.target === offer || event.target.closest(".gutter")) return;
+  setTimeout(offerComment);
+});
+document.addEventListener("keyup", (event) => {
+  if (event.key === "Escape") return (offer.hidden = true);
+  if (event.shiftKey && event.key.startsWith("Arrow")) offerComment();
+});
+window.addEventListener("scroll", () => (offer.hidden = true), true);
+
+$("cancel").addEventListener("click", closeDraft);
+$("save").addEventListener("click", () => {
+  const body = $("body").value.trim();
+  if (!body) return $("body").focus();
+  review.comments.push({ id: "c" + Date.now().toString(36), body, places: draft.places });
+  closeDraft();
+  paintNotes();
+  save();
+});
+$("body").addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) $("save").click();
+});
+
+let typing = null;
+$("summary").addEventListener("input", () => {
+  clearTimeout(typing);
+  typing = setTimeout(save, 400);
+});
+
+$("copy").addEventListener("click", () => {
+  const text = JSON.stringify(review, null, 2);
+  navigator.clipboard.writeText(text).catch(() => window.prompt("Copy the review", text));
+});
+
+(async function load() {
+  try {
+    const saved = live ? await (await fetch("/review")).json() : JSON.parse(localStorage.getItem(storeKey));
+    if (saved && Array.isArray(saved.comments)) review = saved;
+  } catch (error) {
+    failed = live;
+  }
+  $("summary").value = review.summary || "";
+  if (files.length) show(selected);
+  else paintNotes();
+})();
+</script>
+</body>
+</html>
