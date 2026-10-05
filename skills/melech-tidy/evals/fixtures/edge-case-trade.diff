@@ -1,0 +1,61 @@
+Requirement: let a user connect a webhook URL. We register it with the
+vendor's API; the vendor's servers call the URL, not ours.
+
+Repository facts:
+- `src/integrations/alerts/public-url.ts` already exports
+  `assertPublicHttpsUrl(url: string): Promise<URL>`. It performs the same
+  checks as the new `assertWebhookUrl` below: https only, one DNS lookup, and
+  the same private address ranges. `src/integrations/alerts/connect.ts` uses it.
+- The caller of `connectWebhook` catches any error and shows the user one
+  fixed "could not connect" message.
+- The vendor returns a conflict error only when the same URL is registered
+  twice within about a second. Registering again afterwards succeeds.
+- No other integration retries vendor registration.
+- CI runs `eslint` and `npm test`.
+
+Treat this patch as the uncommitted working tree.
+
+diff --git a/src/integrations/webhook/connect.ts b/src/integrations/webhook/connect.ts
+new file mode 100644
+index 0000000..3c4d5e6
+--- /dev/null
++++ b/src/integrations/webhook/connect.ts
+@@ -0,0 +1,38 @@
++import { lookup } from 'node:dns/promises'
++import { vendor } from '../../vendor/client'
++
++const RETRY_DELAY_MS = 1500
++
++function delay(ms: number): Promise<void> {
++    return new Promise((resolve) => setTimeout(resolve, ms))
++}
++
++function isPrivateAddress(address: string): boolean {
++    return /^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(address) || address === '::1'
++}
++
++async function assertWebhookUrl(raw: string): Promise<URL> {
++    const url = new URL(raw)
++    if (url.protocol !== 'https:') {
++        throw new Error('Webhook URL must use https')
++    }
++    const addresses = await lookup(url.hostname, { all: true })
++    if (addresses.some((entry) => isPrivateAddress(entry.address))) {
++        throw new Error('Webhook URL must resolve to a public address')
++    }
++    return url
++}
++
++export async function connectWebhook(userId: string, raw: string): Promise<void> {
++    const url = await assertWebhookUrl(raw)
++    try {
++        await vendor.registerWebhook({ userId, url: url.href })
++    } catch (error) {
++        if (error instanceof vendor.ConflictError) {
++            await delay(RETRY_DELAY_MS)
++            await vendor.registerWebhook({ userId, url: url.href })
++            return
++        }
++        throw error
++    }
++}

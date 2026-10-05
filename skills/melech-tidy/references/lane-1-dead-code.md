@@ -27,6 +27,13 @@ An unused import belongs here. Formatting or moving an otherwise unchanged
 import belongs to **Diff noise** only when order and side effects are proven
 irrelevant; appearance alone is not evidence.
 
+## Boundary with Edge-case trade
+
+**Dead code** removals change nothing observable. If deleting reachable code
+changes behavior in any case, even one nobody asked for (a retry, a special
+error message, a defensive catch), it belongs to **Edge-case trade**, which
+states what is lost.
+
 ---
 
 ## The Core Philosophy: Inverted Burden of Proof
@@ -48,7 +55,7 @@ To survive pruning, every symbol in the audited diff must satisfy these four tes
 |---|---|---|---|
 | **1. Reachability Proof** | "Can runtime execution actually reach this?" | Trace a direct call chain from an active entrypoint (route, UI component, CLI command, export, or event handler). | **Dead / Zombie Code** → Purge. |
 | **2. Requirement Proof** | "Which explicit user requirement demanded this?" | Identify the exact user story or bugfix requiring this branch or parameter. If the answer is *"in case we need it later"*, it fails. | **YAGNI Bloat** → Strip. |
-| **3. Non-Duplication Proof** | "Did this logic already exist in the codebase?" | Verify whether an existing helper, utility, or standard library method already handles this. | **Accidental Reinvention** → Collapse. |
+| **3. Non-Duplication Proof** | "Did this logic already exist in the codebase?" | Search by purpose, not only by name: sibling features solving the same problem (another integration's URL validator, timeout helper, or error mapper), standard library idioms (`AbortSignal.timeout` instead of a controller and timer), schema-level validation that already covers a manual check, and dependency options that make a defensive branch unnecessary (read the dependency source to confirm). | **Accidental Reinvention** → Collapse. |
 | **4. Breakage Proof** | "If we delete this right now, what test or behavior breaks?" | Simulate removal or check test coverage. If nothing fails and no behavior shifts, why does it exist? | **Phantom Scaffolding** → Remove. |
 
 If a symbol looks like a hand-rolled version of a known library or tool rather than of local code, that is an adoption question and not a deletion — note it and flag it for the user.
@@ -76,7 +83,8 @@ If a symbol looks like a hand-rolled version of a known library or tool rather t
    * 🟠 **Tier 3: Speculative / YAGNI Bloat (Design-level)**
      * Unused options, defensive wrappers with only one trivial caller, over-generalized helper parameters.
    * 🔵 **Tier 4: Accidental Duplications**
-     * Custom helpers written during iteration that reinvent existing codebase utilities.
+     * Custom helpers written during iteration that reinvent existing codebase utilities, a sibling feature's implementation of the same check, a standard library idiom, or a dependency option.
+     * Collapse only when the replacement behaves the same. If it differs in any case, the finding belongs to **Edge-case trade**.
 
 Example findings table (feeds the unified Tidy evidence table):
 

@@ -110,7 +110,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 |---|---|---|
 | [`melech-verify`](#melech-verify) | Does this claim, conclusion, or approach hold up against the source of truth? | Say "verify" mid-thread when you want an independent second opinion that understands the discussion but does not defend its earlier conclusion. |
 | [`melech-roi`](#melech-roi) | Is this change's complexity and blast radius actually worth the benefit it delivers? | Grade a PR, diff, or proposed solution with an itemized ROI receipt showing problem reach, solution reach, value, and permanent cost. |
-| [`melech-tidy`](#melech-tidy) | How can this diff shed dead residue, broad seams, prompt bloat, and cosmetic noise? | After coding with an AI, when you want to audit and tidy the diff before PR across dead code, architectural blast radius, prompt bloat, and cosmetic diff noise. |
+| [`melech-tidy`](#melech-tidy) | How can this diff shed dead residue, prompt bloat, cosmetic noise, and rare-case handling that isn't worth its code? | After coding with an AI, when you want to audit and tidy the diff before PR across dead code, prompt bloat, cosmetic diff noise, and 80/20 edge-case trades. |
 | [`melech-debug-mode`](#melech-debug-mode) | Can the agent exercise and inspect this local UI end to end? | Run the UI in your existing Chrome tab with temporary probes. Browser control defaults to autopilot; tests and direct calls remain supplemental. |
 | [`melech-live-browser`](#melech-live-browser) | Can the agent continue work in the Chrome tab I already have open? | Fill forms, draft or post comments and replies, update signed-in web apps, or inspect an existing tab without launching a separate browser profile. |
 | [`melech-smart-comments`](#melech-smart-comments) | Which intent and landmines must survive in the code? | An agent is writing, editing, refactoring, or reviewing commented code. |
@@ -149,7 +149,7 @@ Start from the outcome you need. Skills are individual capabilities; the
 | "Hand this session to another agent / find that transcript." | [`melech-handoff`](#melech-handoff) | Lists recent transcripts newest-first, then continues by ID or intent. |
 | "How much did this repo / worktree / task cost me in agent usage?" | [`melech-cost`](#melech-cost) | Prices every session of every worktree of the current repo from local history and prints handoff-style cards with dollars and tokens. |
 | "Is this bug fix worth the complexity it's adding? Are we overengineering this?" | [`melech-roi`](#melech-roi) | A PR, diff, or idea might be rerouting the house to fix a dripping tap — check whether the blast radius matches the benefit before or after implementing. |
-| "I just finished coding with AI — tidy and minimize this diff before PR." | [`melech-tidy`](#melech-tidy) | Adaptive diff reduction across 4 MECE lanes: purges dead AI residue, anchors live code to narrow leaf seams, shakes prompt bloat, and restores cosmetic-only churn. |
+| "I just finished coding with AI — tidy and minimize this diff before PR." | [`melech-tidy`](#melech-tidy) | Adaptive diff reduction across 4 MECE lanes: purges dead AI residue, shakes prompt bloat, restores cosmetic-only churn, and proposes edge-case trades that drop rare-case handling for a smaller diff. |
 | "Learn how I review PRs and make me a reviewer Clone." | [`melech-cr-clone-trainer`](#melech-cr-clone-trainer) | Builds or resyncs one private user-global Clone, named by you, with repo-specific memory. |
 | "Here is the design—poke holes in it." | [`melech-challenge`](#melech-challenge) | A direction exists and needs pressure-testing. |
 | "Show me the PR before I approve it." | [`melech-plan-review`](#melech-plan-review) | The concept is locked; you want a file tree and a fake diff you can comment on like a GitHub review before you approve. |
@@ -198,7 +198,7 @@ useful implementation, then optionally sketch the PR before approval.
 ### Shipping
 
 ```text
-melech-roi (worth the blast radius?) → melech-tidy (audit residue, seam radius, prompt bloat & diff noise) → melech-smart-comments (during implementation) → melech-pr-gardener
+melech-roi (worth the blast radius?) → melech-tidy (audit residue, prompt bloat, diff noise & edge-case trades) → melech-smart-comments (during implementation) → melech-pr-gardener
 ```
 
 Use when the work is decided and the remaining job is reducing its blast radius,
@@ -288,7 +288,7 @@ Use it when:
 
 ### [`melech-tidy`](skills/melech-tidy)
 
-Adaptive diff reduction — audits and prunes dead code residue, minimizes architectural blast radius, shakes prompt bloat, and restores cosmetic-only diff noise before opening a PR.
+Adaptive diff reduction — audits and prunes dead code residue, shakes prompt bloat, restores cosmetic-only diff noise, and proposes edge-case trades before opening a PR.
 
 ```bash
 npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-tidy
@@ -297,14 +297,14 @@ npx skills add https://github.com/AdirD/agent-shell-hamelech --skill melech-tidy
 Use it when:
 - you've finished coding with an AI agent and want a clean, minimal diff before opening a PR
 - you suspect orphaned helper functions, dead types, or abandoned iterations are lingering in the diff (**Dead code**)
-- the PR works, but touches too many shared systems or files when a local leaf seam suffices (**Blast radius**)
 - you touched prompt, skill, or instruction files and want redundant rules and over-explanation shaken out (**Prompt bloat**)
 - formatter, wrapping, line-ending, mode, or generated-file churn obscures the real change and canonical equivalence can be proven (**Diff noise**)
+- the PR carries retries, special-case messages, defensive catches, or guards stricter than the repo's precedent for cases that almost never happen, and you'd give those cases up for a smaller diff (**Edge-case trade**)
 - you want an evidentiary audit where the agent diagnoses which lanes apply and requests approval before modifying code
 
-Unlike `melech-8020`, which negotiates or narrows scope before implementation, `melech-tidy` runs after implementation: it preserves 100% of the required outcome while purging residue, narrowing blast radius, tightening prompt instructions, and restoring cosmetic-only changes to their base representation.
+Unlike `melech-8020`, which negotiates or narrows scope before implementation, `melech-tidy` runs after implementation and only subtracts. Three lanes keep the required outcome 100% intact while purging residue, tightening prompt instructions, and restoring cosmetic-only changes to their base representation. The **Edge-case trade** lane is the one exception: each finding drops a rare case, states what is lost, and you decide item by item. Every lane only recommends; nothing changes before you approve.
 
-Each lane keeps its full handcrafted playbook as an on-demand reference, loaded only when that lane fires: [`references/lane-1-dead-code.md`](skills/melech-tidy/references/lane-1-dead-code.md), [`references/lane-2-seam-radius.md`](skills/melech-tidy/references/lane-2-seam-radius.md), [`references/lane-3-prompt-shake.md`](skills/melech-tidy/references/lane-3-prompt-shake.md), and [`references/lane-4-diff-noise.md`](skills/melech-tidy/references/lane-4-diff-noise.md).
+Each lane keeps its full handcrafted playbook as an on-demand reference, loaded only when that lane fires: [`references/lane-1-dead-code.md`](skills/melech-tidy/references/lane-1-dead-code.md), [`references/lane-2-prompt-shake.md`](skills/melech-tidy/references/lane-2-prompt-shake.md), [`references/lane-3-diff-noise.md`](skills/melech-tidy/references/lane-3-diff-noise.md), and [`references/lane-4-edge-case-trade.md`](skills/melech-tidy/references/lane-4-edge-case-trade.md).
 
 ---
 

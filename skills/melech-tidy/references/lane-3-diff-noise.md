@@ -1,12 +1,12 @@
-# Lane 4 — Cosmetic Diff Noise (deep playbook)
+# Lane 3 — Cosmetic Diff Noise (deep playbook)
 
 > The full playbook behind Tidy's **Diff noise** lane (internal anchor:
-> Lane 4). Tidy's [`SKILL.md`](../SKILL.md) owns scope resolution, the unified
+> Lane 3). Tidy's [`SKILL.md`](../SKILL.md) owns scope resolution, the unified
 > evidence table, approval, and verification. This file owns finding
 > decomposition, canonical-equivalence proofs, and fail-closed guardrails.
 >
 > User-facing short label in the evidence table / approval / summary:
-> **Diff noise** — never print "Lane 4".
+> **Diff noise** — never print "Lane 3".
 
 ## Goal
 
@@ -23,14 +23,14 @@ The lanes classify **recommended reductions**, not every changed line:
 
 - **Diff noise**: the canonical artifact is unchanged; restore representation.
 - **Dead code**: a semantic code construct exists but is unnecessary; delete it.
-- **Blast radius**: required semantic behavior exists but is implemented across
-  too much surface; re-anchor it.
 - **Prompt bloat**: semantic instruction content exists but is redundant or
   non-load-bearing; cut or collapse it.
+- **Edge-case trade**: live code exists only for a rare case; drop it and
+  state what is lost.
 
 A behavior-preserving refactor is still semantic: renames, helper extraction,
-condition rewrites, and reordered logic change the parsed structure and belong
-under **Blast radius** when they unnecessarily broaden the diff.
+condition rewrites, and reordered logic change the parsed structure and are
+never **Diff noise**.
 
 ## Core rule: proof or keep
 
@@ -56,7 +56,7 @@ changes, and one logical change can span several hunks.
 3. If cosmetic lines are inseparable from a semantic edit, the semantic lane
    owns the whole finding.
 4. Do not emit a second Diff noise row for whitespace that disappears when an
-   approved Dead code, Blast radius, or Prompt bloat action is applied.
+   approved Dead code, Prompt bloat, or Edge-case trade action is applied.
 
 Example:
 

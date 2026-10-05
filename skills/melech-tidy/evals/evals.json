@@ -30,16 +30,16 @@
       "id": 3,
       "name": "one-lane-per-finding",
       "prompt": "/melech-tidy evals/fixtures/four-lanes.diff",
-      "expected_output": "Routes each reducible finding to exactly one lane: the global middleware change is Blast radius, the unreferenced formatReportDate is Dead code, the added release-skill lines are Prompt bloat, and the users.ts reindent is Diff noise. Presents one evidence table with short labels and asks for approval before editing.",
+      "expected_output": "Routes each reducible finding to exactly one lane: the unreferenced formatReportDate is Dead code, the added release-skill lines are Prompt bloat, and the users.ts reindent is Diff noise. The global middleware change is not routed to any lane or rewritten. Presents one evidence table with short labels and asks for approval before editing.",
       "files": ["evals/fixtures/four-lanes.diff"],
       "expectations": [
-        "Classifies the src/middleware/auth.ts change as **Blast radius** and proposes moving the role check into the admin-reports route guards",
+        "Does not put the src/middleware/auth.ts change in any lane or propose moving or rewriting it",
         "Classifies formatReportDate as **Dead code**, citing the zero-references search",
         "Classifies the added skills/release/SKILL.md lines as **Prompt bloat**",
         "Classifies the src/routes/users.ts reindent and blank-line collapse as **Diff noise**",
         "Reports no file or line under two lanes",
         "Uses short lane labels and never prints lane numbers",
-        "Asks for approval with options that include all four lanes and a low-risk set containing Diff noise, and edits nothing before approval"
+        "Asks for approval with options that include every lane with findings, and edits nothing before approval"
       ]
     },
     {
@@ -66,6 +66,20 @@
         "Does not classify the 'Tests pass - Types check' line as Diff noise and notes the list structure changed from two items to one",
         "Recommends restoring the two-item checklist",
         "Keeps the heading rename"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "edge-case-trade-vs-duplicate",
+      "prompt": "/melech-tidy evals/fixtures/edge-case-trade.diff",
+      "expected_output": "Separates a behavior-preserving cut from a trade: replacing the hand-written URL checks with the existing assertPublicHttpsUrl is Dead code because it behaves the same, while dropping the conflict retry is an Edge-case trade that states what is lost — one of two near-simultaneous registrations fails and the user must connect again.",
+      "files": ["evals/fixtures/edge-case-trade.diff"],
+      "expectations": [
+        "Classifies `assertWebhookUrl` and `isPrivateAddress` as **Dead code**, citing the existing `assertPublicHttpsUrl` with the same checks, and recommends using it",
+        "Classifies the conflict retry, `RETRY_DELAY_MS`, and `delay` as **Edge-case trade**, not Dead code",
+        "Backs the trade with the frequency and recovery facts (conflict only on near-simultaneous registration; registering again succeeds) and the precedent that no other integration retries",
+        "States in the What we lose column that one of two near-simultaneous registrations fails and must be retried",
+        "Reports no finding under two lanes and edits nothing before approval"
       ]
     }
   ]
